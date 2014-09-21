@@ -1,12 +1,18 @@
 // ==UserScript==
-// @name        Tux3's cheap 8chan-X userscript
-// @version     1.1
+// @name        Tux3's cheap 8chan userscript
+// @version     1.2
 // @namespace   8chan-X
-// @description Userscript for productive 8chan browsing
+// @description Small userscript to improve 8chan
 // @match       *://8chan.co/*
 // @run-at      document-end
 // @grant       none
 // ==/UserScript==
+
+/*********
+GLOBAL
+*********/
+var originalPageTitle = document.title;
+var unreadPosts = 0;
 
 /**************************************
 MENU BAR
@@ -105,12 +111,30 @@ document.addEventListener('keydown', function(event) {
 /*******************************************
 AUTO UPDATES
 *******************************************/
-// Try to disable the official auto updater (bad hack but I can't see anything better)
+// Try to disable the official auto updater
 var highestTimeoutId = setTimeout("clearAllTimers");
 for (var i = 0 ; i < highestTimeoutId ; i++) {
     clearTimeout(i); 
 }
 $(window).off('scroll');
+
+// Handle auto-update events
+function onUpdatesFetched(newPosts) {
+  updateMenuStats();
+  if (!document.hasFocus())
+  {
+    unreadPosts += newPosts;
+    if (unreadPosts != 0)
+      document.title = "("+unreadPosts+") "+originalPageTitle;
+    else
+      document.title = originalPageTitle;
+  }
+}
+
+document.onfocus=function() {
+  unreadPosts = 0;
+  document.title = originalPageTitle;
+}
 
 // Then implement our own patched auto-updater
 auto_reload_enabled = true;
@@ -171,7 +195,7 @@ $(document) .ready(function () {
           }
         });
         time_loaded = Date.now();
-        updateMenuStats();
+        onUpdatesFetched(new_posts);
       }
     });
     clearTimeout(poll_interval);
