@@ -30,14 +30,8 @@ function getStyleName() {
   return style;
 }
 
-window.onload = function() {
-  // Customize the menu
+function updateMenuStyle() {
   var menu = document.getElementsByClassName("boardlist")[0];
-  menu.style.textAlign = 'center';
-  menu.style.position = 'fixed';
-  menu.style.top = '0px';
-  menu.style.left = '-8px';
-  
   var style = getStyleName();
   if (style == "Yotsuba")
     menu.style.backgroundColor = "#F5C5B5";
@@ -45,9 +39,19 @@ window.onload = function() {
     menu.style.backgroundColor = "#CDD2E6";
   else
     menu.style.backgroundColor = "#333";
+}
+
+window.onload = function() {
+  // Customize the menu
+  var menu = document.getElementsByClassName("boardlist")[0];
+  menu.style.textAlign = 'center';
+  menu.style.position = 'fixed';
+  menu.style.top = '0px';
+  menu.style.left = '-8px';
   menu.style.width = "100%";
   menu.style.marginTop = "0px";
   menu.style.padding = "3px";
+  updateMenuStyle();
   document.querySelector('[data-description="1"]').style.display = 'none';
   document.querySelector('[data-description="2"]').style.display = 'none';
   
@@ -57,6 +61,16 @@ window.onload = function() {
   var statsTextNode=document.createTextNode("["+nPosts+" / "+nImages+"]");
   statsNode.appendChild(statsTextNode);
   menu.appendChild(statsNode);
+  
+  // Hook style changes to update the menu's style
+  var styles = document.getElementsByClassName("styles")[0].childNodes;
+  for(i=0; i<styles.length; i++) {
+      styles[i].onclick = function () {
+        changeStyle(this.innerHTML.substring(1, this.innerHTML.length - 1), this);
+        updateMenuStyle();
+    };
+  }
+    
 }
 
 document.addEventListener('keydown', function(event) {
