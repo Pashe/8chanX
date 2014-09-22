@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Tux3's 8chan X
-// @version     1.8
+// @version     1.9
 // @namespace   8chan-X
 // @description Small userscript to improve 8chan
 // @match       *://8chan.co/*
@@ -481,9 +481,7 @@ document.addEventListener('keydown', function(event) {
   
   if (event.keyCode === event.DOM_VK_R) {
       document.location.reload(); 
-  }
-  
-  if (event.keyCode === event.DOM_VK_I) {
+  } else if (event.keyCode === event.DOM_VK_I) {
       showQR();
   }
 });
@@ -506,9 +504,10 @@ function addLoadEvent(func) {
   }
 }
 // When all is loaded
-addLoadEvent(initMenu); // Must wait until the right CSS is loaded to adapt to it
+//addLoadEvent(initMenu);
 // As soon as the DOM is ready
-$( document ).ready(function() {
+$(document).ready(function() {
+  initMenu();
   initUnreadPosts();
   initImageHover();
 });
