@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Tux3's 8chan X
-// @version     1.4
+// @version     1.5
 // @namespace   8chan-X
 // @description Small userscript to improve 8chan
 // @match       *://8chan.co/*
@@ -191,66 +191,72 @@ function initUnreadPosts() {
 /************
 IMAGE HOVER
 ************/
+var imghoverMMove = function(e) {
+  var picUrl = $(this).attr("src");
+  var picTimestamp = picUrl.substr(picUrl.indexOf("/thumb/")+7);
+  var picTimestamp = picTimestamp.substr(0, picTimestamp.indexOf("."));
+  var picId = "post-image-"+picTimestamp;
+  var hoverPic = $("#"+picId);
+  // Create the hovering image if needed, otherwise just update it's position
+  if (!hoverPic.length)
+  {
+    var newpic = $(this).clone();
+    newpic.attr("id",picId);
+    newpic.css('display', 'block').css('position', 'absolute').css('z-index', '100');
+    newpic.attr("src",picUrl.replace("/thumb/","/src/"));
+    newpic.css('left', e.pageX).css('top', top);
+    newpic.css('width', 'auto').css('height', 'auto');
+    newpic.css('pointer-events','none');
+    newpic.css('max-height',$(window).height());
+    newpic.css('max-width',$(window).width());
+    newpic.insertAfter($(this));
+  }
+  else
+  {
+    var scrollTop = $(window).scrollTop();
+    var epy = e.pageY;
+    var top = epy;
+    if (epy < scrollTop + 15) {
+      top = scrollTop;
+    } else if (epy > scrollTop + $(window).height() - hoverPic.height() - 15) {
+      top = scrollTop + $(window).height() - hoverPic.height() - 15;
+    }
+    hoverPic.css('left', e.pageX).css('top', top);
+  }
+};
+
+var imghoverMOut = function(e) {
+  // Delete the hovering image
+  var picUrl = $(this).attr("src");
+  var picTimestamp = picUrl.substr(picUrl.indexOf("/thumb/")+7);
+  var picTimestamp = picTimestamp.substr(0, picTimestamp.indexOf("."));
+  var picId = "post-image-"+picTimestamp;
+  var hoverPic = $("#"+picId);
+  if (hoverPic.length)
+    hoverPic.remove();
+};
+
 function initImageHover() {
   $('.post-image').each( function (index, data) {
     if ($(this).parent().data("expanded") != "true")
     {
-      $(this).mousemove(function(e) {
-        var picUrl = $(this).attr("src");
-        var picTimestamp = picUrl.substr(picUrl.indexOf("/thumb/")+7);
-        var picTimestamp = picTimestamp.substr(0, picTimestamp.indexOf("."));
-        var picId = "post-image-"+picTimestamp;
-        var hoverPic = $("#"+picId);
-        // Create the hovering image if needed, otherwise just update it's position
-        if (!hoverPic.length)
-        {
-          var newpic = $(this).clone();
-          newpic.attr("id",picId);
-          newpic.css('display', 'block').css('position', 'absolute').css('z-index', '100');
-          newpic.attr("src",picUrl.replace("/thumb/","/src/"));
-          newpic.css('left', e.pageX).css('top', top);
-          newpic.css('width', 'auto').css('height', 'auto');
-          newpic.css('pointer-events','none');
-          newpic.css('max-height',$(window).height());
-          newpic.css('max-width',$(window).width());
-          newpic.insertAfter($(this));
-        }
-        else
-        {
-          var scrollTop = $(window).scrollTop();
-          var epy = e.pageY;
-          var top = epy;
-          if (epy < scrollTop + 15) {
-            top = scrollTop;
-          } else if (epy > scrollTop + $(window).height() - hoverPic.height() - 15) {
-            top = scrollTop + $(window).height() - hoverPic.height() - 15;
-          }
-          hoverPic.css('left', e.pageX).css('top', top);
-        }
-      });
-      $(this).mouseout(function() {
-        // Delete the hovering image
-        var picUrl = $(this).attr("src");
-        var picTimestamp = picUrl.substr(picUrl.indexOf("/thumb/")+7);
-        var picTimestamp = picTimestamp.substr(0, picTimestamp.indexOf("."));
-        var picId = "post-image-"+picTimestamp;
-        var hoverPic = $("#"+picId);
-        if (hoverPic.length)
-          hoverPic.remove();
-      });
-      $(this).click(function() {
-        // Delete the hovering image
-        var picUrl = $(this).attr("src");
-        var picTimestamp = picUrl.substr(picUrl.indexOf("/thumb/")+7);
-        var picTimestamp = picTimestamp.substr(0, picTimestamp.indexOf("."));
-        var picId = "post-image-"+picTimestamp;
-        var hoverPic = $("#"+picId);
-        if (hoverPic.length)
-          hoverPic.remove();
-      });
+      $(this).mousemove(imghoverMMove);
+      $(this).mouseout(imghoverMOut);
+      $(this).click(imghoverMOut);
     }
   });
 }
+
+$(document).on('new_post', function (e, post) {
+  $('#'+$(post).attr('id')+' .post-image').each( function (index, data) {
+    if ($(this).parent().data("expanded") != "true")
+    {
+      $(this).mousemove(imghoverMMove);
+      $(this).mouseout(imghoverMOut);
+      $(this).click(imghoverMOut);
+    }
+  });
+});
 
 /*********
 INIT
