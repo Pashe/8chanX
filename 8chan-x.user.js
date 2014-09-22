@@ -16,6 +16,17 @@ GLOBALS
 var originalPageTitle = document.title;
 var unreadPosts = [];
 
+/**************
+GENERAL / MISC
+**************/
+function strEndsWith(str, s) {
+  return str.length >= s.length && str.substr(str.length - s.length) == s;
+}
+  
+function isOnCatalog() {
+  return strEndsWith(window.location.pathname, "/catalog.html");
+}
+
 /**************************************
 MENU BAR
 **************************************/
@@ -69,26 +80,35 @@ function initMenu() {
   menu.style.width = "100%";
   menu.style.marginTop = "0px";
   menu.style.padding = "3px";
+  menu.style.zIndex='50';
   updateMenuStyle();
   document.querySelector('[data-description="1"]').style.display = 'none';
   document.querySelector('[data-description="2"]').style.display = 'none';
   
-  var nPosts = document.getElementsByClassName("post reply").length+1;
-  var nImages = document.getElementsByClassName("post-image").length;
-  var statsNode=document.createElement("SPAN");
-  var statsTextNode=document.createTextNode("["+nPosts+" / "+nImages+"]");
-  statsNode.appendChild(statsTextNode);
-  statsNode.id = 'menuStats';
-  menu.appendChild(statsNode);
+  if (!isOnCatalog())
+  {
+    var nPosts = document.getElementsByClassName("post reply").length+1;
+    var nImages = document.getElementsByClassName("post-image").length;
+    var statsNode=document.createElement("SPAN");
+    var statsTextNode=document.createTextNode("["+nPosts+" / "+nImages+"]");
+    statsNode.appendChild(statsTextNode);
+    statsNode.id = 'menuStats';
+    menu.appendChild(statsNode);
+  }
   
   // Hook style changes to update the menu's style
-  var styles = document.getElementsByClassName("styles")[0].childNodes;
-  for(i=0; i<styles.length; i++) {
-      styles[i].onclick = function () {
-        changeStyle(this.innerHTML.substring(1, this.innerHTML.length - 1), this);
-        updateMenuStyle();
-    };
+  if (!isOnCatalog())
+  {
+    var styles = document.getElementsByClassName("styles")[0].childNodes;
+    for(i=0; i<styles.length; i++) {
+        styles[i].onclick = function () {
+          changeStyle(this.innerHTML.substring(1, this.innerHTML.length - 1), this);
+          updateMenuStyle();
+      };
+    }
   }
+  else
+    menu.style.backgroundColor = "lightgrey";
     
 }
 
@@ -109,6 +129,14 @@ document.addEventListener('keydown', function(event) {
   }
 });
 
+/****************
+CUSTOM BACKLINKS
+****************/
+
+// Handler when a new post is fetched by the inline extension
+$(document).on('new_post', function (e, post) {
+  
+});
 
 /*******************************************
 UNREAD POSTS
