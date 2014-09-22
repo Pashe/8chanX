@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Tux3's cheap 8chan userscript
-// @version     1.2
+// @version     1.3
 // @namespace   8chan-X
 // @description Small userscript to improve 8chan
 // @match       *://8chan.co/*
@@ -9,10 +9,10 @@
 // ==/UserScript==
 
 /*********
-GLOBAL
+GLOBALS
 *********/
 var originalPageTitle = document.title;
-var unreadPosts = 0;
+var unreadPosts = [];
 
 /**************************************
 MENU BAR
@@ -57,7 +57,7 @@ function updateMenuStats() {
   stats.innerHTML = "["+nPosts+" / "+nImages+"]";
 }
 
-window.onload = function() {
+function initMenu() {
   // Customize the menu
   var menu = document.getElementsByClassName("boardlist")[0];
   menu.style.textAlign = 'center';
@@ -109,115 +109,74 @@ document.addEventListener('keydown', function(event) {
 
 
 /*******************************************
-AUTO UPDATES
+UNREAD POSTS
 *******************************************/
-// Try to disable the official auto updater
-var highestTimeoutId = setTimeout("clearAllTimers");
-for (var i = 0 ; i < highestTimeoutId ; i++) {
-    clearTimeout(i); 
-}
-$(window).off('scroll');
-
-// Handle auto-update events
-function onUpdatesFetched(newPosts) {
-  updateMenuStats();
-  if (!document.hasFocus())
+// Returns true if we've just read a new post, and remove it
+function checkFirstUnread() {
+  if (unreadPosts.length == 0)
+    return false;
+  
+  var postId = unreadPosts[0];
+  var post = $("#reply_"+postId);
+  if ($(window).scrollTop() + $(window).height() >= post.position().top + post.height())
   {
-    unreadPosts += newPosts;
-    if (unreadPosts != 0)
-      document.title = "("+unreadPosts+") "+originalPageTitle;
-    else
-      document.title = originalPageTitle;
+    unreadPosts.shift();
+    return true;
   }
+  else
+    return false;
+}
+function checkUnreadPosts() {  
+  while (checkFirstUnread());
+  
+  if (unreadPosts.length != 0)
+    document.title = "("+unreadPosts.length+") "+originalPageTitle;
+  else
+    document.title = originalPageTitle;
 }
 
-document.onfocus=function() {
-  unreadPosts = 0;
-  document.title = originalPageTitle;
+// Handler when a new post is fetched by the inline extension
+$(document).on('new_post', function (e, post) {
+  var postId = $(post).attr('id').replace(/^reply_/, '');
+  unreadPosts[unreadPosts.length] = postId;
+  //alert(unreadPosts);
+  updateMenuStats();
+  checkUnreadPosts();
+});
+
+// Prepare initial unread posts
+function initUnreadPosts() {
+  // First mark all posts as unread
+  $('.post.reply').each( function (index, data) {
+    var postId = $(this).attr('id').replace(/^reply_/, '');
+    unreadPosts[unreadPosts.length] = postId;
+  });
+  checkUnreadPosts();
+  
+  $(window).scroll(function() {
+   checkUnreadPosts();
+  });
 }
 
-// Then implement our own patched auto-updater
-auto_reload_enabled = true;
-$(document) .ready(function () {
-  if ($('div.banner') .length == 0)
-  return ;
-  if ($('.post.op') .size() != 1)
-  return ;
-  var poll_interval;
-  var settings = new script_settings('auto-reload');
-  var poll_interval_mindelay_bottom = settings.get('min_delay_bottom', 3000);
-  var poll_interval_mindelay_top = settings.get('min_delay_top', 10000);
-  var poll_interval_maxdelay = settings.get('max_delay', 600000);
-  var poll_interval_shortdelay = settings.get('quick_delay', 100);
-  var poll_interval_delay = poll_interval_mindelay_bottom;
-  var end_of_page = false;
-  var new_posts = 0;
-  var first_new_post = null;
-  if (typeof update_title == 'undefined') {
-    var update_title = function () {
-    };
+/*********
+INIT
+*********/
+function addLoadEvent(func) {
+  var oldonload = window.onload;
+  if (typeof window.onload != 'function') {
+    window.onload = func;
+  } else {
+    window.onload = function() {
+      if (oldonload) {
+        oldonload();
+      }
+      func();
+    }
   }
-  if (typeof add_title_collector != 'undefined')
-  add_title_collector(function () {
-    return new_posts;
-  });
-  var window_active = true;
-  $(window) .focus(function () {
-    window_active = true;
-    recheck_activated();
-    if (settings.get('reset_focus', true)) {
-      poll_interval_delay = end_of_page ? poll_interval_mindelay_bottom : poll_interval_mindelay_top;
-    }
-  });
-  $(window) .blur(function () {
-    window_active = false;
-  });
-  var recheck_activated = function () {
-    if (new_posts && window_active && $(window) .scrollTop() + $(window) .height() >= $(first_new_post) .position() .top) {
-      new_posts = 0;
-    }
-    update_title();
-  };
-  var poll = function () {
-    $.ajax({
-      url: document.location,
-      success: function (data) {
-        $(data) .find('div.post.reply') .each(function () {
-          var id = $(this) .attr('id');
-          if ($('#' + id) .length == 0) {
-            if (!new_posts) {
-              first_new_post = this;
-            }
-            $(this) .insertAfter($('div.post:last') .next()) .after('<br class="clear">');
-            new_posts++;
-            $(document) .trigger('new_post', this);
-            recheck_activated();
-          }
-        });
-        time_loaded = Date.now();
-        onUpdatesFetched(new_posts);
-      }
-    });
-    clearTimeout(poll_interval);
-    if (new_posts == 0) {
-      poll_interval_delay *= 2;
-      if (poll_interval_delay > poll_interval_maxdelay) {
-        poll_interval_delay = poll_interval_maxdelay;
-      }
-    } else {
-      poll_interval_delay = end_of_page ? poll_interval_mindelay_bottom : poll_interval_mindelay_top;
-    }
-    poll_interval = setTimeout(poll, poll_interval_delay);
-  };
-  $(window) .scroll(function () {
-    recheck_activated();
-    if ($(this) .scrollTop() + $(this) .height() < $('div.post:last') .position() .top + $('div.post:last') .height()) {
-      end_of_page = false;
-      return ;
-    }
-    clearTimeout(poll_interval);
-    poll_interval = setTimeout(poll, poll_interval_shortdelay);
-    end_of_page = true;
-  }) .trigger('scroll');
-  poll_interval = setTimeout(poll, poll_interval_delay);
+}
+// When all is loaded
+addLoadEvent(initMenu); // Must wait until the right CSS is loaded to adapt to it
+// As soon as the DOM is ready
+$( document ).ready(function() {
+  initUnreadPosts();
 });
