@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Tux3's 8chan X
-// @version     1.7
+// @version     1.8
 // @namespace   8chan-X
 // @description Small userscript to improve 8chan
 // @match       *://8chan.co/*
@@ -75,8 +75,12 @@ function updateMenuStyle() {
     menu.style.backgroundColor = "#F5C5B5";
   else if (style == "Yotsuba B")
     menu.style.backgroundColor = "#CDD2E6";
-  else
+  else if (style == "Dark")
     menu.style.backgroundColor = "#333";
+  else if (style == "Photon")
+    menu.style.backgroundColor = "#DDD";
+  else
+    menu.style.backgroundColor = "#CDD2E6";
 }
 
 function updateMenuStats() {
