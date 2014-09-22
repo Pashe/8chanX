@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Tux3's 8chan X
-// @version     1.6
+// @version     1.7
 // @namespace   8chan-X
 // @description Small userscript to improve 8chan
 // @match       *://8chan.co/*
@@ -33,6 +33,14 @@ function strEndsWith(str, s) {
   
 function isOnCatalog() {
   return strEndsWith(window.location.pathname, "/catalog.html");
+}
+
+function isOnBoardIndex() {
+  return strEndsWith(window.location.pathname, "/index.html");
+}
+
+function isOnThread() {
+  return !isOnCatalog() && !isOnBoardIndex();
 }
 
 /**************************************
@@ -93,7 +101,7 @@ function initMenu() {
   document.querySelector('[data-description="1"]').style.display = 'none';
   document.querySelector('[data-description="2"]').style.display = 'none';
   
-  if (!isOnCatalog())
+  if (isOnThread())
   {
     var nPosts = document.getElementsByClassName("post reply").length+1;
     var nImages = document.getElementsByClassName("post-image").length;
@@ -129,9 +137,9 @@ $(document).on('new_post', function (e, post) {
   
 });
 
-/*******************************************
+/***********************
 UNREAD POSTS
-*******************************************/
+***********************/
 // Returns true if we've just read a new post, and remove it
 function checkFirstUnread() {
   if (unreadPosts.length == 0)
@@ -150,10 +158,13 @@ function checkFirstUnread() {
 function checkUnreadPosts() {  
   while (checkFirstUnread());
   
-  if (unreadPosts.length != 0)
-    document.title = "("+unreadPosts.length+") "+originalPageTitle;
-  else
-    document.title = originalPageTitle;
+  if (isOnThread())
+  {
+    if (unreadPosts.length != 0)
+      document.title = "("+unreadPosts.length+") "+originalPageTitle;
+    else
+      document.title = originalPageTitle;
+  }
 }
 
 // Handler when a new post is fetched by the inline extension
