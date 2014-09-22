@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Tux3's 8chan X
-// @version     1.5
+// @version     1.6
 // @namespace   8chan-X
 // @description Small userscript to improve 8chan
 // @match       *://8chan.co/*
@@ -119,23 +119,6 @@ function initMenu() {
     menu.style.backgroundColor = "lightgrey";
     
 }
-
-
-/***************************************
-KEYBOARD EVENTS
-***************************************/
-document.addEventListener('keydown', function(event) {
-  var activeElem = document.activeElement;
-  
-  // Most events should be ignored if we're just trying to write text
-  if (activeElem.nodeName == "INPUT"
-     || activeElem.nodeName == "TEXTAREA")
-    return;
-  
-  if (event.keyCode === event.DOM_VK_R) {
-      document.location.reload(); 
-  }
-});
 
 /****************
 CUSTOM BACKLINKS
@@ -265,6 +248,231 @@ $(document).on('new_post', function (e, post) {
     }
   });
 });
+
+/*************
+QUICK REPLY
+*************/
+var settings = new script_settings('quick-reply');
+var doQRCSS = function () {
+    $('#quick-reply-css') .remove();
+    var dummy_reply = $('<div class="post reply"></div>') .appendTo($('body'));
+    var reply_background = dummy_reply.css('backgroundColor');
+    var reply_border_style = dummy_reply.css('borderStyle');
+    var reply_border_color = dummy_reply.css('borderColor');
+    var reply_border_width = dummy_reply.css('borderWidth');
+    dummy_reply.remove();
+    $('<style type="text/css" id="quick-reply-css">\t\t#quick-reply {\t\t\tposition: fixed;\t\t\tright: 5%;\t\t\ttop: 5%;\t\t\tfloat: right;\t\t\tdisplay: block;\t\t\tpadding: 0 0 0 0;\t\t\twidth: 300px;\t\t\tz-index: 100;\t\t}\t\t#quick-reply table {\t\t\tborder-collapse: collapse;\t\t\tbackground: '
+    + reply_background + ';\t\t\tborder-style: '
+    + reply_border_style + ';\t\t\tborder-width: '
+    + reply_border_width + ';\t\t\tborder-color: '
+    + reply_border_color + ';\t\t\tmargin: 0;\t\t\twidth: 100%;\t\t}\t\t#quick-reply tr td:nth-child(2) {\t\t\twhite-space: nowrap;\t\t\ttext-align: right;\t\t\tpadding-right: 4px;\t\t}\t\t#quick-reply tr td:nth-child(2) input[type="submit"] {\t\t\twidth: 100%;\t\t}\t\t#quick-reply th, #quick-reply td {\t\t\tmargin: 0;\t\t\tpadding: 0;\t\t}\t\t#quick-reply th {\t\t\ttext-align: center;\t\t\tpadding: 2px 0;\t\t\tborder: 1px solid #222;\t\t}\t\t#quick-reply th .handle {\t\t\tfloat: left;\t\t\twidth: 100%;\t\t\tdisplay: inline-block;\t\t}\t\t#quick-reply th .close-btn {\t\t\tfloat: right;\t\t\tpadding: 0 5px;\t\t}\t\t#quick-reply input[type="text"], #quick-reply select {\t\t\twidth: 100%;\t\t\tpadding: 2px;\t\t\tfont-size: 10pt;\t\t\tbox-sizing: border-box;\t\t\t-webkit-box-sizing:border-box;\t\t\t-moz-box-sizing: border-box;\t\t}\t\t#quick-reply textarea {\t\t\twidth: 100%;\t\t\tbox-sizing: border-box;\t\t\t-webkit-box-sizing:border-box;\t\t\t-moz-box-sizing: border-box;\t\t\tfont-size: 10pt;\t\t\tresize: vertical;\t\t}\t\t#quick-reply input, #quick-reply select, #quick-reply textarea {\t\t\tmargin: 0 0 1px 0;\t\t}\t\t#quick-reply input[type="file"] {\t\t\tpadding: 5px 2px;\t\t}\t\t#quick-reply .nonsense {\t\t\tdisplay: none;\t\t}\t\t#quick-reply td.submit {\t\t\twidth: 1%;\t\t}\t\t#quick-reply td.recaptcha {\t\t\ttext-align: center;\t\t\tpadding: 0 0 1px 0;\t\t}\t\t#quick-reply td.recaptcha span {\t\t\tdisplay: inline-block;\t\t\twidth: 100%;\t\t\tbackground: white;\t\t\tborder: 1px solid #ccc;\t\t\tcursor: pointer;\t\t}\t\t#quick-reply td.recaptcha-response {\t\t\tpadding: 0 0 1px 0;\t\t}\t\t@media screen and (max-width: 800px) {\t\t\t#quick-reply {\t\t\t\tdisplay: none !important;\t\t\t}\t\t}\t\t</style>'
+    ) .appendTo($('head'));
+  };
+var showQR = function () {
+  if ($('div.banner') .length == 0)
+    return ;
+  if ($('#quick-reply') .length != 0)
+    return ;
+  doQRCSS();
+  var $postForm = $('form[name="post"]') .clone();
+  $postForm.clone();
+  $dummyStuff = $('<div class="nonsense"></div>') .appendTo($postForm);
+  $postForm.find('table tr') .each(function () {
+    var $th = $(this) .children('th:first');
+    var $td = $(this) .children('td:first');
+    if ($th.length && $td.length) {
+      $td.attr('colspan', 2);
+      if ($td.find('input[type="text"]') .length) {
+        $td.find('input[type="text"]') .removeAttr('size') .attr('placeholder', $th.clone() .children() .remove() .end() .text());
+      }
+      $th.contents() .filter(function () {
+        return this.nodeType == 3;
+      }) .remove();
+      $th.contents() .appendTo($dummyStuff);
+      $th.remove();
+      if ($td.find('input[name="password"]') .length) {
+        $(this) .hide();
+      }
+      if ($td.find('input[type="submit"]') .length) {
+        $td.removeAttr('colspan');
+        $('<td class="submit"></td>') .append($td.find('input[type="submit"]')) .insertAfter($td);
+      }
+      if ($td.find('#recaptcha_widget_div') .length) {
+        var $captchaimg = $td.find('#recaptcha_image img');
+        $captchaimg.removeAttr('id') .removeAttr('style') .addClass('recaptcha_image') .click(function () {
+          $('#recaptcha_reload') .click();
+        });
+        $('#recaptcha_response_field') .focus(function () {
+          if ($captchaimg.attr('src') != $('#recaptcha_image img') .attr('src')) {
+            $captchaimg.attr('src', $('#recaptcha_image img') .attr('src'));
+            $postForm.find('input[name="recaptcha_challenge_field"]') .val($('#recaptcha_challenge_field') .val());
+            $postForm.find('input[name="recaptcha_response_field"]') .val('') .focus();
+          }
+        });
+        $postForm.submit(function () {
+          setTimeout(function () {
+            $('#recaptcha_reload') .click();
+          }, 200);
+        });
+        var $newRow = $('<tr><td class="recaptcha-response" colspan="2"></td></tr>');
+        $newRow.children() .first() .append($td.find('input') .removeAttr('style'));
+        $newRow.find('#recaptcha_response_field') .removeAttr('id') .addClass('recaptcha_response_field') .attr('placeholder', $('#recaptcha_response_field') .attr('placeholder'));
+        $('#recaptcha_response_field') .addClass('recaptcha_response_field')
+        $td.replaceWith($('<td class="recaptcha" colspan="2"></td>') .append($('<span></span>') .append($captchaimg)));
+        $newRow.insertAfter(this);
+      }
+      if ($td.find('input[type="file"]') .length) {
+        if ($td.find('input[name="file_url"]') .length) {
+          $file_url = $td.find('input[name="file_url"]');
+          if (settings.get('show_remote', false)) {
+            var $newRow = $('<tr><td colspan="2"></td></tr>');
+            $file_url.clone() .attr('placeholder', _('Upload URL')) .appendTo($newRow.find('td'));
+            $newRow.insertBefore(this);
+          }
+          $file_url.parent() .remove();
+          $td.find('label') .remove();
+          $td.contents() .filter(function () {
+            return this.nodeType == 3;
+          }) .remove();
+          $td.find('input[name="file_url"]') .removeAttr('id');
+        }
+        if ($(this) .find('input[name="spoiler"]') .length) {
+          $td.removeAttr('colspan');
+        }
+      }
+      if (!settings.get('show_embed', false) && $td.find('input[name="embed"]') .length) {
+        $(this) .remove();
+      }
+      if ($(this) .is('#oekaki')) {
+        $(this) .remove();
+      }
+      if ($td.is('#upload_selection')) {
+        $(this) .remove();
+      }
+      if ($td.find('input[type="checkbox"]') .length) {
+        var tr = this;
+        $td.find('input[type="checkbox"]') .each(function () {
+          if ($(this) .attr('name') == 'spoiler') {
+            $td.find('label') .remove();
+            $(this) .attr('id', 'q-spoiler-image');
+            $postForm.find('input[type="file"]') .parent() .removeAttr('colspan') .after($('<td class="spoiler"></td>') .append(this, ' ', $('<label for="q-spoiler-image">') .text(_('Spoiler Image'))));
+          } else if ($(this) .attr('name') == 'no_country') {
+            $td.find('label,input[type="checkbox"]') .remove();
+          } else {
+            $(tr) .remove();
+          }
+        });
+      }
+      $td.find('small') .hide();
+    }
+  });
+  $postForm.find('textarea[name="body"]') .removeAttr('id') .removeAttr('cols') .attr('placeholder', _('Comment'));
+  $postForm.find('textarea:not([name="body"]),input[type="hidden"]') .removeAttr('id') .appendTo($dummyStuff);
+  $postForm.find('br') .remove();
+  $postForm.find('table') .prepend('<tr><th colspan="2">\t\t\t<span class="handle">\t\t\t\t<a class="close-btn" href="javascript:void(0)">X</a>\t\t\t\t'
+                                   + _('Quick Reply') + '\t\t\t</span>\t\t\t</th></tr>'
+                                  );
+  $postForm.attr('id', 'quick-reply');
+  $postForm.appendTo($('body')) .hide();
+  $origPostForm = $('form[name="post"]:first');
+  $origPostForm.find('textarea[name="body"]') .on('change input propertychange', function () {
+    $postForm.find('textarea[name="body"]') .val($(this) .val());
+  });
+  $postForm.find('textarea[name="body"]') .on('change input propertychange', function () {
+    $origPostForm.find('textarea[name="body"]') .val($(this) .val());
+  });
+  $postForm.find('textarea[name="body"]') .focus(function () {
+    $origPostForm.find('textarea[name="body"]') .removeAttr('id');
+    $(this) .attr('id', 'body');
+  });
+  $origPostForm.find('textarea[name="body"]') .focus(function () {
+    $postForm.find('textarea[name="body"]') .removeAttr('id');
+    $(this) .attr('id', 'body');
+  });
+  $origPostForm.find('input[type="text"],select') .on('change input propertychange', function () {
+    $postForm.find('[name="' + $(this) .attr('name') + '"]') .val($(this) .val());
+  });
+  $postForm.find('input[type="text"],select') .on('change input propertychange', function () {
+    $origPostForm.find('[name="' + $(this) .attr('name') + '"]') .val($(this) .val());
+  });
+  if (typeof $postForm.draggable != 'undefined') {
+    if (localStorage.quickReplyPosition) {
+      var offset = JSON.parse(localStorage.quickReplyPosition);
+      if (offset.top < 0)
+        offset.top = 0;
+      if (offset.right > $(window) .width() - $postForm.width())
+        offset.right = $(window) .width() - $postForm.width();
+      if (offset.top > $(window) .height() - $postForm.height())
+        offset.top = $(window) .height() - $postForm.height();
+      $postForm.css('right', offset.right) .css('top', offset.top);
+    }
+    $postForm.draggable({
+      handle: 'th .handle',
+      containment: 'window',
+      distance: 10,
+      scroll: false,
+      stop: function () {
+        var offset = {
+          top: $(this) .offset() .top - $(window) .scrollTop(),
+          right: $(window) .width() - $(this) .offset() .left - $(this) .width(),
+        };
+        localStorage.quickReplyPosition = JSON.stringify(offset);
+        $postForm.css('right', offset.right) .css('top', offset.top) .css('left', 'auto');
+      }
+    });
+    $postForm.find('th .handle') .css('cursor', 'move');
+  }
+  $postForm.find('th .close-btn') .click(function () {
+    $origPostForm.find('textarea[name="body"]') .attr('id', 'body');
+    $postForm.remove();
+    floating_link();
+  });
+  $postForm.show();
+  $postForm.width($postForm.find('table') .width());
+  $postForm.hide();
+  $(window) .trigger('quick-reply');
+  $(window) .ready(function () {
+    if (settings.get('hide_at_top', true)) {
+      $(window) .scroll(function () {
+        if ($(this) .width() <= 800)
+          return ;
+        if ($(this) .scrollTop() < $origPostForm.offset() .top + $origPostForm.height() - 100)
+          $postForm.fadeOut(100);
+        else
+          $postForm.fadeIn(100);
+      }) .scroll();
+    } else {
+      $postForm.show();
+    }
+    $(window) .on('stylesheet', function () {
+      doQRCSS();
+      if ($('link#stylesheet') .attr('href')) {
+        $('link#stylesheet') [0].onload = doQRCSS;
+      }
+    });
+  });
+};
+
+/***************************************
+KEYBOARD EVENTS
+***************************************/
+document.addEventListener('keydown', function(event) {
+  var activeElem = document.activeElement;
+  
+  // Most events should be ignored if we're just trying to write text
+  if (activeElem.nodeName == "INPUT"
+     || activeElem.nodeName == "TEXTAREA")
+    return;
+  
+  if (event.keyCode === event.DOM_VK_R) {
+      document.location.reload(); 
+  }
+  
+  if (event.keyCode === event.DOM_VK_I) {
+      showQR();
+  }
+});
+
 
 /*********
 INIT

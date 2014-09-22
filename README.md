@@ -5,7 +5,7 @@ This is a small 8chan userscript, it adds various features like :
  - A fixed menu bar with customizable board list (no forced default boards)
  - Post and image counts
  - Unread post count in tab title
- - Some key bindings ('r' to reload the page)
+ - Some key bindings ('r' to reload the page, 'i' to open quick reply, ...)
  - Image expansion on hover
  - Relative post dates (X minutes/hours/days ago)
 
