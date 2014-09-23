@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Tux3's 8chan X
-// @version     1.19
+// @version     1.20
 // @namespace   8chan-X
 // @description Small userscript to improve 8chan
 // @match       *://8chan.co/*
@@ -50,6 +50,7 @@ var tempSettings = {
 var defaultSettings = {
   'relativetime': true,
   'revealspoilers': false,
+  'revealimagespoilers': false,
   'imagehover': true,
   'catalogimagehover': true,
   'cataloglinks': false
@@ -65,6 +66,7 @@ settingsMenu.innerHTML = prefix
 + '<div style="' + style + '">'
 + '<label><input type="checkbox" name="relativetime">' + _('Use relative post times') + '</label><br>'
 + '<label><input type="checkbox" name="revealspoilers">' + _('Reveal text spoilers') + '</label><br>'
++ '<label><input type="checkbox" name="revealimagespoilers">' + _('Reveal image spoilers') + '</label><br>'
 + '<label><input type="checkbox" name="imagehover">' + _('Show full images on hover') + '</label><br>'
 + '<label><input type="checkbox" name="catalogimagehover">' + _('Show full images on hover on catalog') + '</label><br>'
 + '<label><input type="checkbox" name="cataloglinks">' + _('Link to the catalog in the menu') + '</label><br>'
@@ -227,23 +229,68 @@ function initMenu() {
     menu.style.backgroundColor = "lightgrey";    
 }
 
-/********************
-REVEAL SPOILER TEXT
-********************/
+/*********************
+REVEAL TEXT SPOILERS
+*********************/
 
 function initRevealSpoilers() {
   if (!setting('revealspoilers'))
     return;
   $('.spoiler').each(function() {
     $(this).css('color','white');
-  })
+  });
 }
 
 // Handler when a new post is fetched by the inline extension
 $(document).on('new_post', function (e, post) {
   if (!setting('revealspoilers'))
     return;
-  post.css('color','white');
+  $('#'+$(post).attr('id')+' .spoiler').each(function() {
+    $(this).css('color','white');
+  });
+  
+  
+});
+
+/*********************
+REVEAL IMAGE SPOILERS
+*********************/
+
+function initRevealImageSpoilers() {
+  if (!setting('revealimagespoilers'))
+    return;
+  $('.post-image').each(function() {
+    var pic;
+    if ($(this)[0].tagName == "IMG")
+      pic = $(this);
+    else if ($(this)[0].tagName == "CANVAS")
+      pic = $(this).next();
+    var picUrl = pic.attr("src");
+    if (picUrl.contains('spoiler.png'))
+    {
+      pic.attr("src", $(this).parent().attr("href"));
+      pic.addClass("8chanx-spoilered-image");
+    }
+  });
+}
+
+// Handler when a new post is fetched by the inline extension
+$(document).on('new_post', function (e, post) {
+  if (!setting('revealimagespoilers'))
+    return;
+  $('#'+$(post).attr('id')+' .post-image').each(function() {
+    var pic;
+    if ($(this)[0].tagName == "IMG")
+      pic = $(this);
+    else if ($(this)[0].tagName == "CANVAS")
+      pic = $(this).next();
+    var picUrl = pic.attr("src");
+    if (picUrl.contains('spoiler.png'))
+    {
+      pic.attr("src", $(this).parent().attr("href"));
+      pic.addClass("8chanx-spoilered-image");
+    }
+  })
 });
 
 /***********************
@@ -312,7 +359,11 @@ var imghoverMMove = function(e) {
     pic = $(this).next();
   var picUrl = pic.attr("src");
   if (picUrl.contains('spoiler.png'))
-    picUrl = $(this).parent().attr("href").replace("/src/","/thumb/");
+    picUrl = $(this).parent().attr("href");
+  pic.parent().removeData("expanded");
+  if (pic.parent().data("expanded"))
+    return;
+  picUrl = picUrl.replace("/src/","/thumb/");
   if (!picUrl.contains('/thumb/'))
     return;
   var picTimestamp = picUrl.substr(picUrl.indexOf("/thumb/")+7);
@@ -356,13 +407,25 @@ var imghoverMOut = function(e) {
     pic = $(this).next();
   var picUrl = pic.attr("src");
   if (picUrl.contains('spoiler.png'))
-    picUrl = $(this).parent().attr("href").replace("/src/","/thumb/");
+    picUrl = $(this).parent().attr("href");
+  picUrl = picUrl.replace("/src/","/thumb/");
   var picTimestamp = picUrl.substr(picUrl.indexOf("/thumb/")+7);
   var picTimestamp = picTimestamp.substr(0, picTimestamp.lastIndexOf("."));
   var picId = "post-image-"+picTimestamp;
   var hoverPic = $("#"+picId);
   if (hoverPic.length)
     hoverPic.remove();
+  if ($(this).hasClass('unanimated'))
+  {
+    $($(this).parent().children()).each( function (index, data) {
+    if ($(this).parent().data("expanded") != "true")
+    {
+      $(this).mousemove(imghoverMMove);
+      $(this).mouseout(imghoverMOut);
+      $(this).click(imghoverMOut);
+    }
+  });
+  }
 };
 
 function initImageHover() {
@@ -654,4 +717,5 @@ $(document).ready(function() {
   initUnreadPosts();
   initImageHover();
   initRevealSpoilers();
+  initRevealImageSpoilers();
 });
