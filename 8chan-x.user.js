@@ -578,7 +578,7 @@ document.addEventListener('keydown', function(event) {
   
   if (event.keyCode === event.DOM_VK_R) {
       document.location.reload(); 
-  } else if (event.keyCode === event.DOM_VK_I) {
+  } else if (event.keyCode === event.DOM_VK_Q) {
       showQR();
   }
 });
