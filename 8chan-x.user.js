@@ -311,6 +311,8 @@ var imghoverMMove = function(e) {
   else if ($(this)[0].tagName == "CANVAS")
     pic = $(this).next();
   var picUrl = pic.attr("src");
+  if (picUrl.contains('spoiler.png'))
+    picUrl = $(this).parent().attr("href").replace("/src/","/thumb/");
   if (!picUrl.contains('/thumb/'))
     return;
   var picTimestamp = picUrl.substr(picUrl.indexOf("/thumb/")+7);
@@ -353,6 +355,8 @@ var imghoverMOut = function(e) {
   else if ($(this)[0].tagName == "CANVAS")
     pic = $(this).next();
   var picUrl = pic.attr("src");
+  if (picUrl.contains('spoiler.png'))
+    picUrl = $(this).parent().attr("href").replace("/src/","/thumb/");
   var picTimestamp = picUrl.substr(picUrl.indexOf("/thumb/")+7);
   var picTimestamp = picTimestamp.substr(0, picTimestamp.lastIndexOf("."));
   var picId = "post-image-"+picTimestamp;
