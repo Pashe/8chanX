@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Tux3's 8chan X
-// @version     1.12
+// @version     1.13
 // @namespace   8chan-X
 // @description Small userscript to improve 8chan
 // @match       *://8chan.co/*
@@ -47,7 +47,8 @@ if (typeof _ == 'undefined') {
 var tempSettings = {
 };
 var defaultSettings = {
-  'relativetime': true
+  'relativetime': true,
+  'imagehover': true
   //'inlineposts': false
 };
 var settingsMenu = document.createElement('div');
@@ -59,6 +60,7 @@ if (window.Options) {
 settingsMenu.innerHTML = prefix
 + '<div style="' + style + '">'
 + '<label><input type="checkbox" name="relativetime">' + _('Use relative post times') + '</label><br>'
++ '<label><input type="checkbox" name="imagehover">' + _('Show full images on hover') + '</label><br>'
 //+ '<label><input type="checkbox" name="inlineposts">' + _('Inline quoted posts on click') + '</label><br>'
 + suffix;
 function setting(name) {
@@ -278,6 +280,8 @@ function initUnreadPosts() {
 IMAGE HOVER
 ************/
 var imghoverMMove = function(e) {
+  if (!setting('imagehover'))
+    return;
   var picUrl = $(this).attr("src");
   var picTimestamp = picUrl.substr(picUrl.indexOf("/thumb/")+7);
   var picTimestamp = picTimestamp.substr(0, picTimestamp.indexOf("."));
@@ -323,6 +327,8 @@ var imghoverMOut = function(e) {
 };
 
 function initImageHover() {
+  if (!setting('imagehover'))
+    return;
   $('.post-image').each( function (index, data) {
     if ($(this).parent().data("expanded") != "true")
     {
@@ -334,6 +340,8 @@ function initImageHover() {
 }
 
 $(document).on('new_post', function (e, post) {
+  if (!setting('imagehover'))
+    return;
   $('#'+$(post).attr('id')+' .post-image').each( function (index, data) {
     if ($(this).parent().data("expanded") != "true")
     {
