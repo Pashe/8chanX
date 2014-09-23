@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Tux3's 8chan X
-// @version     1.21
+// @version     1.22
 // @namespace   8chan-X
 // @description Small userscript to improve 8chan
 // @match       *://8chan.co/*
@@ -192,6 +192,7 @@ function initMenu() {
   menu.style.marginTop = "0px";
   menu.style.padding = "3px";
   menu.style.zIndex='50';
+  $("html").css("margin-top","15px");
   updateMenuStyle();
   document.querySelector('[data-description="1"]').style.display = 'none';
   document.querySelector('[data-description="2"]').style.display = 'none';
