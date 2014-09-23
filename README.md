@@ -8,5 +8,6 @@ This is a small 8chan userscript, it adds various features like :
  - Some key bindings ('r' to reload the page, 'i' to open quick reply, ...)
  - Image expansion on hover
  - Relative post dates (X minutes/hours/days ago)
+ - Integration with the official 8chan Options menu
 
 <h1><a href="https://github.com/tux3/8chan-X/raw/master/8chan-x.user.js">Install 8chan-X</a> (Firefox)</h1>
