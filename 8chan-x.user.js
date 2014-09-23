@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Tux3's 8chan X
-// @version     1.20
+// @version     1.21
 // @namespace   8chan-X
 // @description Small userscript to improve 8chan
 // @match       *://8chan.co/*
@@ -680,15 +680,24 @@ KEYBOARD EVENTS
 document.addEventListener('keydown', function(event) {
   var activeElem = document.activeElement;
   
+  if (event.keyCode === event.DOM_VK_ESCAPE) {
+    $origPostForm.find('textarea[name="body"]').attr('id', 'body');
+    $origPostForm.find('textarea[name="body"]').val('');
+    $('#quick-reply').remove();
+    
+  }
+  
   // Most events should be ignored if we're just trying to write text
   if (activeElem.nodeName == "INPUT"
      || activeElem.nodeName == "TEXTAREA")
     return;
   
   if (event.keyCode === event.DOM_VK_R) {
-      document.location.reload(); 
+    document.location.reload(); 
   } else if (event.keyCode === event.DOM_VK_Q) {
-      showQR();
+    showQR();
+    $("#quick-reply textarea").focus();
+    event.preventDefault();
   }
 });
 
