@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Tux3's 8chan X
-// @version     1.16
+// @version     1.17
 // @namespace   8chan-X
 // @description Small userscript to improve 8chan
 // @match       *://8chan.co/*
@@ -50,6 +50,7 @@ var tempSettings = {
 var defaultSettings = {
   'relativetime': true,
   'imagehover': true,
+  'catalogimagehover': true,
   'cataloglinks': false
   //'inlineposts': false
 };
@@ -63,6 +64,7 @@ settingsMenu.innerHTML = prefix
 + '<div style="' + style + '">'
 + '<label><input type="checkbox" name="relativetime">' + _('Use relative post times') + '</label><br>'
 + '<label><input type="checkbox" name="imagehover">' + _('Show full images on hover') + '</label><br>'
++ '<label><input type="checkbox" name="catalogimagehover">' + _('Show full images on hover on catalog') + '</label><br>'
 + '<label><input type="checkbox" name="cataloglinks">' + _('Link to the catalog in the menu') + '</label><br>'
 //+ '<label><input type="checkbox" name="inlineposts">' + _('Inline quoted posts on click') + '</label><br>'
 + suffix;
@@ -308,7 +310,7 @@ var imghoverMMove = function(e) {
   {
     var newpic = pic.clone();
     newpic.attr("id",picId);
-    newpic.css('display', 'block').css('position', 'absolute').css('z-index', '100');
+    newpic.css('display', 'block').css('position', 'absolute').css('z-index', '200');
     newpic.attr("src",picUrl.replace("/thumb/","/src/"));
     newpic.css('left', e.pageX).css('top', top);
     newpic.css('width', 'auto').css('height', 'auto');
@@ -350,15 +352,18 @@ var imghoverMOut = function(e) {
 function initImageHover() {
   if (!setting('imagehover'))
     return;
-  $('img.post-image').each( function (index, data) {
-    if ($(this).parent().data("expanded") != "true")
-    {
-      $(this).mousemove(imghoverMMove);
-      $(this).mouseout(imghoverMOut);
-      $(this).click(imghoverMOut);
-    }
-  });
-  $('canvas.post-image').each( function (index, data) {
+  
+  var selector = 'img.post-image, canvas.post-image';
+  
+  if (setting('catalogimagehover') && isOnCatalog())
+  {
+    selector += ', .thread-image';
+    $('.theme-catalog div.thread').each(function() {
+      $(this).css('position','inherit');
+    });
+  }
+  
+  $('img.post-image, canvas.post-image, .thread-image').each( function (index, data) {
     if ($(this).parent().data("expanded") != "true")
     {
       $(this).mousemove(imghoverMMove);
