@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Tux3's 8chan X
-// @version     1.15
+// @version     1.16
 // @namespace   8chan-X
 // @description Small userscript to improve 8chan
 // @match       *://8chan.co/*
@@ -291,15 +291,22 @@ IMAGE HOVER
 var imghoverMMove = function(e) {
   if (!setting('imagehover'))
     return;
-  var picUrl = $(this).attr("src");
+  var pic;
+  if ($(this)[0].tagName == "IMG")
+    pic = $(this);
+  else if ($(this)[0].tagName == "CANVAS")
+    pic = $(this).next();
+  var picUrl = pic.attr("src");
+  if (!picUrl.contains('/thumb/'))
+    return;
   var picTimestamp = picUrl.substr(picUrl.indexOf("/thumb/")+7);
-  var picTimestamp = picTimestamp.substr(0, picTimestamp.indexOf("."));
+  var picTimestamp = picTimestamp.substr(0, picTimestamp.lastIndexOf("."));
   var picId = "post-image-"+picTimestamp;
   var hoverPic = $("#"+picId);
   // Create the hovering image if needed, otherwise just update it's position
   if (!hoverPic.length)
   {
-    var newpic = $(this).clone();
+    var newpic = pic.clone();
     newpic.attr("id",picId);
     newpic.css('display', 'block').css('position', 'absolute').css('z-index', '100');
     newpic.attr("src",picUrl.replace("/thumb/","/src/"));
@@ -308,7 +315,7 @@ var imghoverMMove = function(e) {
     newpic.css('pointer-events','none');
     newpic.css('max-height',$(window).height());
     newpic.css('max-width',$(window).width());
-    newpic.insertAfter($(this));
+    newpic.insertAfter(pic);
   }
   else
   {
@@ -326,9 +333,14 @@ var imghoverMMove = function(e) {
 
 var imghoverMOut = function(e) {
   // Delete the hovering image
-  var picUrl = $(this).attr("src");
+  var pic;
+  if ($(this)[0].tagName == "IMG")
+    pic = $(this);
+  else if ($(this)[0].tagName == "CANVAS")
+    pic = $(this).next();
+  var picUrl = pic.attr("src");
   var picTimestamp = picUrl.substr(picUrl.indexOf("/thumb/")+7);
-  var picTimestamp = picTimestamp.substr(0, picTimestamp.indexOf("."));
+  var picTimestamp = picTimestamp.substr(0, picTimestamp.lastIndexOf("."));
   var picId = "post-image-"+picTimestamp;
   var hoverPic = $("#"+picId);
   if (hoverPic.length)
@@ -338,7 +350,15 @@ var imghoverMOut = function(e) {
 function initImageHover() {
   if (!setting('imagehover'))
     return;
-  $('.post-image').each( function (index, data) {
+  $('img.post-image').each( function (index, data) {
+    if ($(this).parent().data("expanded") != "true")
+    {
+      $(this).mousemove(imghoverMMove);
+      $(this).mouseout(imghoverMOut);
+      $(this).click(imghoverMOut);
+    }
+  });
+  $('canvas.post-image').each( function (index, data) {
     if ($(this).parent().data("expanded") != "true")
     {
       $(this).mousemove(imghoverMMove);
