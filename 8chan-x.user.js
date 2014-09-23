@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Tux3's 8chan X
-// @version     1.17
+// @version     1.18
 // @namespace   8chan-X
 // @description Small userscript to improve 8chan
 // @match       *://8chan.co/*
@@ -50,6 +50,7 @@ var tempSettings = {
 var defaultSettings = {
   'relativetime': true,
   'imagehover': true,
+  'revealspoilers': false,
   'catalogimagehover': true,
   'cataloglinks': false
   //'inlineposts': false
@@ -64,6 +65,7 @@ settingsMenu.innerHTML = prefix
 + '<div style="' + style + '">'
 + '<label><input type="checkbox" name="relativetime">' + _('Use relative post times') + '</label><br>'
 + '<label><input type="checkbox" name="imagehover">' + _('Show full images on hover') + '</label><br>'
++ '<label><input type="checkbox" name="revealspoilers">' + _('Reveal text spoilers') + '</label><br>'
 + '<label><input type="checkbox" name="catalogimagehover">' + _('Show full images on hover on catalog') + '</label><br>'
 + '<label><input type="checkbox" name="cataloglinks">' + _('Link to the catalog in the menu') + '</label><br>'
 //+ '<label><input type="checkbox" name="inlineposts">' + _('Inline quoted posts on click') + '</label><br>'
@@ -225,13 +227,23 @@ function initMenu() {
     menu.style.backgroundColor = "lightgrey";    
 }
 
-/****************
-CUSTOM BACKLINKS
-****************/
+/********************
+REVEAL SPOILER TEXT
+********************/
+
+function initRevealSpoilers() {
+  if (!setting('revealspoilers'))
+    return;
+  $('.spoiler').each(function() {
+    $(this).css('color','white');
+  })
+}
 
 // Handler when a new post is fetched by the inline extension
 $(document).on('new_post', function (e, post) {
-  
+  if (!setting('revealspoilers'))
+    return;
+  post.css('color','white');
 });
 
 /***********************
@@ -632,4 +644,5 @@ $(document).ready(function() {
   initMenu();
   initUnreadPosts();
   initImageHover();
+  initRevealSpoilers();
 });
