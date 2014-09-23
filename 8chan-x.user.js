@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Tux3's 8chan X
-// @version     1.13
+// @version     1.14
 // @namespace   8chan-X
 // @description Small userscript to improve 8chan
 // @match       *://8chan.co/*
@@ -48,7 +48,8 @@ var tempSettings = {
 };
 var defaultSettings = {
   'relativetime': true,
-  'imagehover': true
+  'imagehover': true,
+  'cataloglinks': false
   //'inlineposts': false
 };
 var settingsMenu = document.createElement('div');
@@ -61,6 +62,7 @@ settingsMenu.innerHTML = prefix
 + '<div style="' + style + '">'
 + '<label><input type="checkbox" name="relativetime">' + _('Use relative post times') + '</label><br>'
 + '<label><input type="checkbox" name="imagehover">' + _('Show full images on hover') + '</label><br>'
++ '<label><input type="checkbox" name="cataloglinks">' + _('Link to the catalog in the menu') + '</label><br>'
 //+ '<label><input type="checkbox" name="inlineposts">' + _('Inline quoted posts on click') + '</label><br>'
 + suffix;
 function setting(name) {
@@ -187,6 +189,13 @@ function initMenu() {
   updateMenuStyle();
   document.querySelector('[data-description="1"]').style.display = 'none';
   document.querySelector('[data-description="2"]').style.display = 'none';
+  
+  if (setting('cataloglinks'))
+  {
+    $('.favorite-boards a').each( function (index, data) {
+      $(this).attr("href", $(this).attr("href")+"/catalog.html");
+    });
+  }
   
   if (isOnThread())
   {
