@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Tux3's 8chan X
-// @version     1.27
+// @version     1.28
 // @namespace   8chan-X
 // @description Small userscript to improve 8chan
 // @match       *://8chan.co/*
@@ -194,7 +194,7 @@ function updateMenuStats() {
   var stats = document.getElementById("menuStats");
   var nPosts = document.getElementsByClassName("post reply").length+1;
   var nImages = document.getElementsByClassName("post-image").length;
-  stats.innerHTML = "["+nPosts+" / "+nImages+"]";
+  stats.innerHTML = " ["+nPosts+" / "+nImages+"]";
 }
 
 function initMenu() {
@@ -222,10 +222,22 @@ function initMenu() {
   
   if (isOnThread())
   {
+    $('#update_secs').remove();
+    $('#update_thread').html("[Update thread]");
+    var updateNode=document.createElement("SPAN");
+    var updateTextNode=document.createTextNode('0');
+    updateNode.appendChild(updateTextNode);
+    updateNode.id = 'update_secs';
+    menu.appendChild(updateNode);
+    $('#update_secs').attr("title","Update thread");
+    $('#update_secs').click(function() { 
+      $('#update_thread').click();
+    });
+    
     var nPosts = document.getElementsByClassName("post reply").length+1;
     var nImages = document.getElementsByClassName("post-image").length;
     var statsNode=document.createElement("SPAN");
-    var statsTextNode=document.createTextNode("["+nPosts+" / "+nImages+"]");
+    var statsTextNode=document.createTextNode(" ["+nPosts+" / "+nImages+"]");
     statsNode.appendChild(statsTextNode);
     statsNode.id = 'menuStats';
     menu.appendChild(statsNode);
