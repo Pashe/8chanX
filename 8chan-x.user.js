@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Tux3's 8chan X
-// @version     1.28
+// @version     1.29
 // @namespace   8chan-X
 // @description Small userscript to improve 8chan
 // @match       *://8chan.co/*
@@ -715,42 +715,37 @@ var showQR = function () {
 /***************************************
 KEYBOARD EVENTS
 ***************************************/
-$(document).keydown(function(event) {
+document.addEventListener('keydown', function(event) {
   var activeElem = document.activeElement;
-  
-  if (event.key == 'Esc') {
+  if (event.keyCode === event.DOM_VK_ESCAPE) {
     $origPostForm.find('textarea[name="body"]').attr('id', 'body');
     $origPostForm.find('textarea[name="body"]').val('');
-    $('#quick-reply').remove(); 
+    $('#quick-reply').remove();
   }
-  
   // Some shortcuts should only work inside the QR box, some only outside it
   if (activeElem.nodeName == "INPUT"
      || activeElem.nodeName == "TEXTAREA")
   {
-    if ((event.ctrlKey || event.metaKey) && event.key === 's') { 
+    if ((event.ctrlKey || event.metaKey) && event.keyCode === event.DOM_VK_S) {
       event.preventDefault();
       wrapQRSelectionWith('**');
     }
-    
     return;
   }
-  
-  if (event.key == 'r') {
-    document.location.reload(); 
-  } else if (event.key == 'q') {
+  if (event.keyCode === event.DOM_VK_R) {
+    document.location.reload();
+  } else if (event.keyCode === event.DOM_VK_Q) {
     showQR();
     $("#quick-reply textarea").focus();
     event.preventDefault();
-  } else if (event.key == 'e') {
+  } else if (event.keyCode === event.DOM_VK_E) {
     var shrink = $('#shrink-all-images a');
     if (shrink.length)
-      shrink.click();
+    shrink.click();
     else
-      $('#expand-all-images a').click();
+    $('#expand-all-images a').click();
   }
 });
-
 
 /*********
 INIT
