@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Tux3's 8chan X
-// @version     1.22
+// @version     1.23
 // @namespace   8chan-X
 // @description Small userscript to improve 8chan
 // @match       *://8chan.co/*
@@ -31,6 +31,18 @@ function isOnCatalog() {
 
 function isOnBoardIndex() {
   return strEndsWith(window.location.pathname, "/index.html");
+}
+
+function wrapQRSelectionWith(str) {
+  if ($(document.activeElement)[0].id != "body")
+    return;
+  var txtarea = document.getElementById("body");
+  var start = txtarea.selectionStart;
+  var finish = txtarea.selectionEnd;
+  var sel = txtarea.value.substring(start, finish);
+  sel = str + sel + str;
+  var fulltext = txtarea.value.substring(0, start) + sel + txtarea.value.substring(finish);
+  txtarea.value = fulltext;
 }
 
 function isOnThread() {
@@ -684,14 +696,20 @@ document.addEventListener('keydown', function(event) {
   if (event.keyCode === event.DOM_VK_ESCAPE) {
     $origPostForm.find('textarea[name="body"]').attr('id', 'body');
     $origPostForm.find('textarea[name="body"]').val('');
-    $('#quick-reply').remove();
-    
+    $('#quick-reply').remove(); 
   }
   
-  // Most events should be ignored if we're just trying to write text
+  // Some shortcuts should only work inside the QR box, some only outside it
   if (activeElem.nodeName == "INPUT"
      || activeElem.nodeName == "TEXTAREA")
+  {
+    if ((event.ctrlKey || event.metaKey) && event.keyCode === event.DOM_VK_S) { 
+      event.preventDefault();
+      wrapQRSelectionWith('**');
+    }
+    
     return;
+  }
   
   if (event.keyCode === event.DOM_VK_R) {
     document.location.reload(); 
