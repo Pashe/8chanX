@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Tux3's 8chan X
-// @version     1.25
+// @version     1.26
 // @namespace   8chan-X
 // @description Small userscript to improve 8chan
 // @match       *://8chan.co/*
@@ -694,10 +694,10 @@ var showQR = function () {
 /***************************************
 KEYBOARD EVENTS
 ***************************************/
-document.addEventListener('keydown', function(event) {
+$(document).keydown(function(event) {
   var activeElem = document.activeElement;
   
-  if (event.keyCode === event.DOM_VK_ESCAPE) {
+  if (event.key == 'Esc') {
     $origPostForm.find('textarea[name="body"]').attr('id', 'body');
     $origPostForm.find('textarea[name="body"]').val('');
     $('#quick-reply').remove(); 
@@ -707,7 +707,7 @@ document.addEventListener('keydown', function(event) {
   if (activeElem.nodeName == "INPUT"
      || activeElem.nodeName == "TEXTAREA")
   {
-    if ((event.ctrlKey || event.metaKey) && event.keyCode === event.DOM_VK_S) { 
+    if ((event.ctrlKey || event.metaKey) && event.key === 's') { 
       event.preventDefault();
       wrapQRSelectionWith('**');
     }
@@ -715,13 +715,13 @@ document.addEventListener('keydown', function(event) {
     return;
   }
   
-  if (event.keyCode === event.DOM_VK_R) {
+  if (event.key == 'r') {
     document.location.reload(); 
-  } else if (event.keyCode === event.DOM_VK_Q) {
+  } else if (event.key == 'q') {
     showQR();
     $("#quick-reply textarea").focus();
     event.preventDefault();
-  } else if (event.keyCode === event.DOM_VK_E) {
+  } else if (event.key == 'e') {
     var shrink = $('#shrink-all-images a');
     if (shrink.length)
       shrink.click();
