@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Tux3's 8chan X
-// @version     1.26
+// @version     1.27
 // @namespace   8chan-X
 // @description Small userscript to improve 8chan
 // @match       *://8chan.co/*
@@ -318,6 +318,9 @@ function checkFirstUnread() {
   if (unreadPosts.length == 0)
     return false;
   
+  if (!document.hasFocus())
+    return false;
+  
   var postId = unreadPosts[0];
   var post = $("#reply_"+postId);
   if ($(window).scrollTop() + $(window).height() >= post.position().top + post.height())
@@ -328,6 +331,7 @@ function checkFirstUnread() {
   else
     return false;
 }
+
 function checkUnreadPosts() {  
   while (checkFirstUnread());
   
@@ -339,6 +343,11 @@ function checkUnreadPosts() {
       document.title = originalPageTitle;
   }
 }
+
+$(window).focus(function(){
+  if (unreadPosts.length)
+    checkUnreadPosts();
+});
 
 // Handler when a new post is fetched by the inline extension
 $(document).on('new_post', function (e, post) {
