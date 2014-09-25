@@ -29,10 +29,6 @@ function isOnCatalog() {
   return strEndsWith(window.location.pathname, "/catalog.html");
 }
 
-function isOnBoardIndex() {
-  return strEndsWith(window.location.pathname, "/index.html");
-}
-
 function wrapQRSelectionWith(str) {
   if ($(document.activeElement)[0].id != "body")
     return;
@@ -46,7 +42,7 @@ function wrapQRSelectionWith(str) {
 }
 
 function isOnThread() {
-  if (isOnCatalog() || isOnBoardIndex())
+  if (isOnCatalog())
     return false;
   
   if (window.location.pathname.indexOf("/res/") >= 0)
