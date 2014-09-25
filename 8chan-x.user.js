@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Tux3's 8chan X
-// @version     1.33
+// @version     1.34
 // @namespace   8chan-X
 // @description Small userscript to improve 8chan
 // @match       *://8chan.co/*
@@ -154,7 +154,7 @@ $(document).on('new_post', function (e, post) {
 MENU BAR
 **************************************/
 function getStyleName() {
-  var matches = document.URL.match(/\/(\w+)\/($|res\/\d+\.html|index\.html|res\/\d+\+50\.html)/);
+  var matches = document.URL.match(/\/(\w+)\/($|res\/\d+\.html|index\.html|res\/\d+\+50\.html|\d+\.html|catalog\.html)/);
   var board_name;
   var style;
   if (matches) {
@@ -244,18 +244,13 @@ function initMenu() {
   }
   
   // Hook style changes to update the menu's style
-  if (!isOnCatalog())
-  {
-    var styles = document.getElementsByClassName("styles")[0].childNodes;
-    for(i=0; i<styles.length; i++) {
-        styles[i].onclick = function () {
-          changeStyle(this.innerHTML.substring(1, this.innerHTML.length - 1), this);
-          updateMenuStyle();
-      };
-    }
+  var styles = document.getElementsByClassName("styles")[0].childNodes;
+  for(i=0; i<styles.length; i++) {
+    styles[i].onclick = function () {
+      changeStyle(this.innerHTML.substring(1, this.innerHTML.length - 1), this);
+      updateMenuStyle();
+    };
   }
-  else
-    menu.style.backgroundColor = "lightgrey";    
 }
 
 /*********************
