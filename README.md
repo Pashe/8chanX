@@ -24,6 +24,7 @@ General :
  - e : Expend/shrink all images
  - q : Open the quick reply
  - Esc : Close the quick reply
+
 QR Formatting :
  - CTRL+S : Spoilers
  - CTRL+I : Italics
