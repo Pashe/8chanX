@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Tux3's 8chan X
-// @version     1.31
+// @version     1.32
 // @namespace   8chan-X
 // @description Small userscript to improve 8chan
 // @match       *://8chan.co/*
@@ -258,6 +258,28 @@ function initMenu() {
   }
   else
     menu.style.backgroundColor = "lightgrey";    
+}
+
+/*********************
+IMPROVED PAGE TITLES
+*********************/
+function initImprovedPageTitles() {
+  var path = document.location.pathname;
+  if (path.indexOf("catalog.html") != -1)
+      originalPageTitle = path.replace("catalog.html", " - Catalog");
+  else if (path.indexOf("/res/") > 1) // in case there's a /res/ board
+  {
+      try {
+          originalPageTitle = path.match(/\/(.*?)\//)[0] + " - " + (function(){
+              var op = document.getElementsByClassName("op")[0];
+              var subject = op ? op.getElementsByClassName("subject")[0] : null;
+              var body = op ? op.getElementsByClassName("body")[0] : null;
+              return subject ? subject.textContent : body ? body.textContent.length > 30 ? body.textContent.substr(0, 30) + "…" : body.textContent : "8chan";
+          })();
+      } catch (e) { }
+  }
+  
+  document.title = originalPageTitle;
 }
 
 /*********************
@@ -807,6 +829,7 @@ function addLoadEvent(func) {
 //addLoadEvent(initMenu);
 // As soon as the DOM is ready
 $(document).ready(function() {
+  initImprovedPageTitles();
   initMenu();
   initUnreadPosts();
   initImageHover();
