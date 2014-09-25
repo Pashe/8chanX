@@ -209,6 +209,9 @@ function initMenu() {
   document.querySelector('[data-description="1"]').style.display = 'none';
   document.querySelector('[data-description="2"]').style.display = 'none';
   
+  if (isOnCatalog())
+    add_favorites();
+
   if (setting('cataloglinks'))
   {
     $('.favorite-boards a').each( function (index, data) {
