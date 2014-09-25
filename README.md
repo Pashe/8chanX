@@ -21,9 +21,9 @@ Key bindings
 
 General :
  - r : Reloads the page
- - e : Expend/shrink all images
- - q : Open the quick reply
- - Esc : Close the quick reply
+ - e : Expands/shrinks all images
+ - q : Opens the quick reply
+ - Esc : Closes the quick reply
 
 QR Formatting :
  - CTRL+S : Spoilers
