@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Tux3's 8chan X
-// @version     1.34
+// @version     1.35
 // @namespace   8chan-X
 // @description Small userscript to improve 8chan
 // @match       *://8chan.co/*
@@ -781,6 +781,15 @@ window.addEventListener('keydown', function(event) {
     if ((event.ctrlKey || event.metaKey) && event.keyCode === KeyEvent.DOM_VK_S) {
       event.preventDefault();
       wrapQRSelectionWith('**');
+    } else if ((event.ctrlKey || event.metaKey) && event.keyCode === KeyEvent.DOM_VK_I) {
+      event.preventDefault();
+      wrapQRSelectionWith("''");
+    } else if ((event.ctrlKey || event.metaKey) && event.keyCode === KeyEvent.DOM_VK_B) {
+      event.preventDefault();
+      wrapQRSelectionWith("'''");
+    } else if ((event.ctrlKey || event.metaKey) && event.keyCode === KeyEvent.DOM_VK_R) {
+      event.preventDefault();
+      wrapQRSelectionWith('==');
     }
     return;
   }
