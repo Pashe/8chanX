@@ -253,19 +253,18 @@ function initMenu() {
 IMPROVED PAGE TITLES
 *********************/
 function initImprovedPageTitles() {
-  var path = document.location.pathname;
-  if (path.indexOf("catalog.html") != -1)
-      originalPageTitle = path.replace("catalog.html", " - Catalog");
-  else if (path.indexOf("/res/") > 1) // in case there's a /res/ board
+  if (isOnCatalog())
+    originalPageTitle = document.location.pathname.replace("catalog.html", " - Catalog");
+  else if (isOnThread())
   {
-      try {
-          originalPageTitle = path.match(/\/(.*?)\//)[0] + " - " + (function(){
-              var op = document.getElementsByClassName("op")[0];
-              var subject = op ? op.getElementsByClassName("subject")[0] : null;
-              var body = op ? op.getElementsByClassName("body")[0] : null;
-              return subject ? subject.textContent : body ? body.textContent.length > 70 ? body.textContent.substr(0, 70) + "…" : body.textContent : "8chan";
-          })();
-      } catch (e) { }
+    try {
+      originalPageTitle = path.match(/\/(.*?)\//)[0] + " - " + (function(){
+        var op = document.getElementsByClassName("op")[0];
+        var subject = op ? op.getElementsByClassName("subject")[0] : null;
+        var body = op ? op.getElementsByClassName("body")[0] : null;
+        return subject ? subject.textContent : body ? body.textContent.length > 70 ? body.textContent.substr(0, 70) + "…" : body.textContent : "8chan";
+      })();
+    } catch (e) { }
   }
   
   document.title = originalPageTitle;
