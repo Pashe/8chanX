@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Tux3's 8chan X
-// @version     1.32
+// @version     1.33
 // @namespace   8chan-X
 // @description Small userscript to improve 8chan
 // @match       *://8chan.co/*
@@ -29,6 +29,10 @@ function isOnCatalog() {
   return strEndsWith(window.location.pathname, "/catalog.html");
 }
 
+function isOnBoardIndex() {
+  return strEndsWith(window.location.pathname, "/index.html");
+}
+
 function wrapQRSelectionWith(str) {
   if ($(document.activeElement)[0].id != "body")
     return;
@@ -42,7 +46,7 @@ function wrapQRSelectionWith(str) {
 }
 
 function isOnThread() {
-  if (isOnCatalog())
+  if (isOnCatalog() || isOnBoardIndex())
     return false;
   
   if (window.location.pathname.indexOf("/res/") >= 0)
@@ -65,8 +69,7 @@ var defaultSettings = {
   'revealimagespoilers': false,
   'imagehover': true,
   'catalogimagehover': true,
-  'cataloglinks': false,
-  'keybindings': true
+  'cataloglinks': false
   //'inlineposts': false
 };
 var settingsMenu = document.createElement('div');
@@ -83,7 +86,6 @@ settingsMenu.innerHTML = prefix
 + '<label><input type="checkbox" name="imagehover">' + _('Show full images on hover') + '</label><br>'
 + '<label><input type="checkbox" name="catalogimagehover">' + _('Show full images on hover on catalog') + '</label><br>'
 + '<label><input type="checkbox" name="cataloglinks">' + _('Link to the catalog in the menu') + '</label><br>'
-+ '<label><input type="checkbox" name="keybindings">' + _('Enable key bindings') + '</label><br>'
 //+ '<label><input type="checkbox" name="inlineposts">' + _('Inline quoted posts on click') + '</label><br>'
 + suffix;
 function setting(name) {
@@ -257,28 +259,6 @@ function initMenu() {
 }
 
 /*********************
-IMPROVED PAGE TITLES
-*********************/
-function initImprovedPageTitles() {
-  var path = document.location.pathname;
-  if (path.indexOf("catalog.html") != -1)
-      originalPageTitle = path.replace("catalog.html", " - Catalog");
-  else if (path.indexOf("/res/") > 1) // in case there's a /res/ board
-  {
-      try {
-          originalPageTitle = path.match(/\/(.*?)\//)[0] + " - " + (function(){
-              var op = document.getElementsByClassName("op")[0];
-              var subject = op ? op.getElementsByClassName("subject")[0] : null;
-              var body = op ? op.getElementsByClassName("body")[0] : null;
-              return subject ? subject.textContent : body ? body.textContent.length > 30 ? body.textContent.substr(0, 30) + "…" : body.textContent : "8chan";
-          })();
-      } catch (e) { }
-  }
-  
-  document.title = originalPageTitle;
-}
-
-/*********************
 REVEAL TEXT SPOILERS
 *********************/
 
@@ -315,7 +295,7 @@ function initRevealImageSpoilers() {
     else if ($(this)[0].tagName == "CANVAS")
       pic = $(this).next();
     var picUrl = pic.attr("src");
-    if (picUrl.contains('spoiler.png'))
+    if (picUrl.indexOf('spoiler.png') >= 0)
     {
       pic.attr("src", $(this).parent().attr("href"));
       pic.addClass("8chanx-spoilered-image");
@@ -334,7 +314,7 @@ $(document).on('new_post', function (e, post) {
     else if ($(this)[0].tagName == "CANVAS")
       pic = $(this).next();
     var picUrl = pic.attr("src");
-    if (picUrl.contains('spoiler.png'))
+    if (picUrl.indexOf('spoiler.png') >= 0)
     {
       pic.attr("src", $(this).parent().attr("href"));
       pic.addClass("8chanx-spoilered-image");
@@ -416,13 +396,13 @@ var imghoverMMove = function(e) {
   else if ($(this)[0].tagName == "CANVAS")
     pic = $(this).next();
   var picUrl = pic.attr("src");
-  if (picUrl.contains('spoiler.png'))
+  if (picUrl.indexOf('spoiler.png') >= 0)
     picUrl = $(this).parent().attr("href");
   pic.parent().removeData("expanded");
   if (pic.parent().data("expanded"))
     return;
   picUrl = picUrl.replace("/src/","/thumb/");
-  if (!picUrl.contains('/thumb/'))
+  if (picUrl.indexOf('/thumb/') == -1)
     return;
   var picTimestamp = picUrl.substr(picUrl.indexOf("/thumb/")+7);
   var picTimestamp = picTimestamp.substr(0, picTimestamp.lastIndexOf("."));
@@ -464,7 +444,7 @@ var imghoverMOut = function(e) {
   else if ($(this)[0].tagName == "CANVAS")
     pic = $(this).next();
   var picUrl = pic.attr("src");
-  if (picUrl.contains('spoiler.png'))
+  if (picUrl.indexOf('spoiler.png') >= 0)
     picUrl = $(this).parent().attr("href");
   picUrl = picUrl.replace("/src/","/thumb/");
   var picTimestamp = picUrl.substr(picUrl.indexOf("/thumb/")+7);
@@ -769,9 +749,6 @@ if (typeof KeyEvent == "undefined") {
 }
 
 window.addEventListener('keydown', function(event) {
-  if (!setting('keybindings'))
-    return;
-  
   var activeElem = document.activeElement;
   if (event.keyCode === KeyEvent.DOM_VK_ESCAPE) {
     $origPostForm.find('textarea[name="body"]').attr('id', 'body');
@@ -825,7 +802,6 @@ function addLoadEvent(func) {
 //addLoadEvent(initMenu);
 // As soon as the DOM is ready
 $(document).ready(function() {
-  initImprovedPageTitles();
   initMenu();
   initUnreadPosts();
   initImageHover();
