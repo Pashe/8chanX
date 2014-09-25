@@ -26,11 +26,15 @@ function strEndsWith(str, s) {
 }
   
 function isOnCatalog() {
-  return strEndsWith(window.location.pathname, "/catalog.html");
+  return active_page === "catalog";
 }
 
 function isOnBoardIndex() {
-  return strEndsWith(window.location.pathname, "/index.html");
+  return active_page === "index";
+}
+
+function isOnThread() {
+  return active_page === "thread";
 }
 
 function wrapQRSelectionWith(str) {
@@ -43,14 +47,6 @@ function wrapQRSelectionWith(str) {
   sel = str + sel + str;
   var fulltext = txtarea.value.substring(0, start) + sel + txtarea.value.substring(finish);
   txtarea.value = fulltext;
-}
-
-function isOnThread() {
-  if (isOnCatalog() || isOnBoardIndex())
-    return false;
-  
-  if (window.location.pathname.indexOf("/res/") >= 0)
-    return true;
 }
 
 /**************
