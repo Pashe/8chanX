@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Tux3's 8chan X
-// @version     1.29
+// @version     1.30
 // @namespace   8chan-X
 // @description Small userscript to improve 8chan
 // @match       *://8chan.co/*
@@ -715,30 +715,65 @@ var showQR = function () {
 /***************************************
 KEYBOARD EVENTS
 ***************************************/
-document.addEventListener('keydown', function(event) {
+// Seems like only firefox has those handy defines
+if (typeof KeyEvent == "undefined") {
+    var KeyEvent = {
+        DOM_VK_ESCAPE: 27,
+        DOM_VK_A: 65,
+        DOM_VK_B: 66,
+        DOM_VK_C: 67,
+        DOM_VK_D: 68,
+        DOM_VK_E: 69,
+        DOM_VK_F: 70,
+        DOM_VK_G: 71,
+        DOM_VK_H: 72,
+        DOM_VK_I: 73,
+        DOM_VK_J: 74,
+        DOM_VK_K: 75,
+        DOM_VK_L: 76,
+        DOM_VK_M: 77,
+        DOM_VK_N: 78,
+        DOM_VK_O: 79,
+        DOM_VK_P: 80,
+        DOM_VK_Q: 81,
+        DOM_VK_R: 82,
+        DOM_VK_S: 83,
+        DOM_VK_T: 84,
+        DOM_VK_U: 85,
+        DOM_VK_V: 86,
+        DOM_VK_W: 87,
+        DOM_VK_X: 88,
+        DOM_VK_Y: 89,
+        DOM_VK_Z: 90
+    };
+}
+
+window.addEventListener('keydown', function(event) {
   var activeElem = document.activeElement;
-  if (event.keyCode === event.DOM_VK_ESCAPE) {
+  if (event.keyCode === KeyEvent.DOM_VK_ESCAPE) {
     $origPostForm.find('textarea[name="body"]').attr('id', 'body');
     $origPostForm.find('textarea[name="body"]').val('');
     $('#quick-reply').remove();
   }
+  
   // Some shortcuts should only work inside the QR box, some only outside it
   if (activeElem.nodeName == "INPUT"
      || activeElem.nodeName == "TEXTAREA")
   {
-    if ((event.ctrlKey || event.metaKey) && event.keyCode === event.DOM_VK_S) {
+    if ((event.ctrlKey || event.metaKey) && event.keyCode === KeyEvent.DOM_VK_S) {
       event.preventDefault();
       wrapQRSelectionWith('**');
     }
     return;
   }
-  if (event.keyCode === event.DOM_VK_R) {
+
+  if (event.keyCode === KeyEvent.DOM_VK_R) {
     document.location.reload();
-  } else if (event.keyCode === event.DOM_VK_Q) {
+  } else if (event.keyCode === KeyEvent.DOM_VK_Q) {
     showQR();
     $("#quick-reply textarea").focus();
     event.preventDefault();
-  } else if (event.keyCode === event.DOM_VK_E) {
+  } else if (event.keyCode === KeyEvent.DOM_VK_E) {
     var shrink = $('#shrink-all-images a');
     if (shrink.length)
     shrink.click();
