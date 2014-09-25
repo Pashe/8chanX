@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Tux3's 8chan X
-// @version     1.30
+// @version     1.31
 // @namespace   8chan-X
 // @description Small userscript to improve 8chan
 // @match       *://8chan.co/*
@@ -69,7 +69,8 @@ var defaultSettings = {
   'revealimagespoilers': false,
   'imagehover': true,
   'catalogimagehover': true,
-  'cataloglinks': false
+  'cataloglinks': false,
+  'keybindings': true
   //'inlineposts': false
 };
 var settingsMenu = document.createElement('div');
@@ -86,6 +87,7 @@ settingsMenu.innerHTML = prefix
 + '<label><input type="checkbox" name="imagehover">' + _('Show full images on hover') + '</label><br>'
 + '<label><input type="checkbox" name="catalogimagehover">' + _('Show full images on hover on catalog') + '</label><br>'
 + '<label><input type="checkbox" name="cataloglinks">' + _('Link to the catalog in the menu') + '</label><br>'
++ '<label><input type="checkbox" name="keybindings">' + _('Enable key bindings') + '</label><br>'
 //+ '<label><input type="checkbox" name="inlineposts">' + _('Inline quoted posts on click') + '</label><br>'
 + suffix;
 function setting(name) {
@@ -749,6 +751,9 @@ if (typeof KeyEvent == "undefined") {
 }
 
 window.addEventListener('keydown', function(event) {
+  if (!setting('keybindings'))
+    return;
+  
   var activeElem = document.activeElement;
   if (event.keyCode === KeyEvent.DOM_VK_ESCAPE) {
     $origPostForm.find('textarea[name="body"]').attr('id', 'body');
