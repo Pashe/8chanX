@@ -49,7 +49,7 @@ function isOnThread() {
   if (isOnCatalog() || isOnBoardIndex())
     return false;
   
-  if (window.location.pathname.contains("/res/"))
+  if (window.location.pathname.indexOf("/res/") >= 0)
     return true;
 }
 
