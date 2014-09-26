@@ -828,6 +828,7 @@ function addLoadEvent(func) {
 // As soon as the DOM is ready
 $(document).ready(function() {
   initMenu();
+  initImprovedPageTitles();
   initUnreadPosts();
   initImageHover();
   initRevealSpoilers();
