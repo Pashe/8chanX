@@ -1,14 +1,14 @@
 // ==UserScript==
-// @name        Tux3's 8chan X
+// @name        Pashe's 8chanX
 // @version     1.35
-// @namespace   8chan-X
+// @namespace   https://github.com/Pashe/
 // @description Small userscript to improve 8chan
 // @match       *://8chan.co/*
 // @run-at      document-end
 // @grant       none
 // @require     http://timeago.yarp.com/jquery.timeago.js
-// @updateURL   https://github.com/tux3/8chan-X/raw/master/8chan-x.meta.js
-// @downloadURL https://github.com/tux3/8chan-X/raw/master/8chan-x.user.js
+// @updateURL   https://github.com/Pashe/8chan-X/raw/master/8chan-x.meta.js
+// @downloadURL https://github.com/Pashe/8chan-X/raw/master/8chan-x.user.js
 // @icon        data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFQAAABACAYAAACELFBMAAAABGdBTUEAALGPC/xhBQAAAAZiS0dEAP8A/wD/oL2nkwAAAAlwSFlzAAAN1wAADdcBQiibeAAAAAd0SU1FB94JFxA0JlE/D9IAAAuoSURBVHja7Zx/dFTVtcc/+94JIUAFVHwVwfcy9wJLU7EVlbbaivYVpUurqy1Yf/aH1jgTQLC2a9VqTdHWZ3GhS8wE2qW2SFtKba1UXerrKryWIqX02V/+SLh3EiWE8qMIWiAxc+/uH3PSjmEmcyeZhIL5/jOZmXPPPed799n7u/c5ExjCEIYwhCEM4d8EcrRObFLDpFNCCf8bmAG4wIlA7J8TV9mhon9E+J0E8ow313txiNAemLp46sj9o/bfiHITMLHEy7cAS2OVse82Xdf05jua0GnLp1XsDfYuAL4EjOtndztF5VZvl/cI9YTvOEKrU9VTLKxHgbPK2a+iv60IKq5omtfUUsp11pFMpptyr7aw/r/cZGYtTaYHdrA5viz+sXcEofGG+E2KrgBGDNQ9FD1WQnnSaXC+cFQv+XgqfqMgqUEcfwaY7Sf9nx11hE56cNL00ArX50qgHgiAtUYmnVLGVfh3DXVaem66+ahZ8jUNNaNCK1xZgEwVlYeBSxD+A6gp8/xGiS0/dB9wK48aQjvouNuI9EOkTmiFF2ZimcXACpTTjBPcLMhc4EzJyGg/6YvaOgbhNIRbgN+V6FTPUFvnHRVLfsrSKeMzdiYN9LSQZht7VvPxza/Gd8c3C/JeYLuozPfqvMciKIWPK7oEcCIOZW9FWOG+MveVvx3RFpqxMwvzkLnBtu1zmpPNaXeX+zFD5sZAgzOikAngJb01QWdwJsrTEYcyJiOZeUf0kp+6eOpIoPZtS0vl+0FV8JHm2ubdxoF+FHhBMnJha13rX0vpv3Vh694xsTGXAb+OtPJFr0Hzr+5YWYPG6pphB3cdPF0scVAmKjrWwrKAN1R1V2iFf+y0Ov/SXtt+oJR+D4w4MAt4V/dbUbnNS3r3I2iOZhxh2dZsL+m90Zex/772913V36mebXfZLyl6bDHlFk/Fz0mTXl92QscvHz+iKlP1KYQrO3Z3fEhERnRPUxD0X2+w1KIqqHrLSTm/AtZ00bXyteRrrxe1CEtnooSCPJ6RzC2tydZW6g5Za8u8Ws/vz1xavtCyw2l0volyb1G9acn5wPqyBaX48vhoQhaIyjzguD52cxB4NGNn6l+tfXV7b0Je0bUtyZamgXYvE5ZMqKocXrkTGFWk6VN+0r+4LIS6je41Gupio/fKIpoFubujo+O+tpvbDh5un+2knNXA7CLN2v2kf1K/gtKEJROqnJTzPVVdUUYyAUYp+o3K4ZUvOw3O5YUc/qBB+G2EVuPyjTMyoZMbJ59UObxyI3DtAE7lPxFWOcuczZMenPThw0jptghtKtyl7rv6RKj7gHtMqOFTwNRBmY5yRmiFa52U873JjZNPGnQDDSUTpZ1VaQ0rndDV2Ng8pujpgzwvC7g2o5kmp9G5fcKSCVWDdWMVPTFKu7AzfLNkQt1d7u1GNB8mdyYjURZVDq98Jd4Qv2Iw/GtE4/mbN9/rLCnKu43u+1R1Ux/0apOi6y2sbSFhICo1wHllCWTK86EVLmhJtGwaIDbFaXS2kS3/9ToOv87/YEnCXlVTJZCpCKs00Pp8NcNpy6dV7Av2zVLRz6Nc0ue0V/iApdZGJ+WstMX+SnOieVs5+XQanUuLkpld25tKqja5De5MFX024jjeEJE5XsKL1N5pcFy1dKGofJZ+bGEouh/4VofdcW+p6Ww+zKifEdt6wtY/kK2lFvOzl6QT6Scj+1AVnR9xHG9aap0XlUwAv8730ol0HUI1sBR4q6/+VZCvVwVVW9yUW1ezumZYfwhtO6FtcRQygX3h8PAXkS3UfcAdpzHdBlREeFKfSifSP+nPRCanJsdDwjsVvYL+1WhbReUuAlbmCxi9xosGd6GKLon4JL/jJ/wbohPa6F6jqisidPyEn/AvK5f/qm6sPtsKrfsRPtDPrrYLsrRjWMfytuvb9hTT2BrTe4AbI/YdaKinFtpbyk9oyn1Y0c8V1WGEp7ckW/5U7igbT8U/LSL3UPpxmkOLL8LPJJTvVo6rXPfinBffygk+71H0YlG5mRJOmyj6UDqZvr6wjeUvDmwGphXp+yU/6dcwQBi/fPyI4cHwW4AvCzKyDF12Ac1mzicBo/vQx86KsOLUQtsfvQWlSRF857MMINpr2w+kk+lFMYlNAR6FfxWT+4gKE3BO7SOZoYhc2xuZeQmdUT8jBhxT1H2qtDAIaE40b/OT/rWhhO8HNhzGgskdUZTMIYRun7g9Us6sqrsHczYtiZZNfsI/V0QuV7RlkMlc5if9u6IWIN6eM25t2g/Fj/FZWGMPQ2KvXsJbbWWsU4AvA/sGvE6CLPITfrKUis7bUU8oyN7iDiWccLjWnjff6/ST/mLbtl0VTZE9e1Ru7EP4pJf07sjdDCyd0Kw0aI+QpczkMKO5tnl3OpGus9SaCjxVPuHGD22xa/yE/3ipF1sFAk6USs4Z8WXxSeWYgQmEBeWT0+h80Wl0HinUZkvdlpf9pH8xygXAs31UBJ2C/CAkfK+f8K/sa9HFKmB+z0fxaBLKonIQuvWErVflsxM35V5dFVRtQblXVfdEqBGs9ZP+RSFht4/9BbCzYF4CrwI/Qrmhc1jneC/pXdXfRCWvsDfniF4D7KJOW2RWKYWRQ7KyB91LQzu8Op1Iz+5RS1gFXJDjYmZ4Se//+nKPk1Mnj41ZseMllGMkFLXVfj3QoL3UfL/PhJps6Rngwgh9vB7YwQdba1tfKfXm8Yb4WSLynKKN6WT6VkNwTWiFPxekOqdp2j/en8wcgiJdjiB7/unNAQpUfVzyWYt4KGIfY+3A3uA0OBeVcmMn5VwmIv8LjLHE+jFA/MH4R9TSDT3IREXvjUAmwD3Anghp8+AT6u30fgK8EJVUhKedRucHToPj9tZwytIp1W7K/T7wU5MCrvIS3gvxxvhVYsnTh2Rpyo5wePgIRwh6rT1WL6v+qBVaz5UsO2AzyjPAVpGsplV0CnA+2V+2dT/I38SC2Jwuu+tWQeoK9FfrJ/1vR7z3UmAu8H6IdFhhcAk1S7OR6LXCyBJFRR8SJA0sQCmUJKzxk/6lJfR72AktugEXVAUL7YP2dOB9ZRPO0CYq1wO9bVn8VTLSs+54LnADcKYpx60HGoCX8szrFuC/gE3Ayjzp9CeBz5LdkNtnKlprgGqgHdgOTCF7aKwFuJnskcoNwI8LpeeRthuMjPkl8J5BetDtIeEFPU7bfRFYnGfMncDlwBM5FrrRWGk3fmoIxEjBFcCVee77GnAycDtwl3lg5wDPw9t2EVJAXUlBqUfuvEsyMgvwBpxKZYeEMrMHmTMNmXuATxurORZYaL5/BHh3TvvRxl9fCDQBnwC6z0rdZsj0zGfDyO4MPGrIzIcdhtjPAHvJnqZ2+kyoIbWtc1jndJN9DBQ2SkzOyfNT6y8Zy/w88CNgP/A6cL+xRBfIPQY+H1gHPAfcaT4725C3APi7IfvXxnW0GbLWFBjX1WaprwC+Zax8er8IBWi7vm2Pf7x/kYrWAwfKSGRG0Tsm7pz4oQKnkM8C3gB+nue7PxjLzUXumaPuQs9xZHcixhgi03l8+8oC4+vK+bvVvI7rN6EAzCFIJ9Jft8WebH5o9VY/iAwUXRnYwWnpZHrRuvp1mV7USFiGB9ftf4Ne8vuBEfZFS2eJ5m1enXddLIhVo9wJ/KWEy18S5H619JR0Mn1NhLT1BWNZl+T5bioRtmy6PZex3nN7+NxufGLAZVMxNM1rage+BnzNfcCdENrh2ZZYp6voiShjciyxBeHFikzFWnNNKbgPOA942ETXx40/vA74H+N+ouzAdgDLjE9+AvickVyjgK8WiPxHLerNklQjlbpy/r4yR9hrj4BxvvnsbvO+EnjSfKbGYrv7bTOvt5m26837XL18hfnspnyDtI8gQteZCR4LjDVi/GkTnbuVx4nGpz+VE6hGmgDyK+DPxn+uMuQdZ1yJZ6L3fcZ9rAVeNiJ/B/BYjn8dbQT+L8n+n5IhDGEIQxjCEP498Q9VMV2JdBPviQAAAABJRU5ErkJggg==
 // ==/UserScript==
 
@@ -153,6 +153,36 @@ $(document).on('new_post', function (e, post) {
 /**************************************
 MENU BAR
 **************************************/
+function getMenuStats() {
+	var nPosts = document.getElementsByClassName("post reply").length;
+	var nImages = document.getElementsByClassName("post-image").length;
+	
+	var threadId = window.location.pathname.match(/([0-9]+)\.html$/)[1];
+	var threadPage = -1; 
+	
+	var board_id = window.location.pathname.split("/")[1];
+	var threadsRq = $.getJSON("https://8chan.co/" + board_id + "/threads.json");
+	var threads = threadsRq.responseJSON;
+
+	for (var tIdx=0; tIdx<threads.length; tIdx++) {
+		posts = threads[tIdx]['threads'];
+		for (pIdx=0; pIdx<posts.length; pIdx++){
+			tno = posts[pIdx]['no'];
+			if (tno == threadId) {threadPage = threads[tIdx]['page']+1};
+		}
+	}
+    var imageLimit = 1000;
+    var bumpLimit = 250;
+    var hlStyle = "<span style='color:#f00;font-weight:bold;'>";
+    
+    if (nPosts >= bumpLimit) {nPosts = hlStyle + nPosts + "</span>";}
+    if (nImages >= bumpLimit) {nImages = hlStyle + nImages + "</span>";}
+    
+    return "[" + nPosts + " / " + nImages + " / " + threadPage + "]";
+
+}
+
+/*
 function getStyleName() {
   var matches = document.URL.match(/\/(\w+)\/($|res\/\d+\.html|index\.html|res\/\d+\+50\.html|\d+\.html|catalog\.html)/);
   var board_name;
@@ -174,27 +204,23 @@ function getStyleName() {
   }
   return style;
 }
+*/
 
 function updateMenuStyle() {
-  var menu = document.getElementsByClassName("boardlist")[0];
-  var style = getStyleName();
-  if (style == "Yotsuba")
-    menu.style.backgroundColor = "#F5C5B5";
-  else if (style == "Yotsuba B")
-    menu.style.backgroundColor = "#CDD2E6";
-  else if (style == "Dark")
-    menu.style.backgroundColor = "#333";
-  else if (style == "Photon")
-    menu.style.backgroundColor = "#DDD";
-  else
-    menu.style.backgroundColor = "#CDD2E6";
+	var menu = document.getElementsByClassName("boardlist")[0];
+	var rse = document.createElement("div");
+	rse.className = "post reply";
+	var rseBgColor = window.getComputedStyle(rse).backgroundColor;
+	var rseBorderColor = window.getComputedStyle(rse).borderBottomColor;
+	menu.style.backgroundColor = rseBgColor;
+	menu.style.borderBottom = "1pt solid " + rseBorderColor;
 }
 
 function updateMenuStats() {
   var stats = document.getElementById("menuStats");
-  var nPosts = document.getElementsByClassName("post reply").length+1;
+  var nPosts = document.getElementsByClassName("post reply").length;
   var nImages = document.getElementsByClassName("post-image").length;
-  stats.innerHTML = " ["+nPosts+" / "+nImages+"]";
+  stats.innerHTML = getMenuStats();
 }
 
 function initMenu() {
@@ -234,11 +260,8 @@ function initMenu() {
       $('#update_thread').click();
     });
     
-    var nPosts = document.getElementsByClassName("post reply").length+1;
-    var nImages = document.getElementsByClassName("post-image").length;
     var statsNode=document.createElement("SPAN");
-    var statsTextNode=document.createTextNode(" ["+nPosts+" / "+nImages+"]");
-    statsNode.appendChild(statsTextNode);
+    statsNode.innerHTML = getMenuStats();
     statsNode.id = 'menuStats';
     menu.appendChild(statsNode);
   }
@@ -829,6 +852,7 @@ function addLoadEvent(func) {
 //addLoadEvent(initMenu);
 // As soon as the DOM is ready
 $(document).ready(function() {
+	$.ajaxSetup({async: false});
   initMenu();
   initUnreadPosts();
   initImageHover();
