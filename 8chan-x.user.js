@@ -263,11 +263,11 @@ function initImprovedPageTitles() {
   else if (isOnThread())
   {
     try {
-      originalPageTitle = path.match(/\/(.*?)\//)[0] + " - " + (function(){
+      originalPageTitle = document.location.pathname.match(/\/(.*?)\//)[0] + " - " + (function(){
         var op = document.getElementsByClassName("op")[0];
         var subject = op ? op.getElementsByClassName("subject")[0] : null;
         var body = op ? op.getElementsByClassName("body")[0] : null;
-        return subject ? subject.textContent : body ? body.textContent.length > 70 ? body.textContent.substr(0, 70) + "…" : body.textContent : "8chan";
+        return subject ? subject.textContent : body ? body.textContent.length > 70 ? body.textContent.substr(0, 70) + "..." : body.textContent : "8chan";
       })();
     } catch (e) { }
   }
@@ -355,6 +355,28 @@ $(document).on('new_post', function (e, post) {
       pic.addClass("8chanx-spoilered-image");
     }
   })
+});
+
+/***********************
+UNANIMATE GIFS
+***********************/
+// Handler when a new post is fetched by the inline extension
+$(document).on('new_post', function (e, post) {
+  if (localStorage.no_animated_gif === 'false')
+    return;
+  $('#'+$(post).attr('id')+' .post-image').each(function() {
+    var pic;
+    var pic;
+    if ($(this)[0].tagName == "IMG")
+      pic = $(this);
+    else if ($(this)[0].tagName == "CANVAS")
+      pic = $(this).next();
+    var picUrl = pic.attr("src");
+    if (picUrl.match(".gif$"))
+    {
+      unanimate_gif(pic.get(0));
+    }
+  });
 });
 
 /***********************
