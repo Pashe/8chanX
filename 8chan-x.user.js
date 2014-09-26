@@ -65,7 +65,8 @@ var defaultSettings = {
   'revealimagespoilers': false,
   'imagehover': true,
   'catalogimagehover': true,
-  'cataloglinks': false
+  'cataloglinks': false,
+  'threadnewtab': false
   //'inlineposts': false
 };
 var settingsMenu = document.createElement('div');
@@ -82,6 +83,7 @@ settingsMenu.innerHTML = prefix
 + '<label><input type="checkbox" name="imagehover">' + _('Show full images on hover') + '</label><br>'
 + '<label><input type="checkbox" name="catalogimagehover">' + _('Show full images on hover on catalog') + '</label><br>'
 + '<label><input type="checkbox" name="cataloglinks">' + _('Link to the catalog in the menu') + '</label><br>'
++ '<label><input type="checkbox" name="threadnewtab">' + _('Open threads in a new tab') + '</label><br>'
 //+ '<label><input type="checkbox" name="inlineposts">' + _('Inline quoted posts on click') + '</label><br>'
 + suffix;
 function setting(name) {
@@ -273,6 +275,23 @@ function initImprovedPageTitles() {
   document.title = originalPageTitle;
 }
 
+/*********************
+CATALOG THREAD LINKS
+*********************/
+
+function initThreadLinks() {
+  if (!setting("threadnewtab"))
+    return;
+  if (isOnCatalog())
+  {
+    var threads = document.getElementsByClassName("thread");
+    for (i in threads)
+    {
+      if (typeof threads[i] === "object")
+        threads[i].getElementsByTagName("a")[0].target = "_blank";
+    }
+  }
+}
 
 /*********************
 REVEAL TEXT SPOILERS
@@ -829,6 +848,7 @@ function addLoadEvent(func) {
 $(document).ready(function() {
   initMenu();
   initImprovedPageTitles();
+  initThreadLinks();
   initUnreadPosts();
   initImageHover();
   initRevealSpoilers();
