@@ -26,11 +26,15 @@ function strEndsWith(str, s) {
 }
   
 function isOnCatalog() {
-  return strEndsWith(window.location.pathname, "/catalog.html");
+  return active_page === "catalog";
 }
 
 function isOnBoardIndex() {
-  return strEndsWith(window.location.pathname, "/index.html");
+  return active_page === "index";
+}
+
+function isOnThread() {
+  return active_page === "thread";
 }
 
 function wrapQRSelectionWith(str) {
@@ -43,14 +47,6 @@ function wrapQRSelectionWith(str) {
   sel = str + sel + str;
   var fulltext = txtarea.value.substring(0, start) + sel + txtarea.value.substring(finish);
   txtarea.value = fulltext;
-}
-
-function isOnThread() {
-  if (isOnCatalog() || isOnBoardIndex())
-    return false;
-  
-  if (window.location.pathname.indexOf("/res/") >= 0)
-    return true;
 }
 
 /**************
@@ -69,7 +65,8 @@ var defaultSettings = {
   'revealimagespoilers': false,
   'imagehover': true,
   'catalogimagehover': true,
-  'cataloglinks': false
+  'cataloglinks': false,
+  'threadnewtab': false
   //'inlineposts': false
 };
 var settingsMenu = document.createElement('div');
@@ -86,6 +83,7 @@ settingsMenu.innerHTML = prefix
 + '<label><input type="checkbox" name="imagehover">' + _('Show full images on hover') + '</label><br>'
 + '<label><input type="checkbox" name="catalogimagehover">' + _('Show full images on hover on catalog') + '</label><br>'
 + '<label><input type="checkbox" name="cataloglinks">' + _('Link to the catalog in the menu') + '</label><br>'
++ '<label><input type="checkbox" name="threadnewtab">' + _('Open threads in a new tab') + '</label><br>'
 //+ '<label><input type="checkbox" name="inlineposts">' + _('Inline quoted posts on click') + '</label><br>'
 + suffix;
 function setting(name) {
@@ -213,6 +211,9 @@ function initMenu() {
   document.querySelector('[data-description="1"]').style.display = 'none';
   document.querySelector('[data-description="2"]').style.display = 'none';
   
+  if (isOnCatalog())
+    add_favorites();
+
   if (setting('cataloglinks'))
   {
     $('.favorite-boards a').each( function (index, data) {
@@ -257,24 +258,40 @@ function initMenu() {
 IMPROVED PAGE TITLES
 *********************/
 function initImprovedPageTitles() {
-  var path = document.location.pathname;
-  if (path.indexOf("catalog.html") != -1)
-      originalPageTitle = path.replace("catalog.html", " - Catalog");
-  else if (path.indexOf("/res/") > 1) // in case there's a /res/ board
+  if (isOnCatalog())
+    originalPageTitle = document.location.pathname.replace("catalog.html", " - Catalog");
+  else if (isOnThread())
   {
-      try {
-          originalPageTitle = path.match(/\/(.*?)\//)[0] + " - " + (function(){
-              var op = document.getElementsByClassName("op")[0];
-              var subject = op ? op.getElementsByClassName("subject")[0] : null;
-              var body = op ? op.getElementsByClassName("body")[0] : null;
-              return subject ? subject.textContent : body ? body.textContent.length > 70 ? body.textContent.substr(0, 70) + "…" : body.textContent : "8chan";
-          })();
-      } catch (e) { }
+    try {
+      originalPageTitle = document.location.pathname.match(/\/(.*?)\//)[0] + " - " + (function(){
+        var op = document.getElementsByClassName("op")[0];
+        var subject = op ? op.getElementsByClassName("subject")[0] : null;
+        var body = op ? op.getElementsByClassName("body")[0] : null;
+        return subject ? subject.textContent : body ? body.textContent.length > 70 ? body.textContent.substr(0, 70) + "..." : body.textContent : "8chan";
+      })();
+    } catch (e) { }
   }
   
   document.title = originalPageTitle;
 }
 
+/*********************
+CATALOG THREAD LINKS
+*********************/
+
+function initThreadLinks() {
+  if (!setting("threadnewtab"))
+    return;
+  if (isOnCatalog())
+  {
+    var threads = document.getElementsByClassName("thread");
+    for (i in threads)
+    {
+      if (typeof threads[i] === "object")
+        threads[i].getElementsByTagName("a")[0].target = "_blank";
+    }
+  }
+}
 
 /*********************
 REVEAL TEXT SPOILERS
@@ -338,6 +355,28 @@ $(document).on('new_post', function (e, post) {
       pic.addClass("8chanx-spoilered-image");
     }
   })
+});
+
+/***********************
+UNANIMATE GIFS
+***********************/
+// Handler when a new post is fetched by the inline extension
+$(document).on('new_post', function (e, post) {
+  if (localStorage.no_animated_gif === 'false')
+    return;
+  $('#'+$(post).attr('id')+' .post-image').each(function() {
+    var pic;
+    var pic;
+    if ($(this)[0].tagName == "IMG")
+      pic = $(this);
+    else if ($(this)[0].tagName == "CANVAS")
+      pic = $(this).next();
+    var picUrl = pic.attr("src");
+    if (picUrl.match(".gif$"))
+    {
+      unanimate_gif(pic.get(0));
+    }
+  });
 });
 
 /***********************
@@ -830,6 +869,8 @@ function addLoadEvent(func) {
 // As soon as the DOM is ready
 $(document).ready(function() {
   initMenu();
+  initImprovedPageTitles();
+  initThreadLinks();
   initUnreadPosts();
   initImageHover();
   initRevealSpoilers();
