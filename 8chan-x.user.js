@@ -213,10 +213,10 @@ function initMenu() {
   menu.style.textAlign = 'center';
   menu.style.position = 'fixed';
   menu.style.top = '0px';
-  menu.style.left = '-8px';
+  menu.style.left = '-3px';
   menu.style.width = "100%";
   menu.style.marginTop = "0px";
-  menu.style.padding = "3px";
+  menu.style.padding = "1pt";
   menu.style.zIndex='50';
   $("html").css("margin-top","15px");
   updateMenuStyle();
@@ -238,6 +238,8 @@ function initMenu() {
     var updateTextNode=document.createTextNode('0');
     updateNode.appendChild(updateTextNode);
     updateNode.id = 'update_secs';
+		updateNode.style.fontFamily = "'Source Code Pro', monospace";
+		updateNode.style.paddingLeft = "1pt";
     menu.appendChild(updateNode);
     $('#update_secs').attr("title","Update thread");
     $('#update_secs').click(function() { 
@@ -247,6 +249,7 @@ function initMenu() {
     var statsNode=document.createElement("SPAN");
     statsNode.innerHTML = getMenuStats();
     statsNode.id = 'menuStats';
+		statsNode.style.paddingLeft = "3pt";
     menu.appendChild(statsNode);
   }
   
