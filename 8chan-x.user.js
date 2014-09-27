@@ -23,6 +23,7 @@ try {var thisThread = window.location.pathname.match(/([0-9]+)\.html$/)[1];} cat
 var bumpLimit = 250;
 //var imageLimit = 150; //I don't think we have an image limit
 var threads = null;
+var rse = null;
 
 /**************
 GENERAL / MISC
@@ -191,9 +192,8 @@ function getMenuStats() {
 }
 
 function updateMenuStyle() {
+	if (rse == null) {rse = document.createElement("div"); rse.className = "post reply";}
 	var menu = document.getElementsByClassName("boardlist")[0];
-	var rse = document.createElement("div");
-	rse.className = "post reply";
 	var rseBgColor = window.getComputedStyle(rse).backgroundColor;
 	var rseBorderColor = window.getComputedStyle(rse).borderBottomColor;
 	menu.style.backgroundColor = rseBgColor;
