@@ -28,5 +28,5 @@ General :
 QR Formatting :
  - CTRL+S : Spoilers
  - CTRL+I : Italics
- - CTRL+B : Spoilers
+ - CTRL+B : Bold
  - CTRL+R : Redtext
