@@ -38,6 +38,6 @@ Quickreply Formatting:
 Key(s)  | Function
 ------- | --------
 CTRL+S  | Spoilers
-CTRL+B  | Spoilers
+CTRL+B  | Bold
 CTRL+I  | Italics
 CTRL+R  | Redtext
