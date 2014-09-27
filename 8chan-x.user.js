@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Pashe's 8chanX
-// @version     1.35
+// @version     1.35.1
 // @namespace   https://github.com/Pashe/
 // @description Small userscript to improve 8chan
 // @match       *://8chan.co/*
@@ -17,6 +17,12 @@ GLOBALS
 *********/
 var originalPageTitle = document.title;
 var unreadPosts = [];
+var thisBoard = window.location.pathname.split("/")[1];
+console.log(thisBoard);
+try {var thisThread = window.location.pathname.match(/([0-9]+)\.html$/)[1];} catch (e) {var thisThread = -1};
+var bumpLimit = 250;
+//var imageLimit = 150; //I don't think we have an image limit
+var threads = null;
 
 /**************
 GENERAL / MISC
@@ -51,6 +57,23 @@ function isOnThread() {
   
   if (window.location.pathname.indexOf("/res/") >= 0)
     return true;
+}
+
+function getThreadPage(threadId, boardId, cached) {
+	if ((!cached) || (threads == null)) {
+		var threadsRq = $.getJSON("https://8chan.co/" + boardId + "/threads.json");
+		threads = threadsRq.responseJSON;
+	}
+	var threadPage = -1;
+
+	for (var tIdx=0; tIdx<threads.length; tIdx++) {
+		posts = threads[tIdx]['threads'];
+		for (pIdx=0; pIdx<posts.length; pIdx++){
+			tno = posts[pIdx]['no'];
+			if (tno == threadId) {threadPage = threads[tIdx]['page']+1};
+		}
+	}
+	return threadPage;
 }
 
 /**************
@@ -157,54 +180,15 @@ function getMenuStats() {
 	var nPosts = document.getElementsByClassName("post reply").length;
 	var nImages = document.getElementsByClassName("post-image").length;
 	
-	var threadId = window.location.pathname.match(/([0-9]+)\.html$/)[1];
-	var threadPage = -1; 
-	
-	var board_id = window.location.pathname.split("/")[1];
-	var threadsRq = $.getJSON("https://8chan.co/" + board_id + "/threads.json");
-	var threads = threadsRq.responseJSON;
-
-	for (var tIdx=0; tIdx<threads.length; tIdx++) {
-		posts = threads[tIdx]['threads'];
-		for (pIdx=0; pIdx<posts.length; pIdx++){
-			tno = posts[pIdx]['no'];
-			if (tno == threadId) {threadPage = threads[tIdx]['page']+1};
-		}
-	}
-    var imageLimit = 1000;
-    var bumpLimit = 250;
-    var hlStyle = "<span style='color:#f00;font-weight:bold;'>";
+  //var imageLimit = 1000; //I don't think we have an image limit
+  var hlStyle = "<span style='color:#f00;font-weight:bold;'>";
     
-    if (nPosts >= bumpLimit) {nPosts = hlStyle + nPosts + "</span>";}
-    if (nImages >= bumpLimit) {nImages = hlStyle + nImages + "</span>";}
+  if (nPosts >= bumpLimit) {nPosts = hlStyle + nPosts + "</span>";}
+  //if (nImages >= imageLimit) {nImages = hlStyle + nImages + "</span>";}
     
-    return "[" + nPosts + " / " + nImages + " / " + threadPage + "]";
+  return "[" + nPosts + " / " + nImages + " / " + getThreadPage(thisThread, thisBoard, false) + "]";
 
 }
-
-/*
-function getStyleName() {
-  var matches = document.URL.match(/\/(\w+)\/($|res\/\d+\.html|index\.html|res\/\d+\+50\.html|\d+\.html|catalog\.html)/);
-  var board_name;
-  var style;
-  if (matches) {
-    board_name = matches[1];
-  }
-  if (!localStorage.board_stylesheets) {
-    localStorage.board_stylesheets = '{}';
-  }
-  window.stylesheet_choices = JSON.parse(localStorage.board_stylesheets);
-  if (board_name && stylesheet_choices[board_name]) {
-    for (var styleName in styles) {
-      if (styleName == stylesheet_choices[board_name]) {
-        style = styleName;
-        break;
-      }
-    }
-  }
-  return style;
-}
-*/
 
 function updateMenuStyle() {
 	var menu = document.getElementsByClassName("boardlist")[0];
@@ -833,6 +817,40 @@ window.addEventListener('keydown', function(event) {
 });
 
 /*********
+CATALOG
+*********/
+function initCatalog() {
+	if (isOnCatalog()) {
+		addCatalogPages();
+		setCatalogTitle();
+		highlightCatalogAutosage();
+	}
+}
+
+function addCatalogPages() {
+	var threadElements = document.getElementsByClassName("thread");
+
+	for (i=0;i<threadElements.length;i++) {
+		var threadId = threadElements[i].innerHTML.match(/<a href="[^0-9]*([0-9]+).html?">/)[1];
+		
+		threadElements[i].children[1].children[0].children[0].innerHTML += " / P: " + getThreadPage(threadId, thisBoard, true);
+	}
+}
+
+function setCatalogTitle() {
+	document.title = "/" + thisBoard + "/ - " + "Catalog";
+}
+
+function highlightCatalogAutosage() {
+	replyElements = document.getElementsByClassName("replies");
+
+	for (i=0;i<replyElements.length;i++) {
+		eReplies = replyElements[i].innerHTML.match(/R: ([0-9]+)/)[1];
+		if (eReplies>bumpLimit) {replyElements[i].innerHTML = replyElements[i].innerHTML.replace(/R: ([0-9]+)/, "<span style='color:#f00;'>R: $1</span>")};
+	}
+}
+
+/*********
 INIT
 *********/
 function addLoadEvent(func) {
@@ -858,4 +876,5 @@ $(document).ready(function() {
   initImageHover();
   initRevealSpoilers();
   initRevealImageSpoilers();
+	initCatalog();
 });
