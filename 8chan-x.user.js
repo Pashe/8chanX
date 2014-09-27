@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Pashe's 8chanX
-// @version     1.35.1
+// @version     1.35.2
 // @namespace   https://github.com/Pashe/
 // @description Small userscript to improve 8chan
 // @match       *://8chan.co/*
@@ -9,7 +9,7 @@
 // @require     http://timeago.yarp.com/jquery.timeago.js
 // @updateURL   https://github.com/Pashe/8chan-X/raw/master/8chan-x.meta.js
 // @downloadURL https://github.com/Pashe/8chan-X/raw/master/8chan-x.user.js
-// @icon        data:image/png;base64,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
+// @icon        data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBzdGFuZGFsb25lPSJubyI/PjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB3aWR0aD0iMzJweCIgaGVpZ2h0PSIzMnB4Ij48ZyB0cmFuc2Zvcm09Im1hdHJpeCgxLjc2NTUxNDksLTEuNzY2NTg5OSwxLjc2NTUxNDksMS43NjY1ODk5LDcxLjI3MzI4NywyNC42MDgxOTgpIj48cGF0aCBkPSJtIC0xMy4yMTU4MiwtMTcuODQzNDg4IGMgLTAuODQzNzU1LDZlLTYgLTEuNTA3MzI5LDAuMjI1NTkyIC0xLjk5MDcyMywwLjY3Njc1OCAtMC40ODM0MDIsMC40NTExNzcgLTAuNzI1MTAxLDEuMDcyMjcgLTAuNzI1MDk4LDEuODYzMjgxIC0zZS02LDAuNzkxMDE5IDAuMjQxNjk2LDEuNDEyMTEyIDAuNzI1MDk4LDEuODYzMjgxIDAuNDgzMzk0LDAuNDUxMTc0IDEuMTQ2OTY4LDAuNjc2NzU5IDEuOTkwNzIzLDAuNjc2NzU4IDAuODQzNzQzLDFlLTYgMS41MDg3ODIsLTAuMjI3MDQ5IDEuOTk1MTE3LC0wLjY4MTE1MiAwLjQ4NjMyLC0wLjQ1NDA5OSAwLjcyOTQ4NCwtMS4wNzM3MjggMC43Mjk0OTIsLTEuODU4ODg3IC04ZS02LC0wLjc5MTAxMSAtMC4yNDE3MDcsLTEuNDEyMTA0IC0wLjcyNTA5OCwtMS44NjMyODEgLTAuNDgzNDA1LC0wLjQ1MTE2NiAtMS4xNDk5MDksLTAuNjc2NzUyIC0xLjk5OTUxMSwtMC42NzY3NTggeiBtIC0xLjc3NTM5MSwtMC43NTU4NTkgYyAtMC43NjE3MjIsLTAuMTg3NDkzIC0xLjM1NDk4MywtMC41NDE5ODUgLTEuNzc5Nzg1LC0xLjA2MzQ3NyAtMC40MjQ4MDcsLTAuNTIxNDc2IC0wLjYzNzIwOSwtMS4xNTcyMTcgLTAuNjM3MjA3LC0xLjkwNzIyNiAtMmUtNiwtMS4wNDg4MTggMC4zNzM1MzMsLTEuODc3OTE4IDEuMTIwNjA1LC0yLjQ4NzMwNSAwLjc0NzA2NywtMC42MDkzNjIgMS43NzA5OTIsLTAuOTE0MDQ5IDMuMDcxNzc4LC0wLjkxNDA2MyAxLjMwNjYzMywxLjRlLTUgMi4zMzIwMjMsMC4zMDQ3MDEgMy4wNzYxNzIsMC45MTQwNjMgMC43NDQxMzA2LDAuNjA5Mzg3IDEuMTE2MjAwNiwxLjQzODQ4NyAxLjExNjIxMDUsMi40ODczMDUgLTkuOWUtNiwwLjc1MDAwOSAtMC4yMTI0MTIsMS4zODU3NSAtMC42MzcyMDcsMS45MDcyMjYgLTAuNDI0ODEzNSwwLjUyMTQ5MiAtMS4wMTUxNDU1LDAuODc1OTg0IC0xLjc3MDk5NjUsMS4wNjM0NzcgMC44NTU0NjEsMC4xOTkyMjUgMS41MjE5NjQsMC41ODg4NzMgMS45OTk1MTIxLDEuMTY4OTQ1IDAuNDc3NTI5MSwwLjU4MDA4MyAwLjcxNjI5ODQsMS4yODkwNjcgMC43MTYzMDg2LDIuMTI2OTUzIC0xLjAyZS01LDEuMjcxNDg3IC0wLjM4ODE5MzQsMi4yNDcwNzIgLTEuMTY0NTUwOCwyLjkyNjc1OCAtMC43NzYzNzU5LDAuNjc5Njg3IC0xLjg4ODE5MDksMS4wMTk1MzEgLTMuMzM1NDQ4OSwxLjAxOTUzMSAtMS40NDcyNywwIC0yLjU1OTA4NiwtMC4zMzk4NDQgLTMuMzM1NDUsLTEuMDE5NTMxIC0wLjc3NjM2OCwtMC42Nzk2ODYgLTEuMTY0NTUyLC0xLjY1NTI3MSAtMS4xNjQ1NSwtMi45MjY3NTggLTJlLTYsLTAuODM3ODg2IDAuMjQwMjMzLC0xLjU0Njg3IDAuNzIwNzAzLC0yLjEyNjk1MyAwLjQ4MDQ2NiwtMC41ODAwNzIgMS4xNDg0MzQsLTAuOTY5NzIgMi4wMDM5MDYsLTEuMTY4OTQ1IHogbSAtMC42NTAzOTEsLTIuODAzNzExIGMgLTNlLTYsMC42Nzk2OTYgMC4yMTIzOTksMS4yMDk5NjkgMC42MzcyMDcsMS41OTA4MiAwLjQyNDgwMSwwLjM4MDg2NyAxLjAyMDk5MiwwLjU3MTI5NyAxLjc4ODU3NSwwLjU3MTI4OSAwLjc2MTcxMiw4ZS02IDEuMzU3OTAzLC0wLjE5MDQyMiAxLjc4ODU3NCwtMC41NzEyODkgMC40MzA2NTYsLTAuMzgwODUxIDAuNjQ1OTg4LC0wLjkxMTEyNCAwLjY0NTk5NiwtMS41OTA4MiAtOGUtNiwtMC42Nzk2NzcgLTAuMjE1MzQsLTEuMjA5OTUgLTAuNjQ1OTk2LC0xLjU5MDgyMSAtMC40MzA2NzEsLTAuMzgwODQ3IC0xLjAyNjg2MiwtMC41NzEyNzcgLTEuNzg4NTc0LC0wLjU3MTI4OSAtMC43Njc1ODMsMS4yZS01IC0xLjM2Mzc3NCwwLjE5MDQ0MiAtMS43ODg1NzUsMC41NzEyODkgLTAuNDI0ODA4LDAuMzgwODcxIC0wLjYzNzIxLDAuOTExMTQ0IC0wLjYzNzIwNywxLjU5MDgyMSB6IiBzdHlsZT0iZmlsbDojMjA1MDhjIiAvPjwvZz48L3N2Zz4=
 // ==/UserScript==
 
 /*********
@@ -33,11 +33,15 @@ function strEndsWith(str, s) {
 }
   
 function isOnCatalog() {
-  return strEndsWith(window.location.pathname, "/catalog.html");
+  return active_page === "catalog";
 }
 
 function isOnBoardIndex() {
-  return strEndsWith(window.location.pathname, "/index.html");
+  return active_page === "index";
+}
+
+function isOnThread() {
+  return active_page === "thread";
 }
 
 function wrapQRSelectionWith(str) {
@@ -50,14 +54,6 @@ function wrapQRSelectionWith(str) {
   sel = str + sel + str;
   var fulltext = txtarea.value.substring(0, start) + sel + txtarea.value.substring(finish);
   txtarea.value = fulltext;
-}
-
-function isOnThread() {
-  if (isOnCatalog() || isOnBoardIndex())
-    return false;
-  
-  if (window.location.pathname.indexOf("/res/") >= 0)
-    return true;
 }
 
 function getThreadPage(threadId, boardId, cached) {
@@ -93,7 +89,8 @@ var defaultSettings = {
   'revealimagespoilers': false,
   'imagehover': true,
   'catalogimagehover': true,
-  'cataloglinks': false
+  'cataloglinks': false,
+  'threadnewtab': false
   //'inlineposts': false
 };
 var settingsMenu = document.createElement('div');
@@ -110,6 +107,7 @@ settingsMenu.innerHTML = prefix
 + '<label><input type="checkbox" name="imagehover">' + _('Show full images on hover') + '</label><br>'
 + '<label><input type="checkbox" name="catalogimagehover">' + _('Show full images on hover on catalog') + '</label><br>'
 + '<label><input type="checkbox" name="cataloglinks">' + _('Link to the catalog in the menu') + '</label><br>'
++ '<label><input type="checkbox" name="threadnewtab">' + _('Open threads in a new tab') + '</label><br>'
 //+ '<label><input type="checkbox" name="inlineposts">' + _('Inline quoted posts on click') + '</label><br>'
 + suffix;
 function setting(name) {
@@ -222,6 +220,9 @@ function initMenu() {
   updateMenuStyle();
   document.querySelector('[data-description="1"]').style.display = 'none';
   document.querySelector('[data-description="2"]').style.display = 'none';
+	
+  if (isOnCatalog())
+    add_favorites();
   
   if (setting('cataloglinks'))
   {
@@ -267,24 +268,40 @@ function initMenu() {
 IMPROVED PAGE TITLES
 *********************/
 function initImprovedPageTitles() {
-  var path = document.location.pathname;
-  if (path.indexOf("catalog.html") != -1)
-      originalPageTitle = path.replace("catalog.html", " - Catalog");
-  else if (path.indexOf("/res/") > 1) // in case there's a /res/ board
+  if (isOnCatalog())
+    originalPageTitle = document.location.pathname.replace("catalog.html", " - Catalog");
+  else if (isOnThread())
   {
-      try {
-          originalPageTitle = path.match(/\/(.*?)\//)[0] + " - " + (function(){
-              var op = document.getElementsByClassName("op")[0];
-              var subject = op ? op.getElementsByClassName("subject")[0] : null;
-              var body = op ? op.getElementsByClassName("body")[0] : null;
-              return subject ? subject.textContent : body ? body.textContent.length > 70 ? body.textContent.substr(0, 70) + "…" : body.textContent : "8chan";
-          })();
-      } catch (e) { }
+    try {
+      originalPageTitle = document.location.pathname.match(/\/(.*?)\//)[0] + " - " + (function(){
+        var op = document.getElementsByClassName("op")[0];
+        var subject = op ? op.getElementsByClassName("subject")[0] : null;
+        var body = op ? op.getElementsByClassName("body")[0] : null;
+        return subject ? subject.textContent : body ? body.textContent.length > 70 ? body.textContent.substr(0, 70) + "..." : body.textContent : "8chan";
+      })();
+    } catch (e) { }
   }
   
   document.title = originalPageTitle;
 }
 
+/*********************
+CATALOG THREAD LINKS
+*********************/
+
+function initThreadLinks() {
+  if (!setting("threadnewtab"))
+    return;
+  if (isOnCatalog())
+  {
+    var threads = document.getElementsByClassName("thread");
+    for (i in threads)
+    {
+      if (typeof threads[i] === "object")
+        threads[i].getElementsByTagName("a")[0].target = "_blank";
+    }
+  }
+}
 
 /*********************
 REVEAL TEXT SPOILERS
@@ -348,6 +365,28 @@ $(document).on('new_post', function (e, post) {
       pic.addClass("8chanx-spoilered-image");
     }
   })
+});
+
+/***********************
+UNANIMATE GIFS
+***********************/
+// Handler when a new post is fetched by the inline extension
+$(document).on('new_post', function (e, post) {
+  if (localStorage.no_animated_gif === 'false')
+    return;
+  $('#'+$(post).attr('id')+' .post-image').each(function() {
+    var pic;
+    var pic;
+    if ($(this)[0].tagName == "IMG")
+      pic = $(this);
+    else if ($(this)[0].tagName == "CANVAS")
+      pic = $(this).next();
+    var picUrl = pic.attr("src");
+    if (picUrl.match(".gif$"))
+    {
+      unanimate_gif(pic.get(0));
+    }
+  });
 });
 
 /***********************
@@ -875,6 +914,8 @@ function addLoadEvent(func) {
 $(document).ready(function() {
 	$.ajaxSetup({async: false});
   initMenu();
+  initImprovedPageTitles();
+  initThreadLinks();
   initUnreadPosts();
   initImageHover();
   initRevealSpoilers();
