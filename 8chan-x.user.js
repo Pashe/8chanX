@@ -183,7 +183,7 @@ function getMenuStats() {
 	var threadPage = getThreadPage(thisThread, thisBoard, false);
 	if (threadPage < 0) {threadPage = "<span style='opacity: 0.5'>???</span>"}
     
-  return "[" + nPosts + " / " + nImages + " / " + threadPage + "]";
+  return "[ <abbr title='Posts' style='border:none'>" + nPosts + "</abbr> / <abbr title='Images' style='border:none'>" + nImages + "</abbr> / <abbr title='Page' style='border:none'>" + threadPage + "</abbr>]"; //I feel like there's a cleaner way to to the hover text
 
 }
 
