@@ -18,10 +18,8 @@ GLOBALS
 var originalPageTitle = document.title;
 var unreadPosts = [];
 var thisBoard = window.location.pathname.split("/")[1];
-console.log(thisBoard);
 try {var thisThread = window.location.pathname.match(/([0-9]+)\.html$/)[1];} catch (e) {var thisThread = -1};
 var bumpLimit = 250;
-//var imageLimit = 150; //I don't think we have an image limit
 var threads = null;
 var rse = null;
 
@@ -178,13 +176,10 @@ MENU BAR
 function getMenuStats() {
 	var nPosts = document.getElementsByClassName("post reply").length;
 	var nImages = document.getElementsByClassName("post-image").length;
-	
-  //var imageLimit = 1000; //I don't think we have an image limit
   var hlStyle = "<span style='color:#f00;font-weight:bold;'>";
     
   if (nPosts >= bumpLimit) {nPosts = hlStyle + nPosts + "</span>";}
-	console.log(nPosts);
-  //if (nImages >= imageLimit) {nImages = hlStyle + nImages + "</span>";}
+
 	var threadPage = getThreadPage(thisThread, thisBoard, false);
 	if (threadPage < 0) {threadPage = "<span style='opacity: 0.5'>???</span>"}
     
