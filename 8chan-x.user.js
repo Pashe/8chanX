@@ -183,9 +183,12 @@ function getMenuStats() {
   var hlStyle = "<span style='color:#f00;font-weight:bold;'>";
     
   if (nPosts >= bumpLimit) {nPosts = hlStyle + nPosts + "</span>";}
+	console.log(nPosts);
   //if (nImages >= imageLimit) {nImages = hlStyle + nImages + "</span>";}
+	var threadPage = getThreadPage(thisThread, thisBoard, false);
+	if (threadPage < 0) {threadPage = "<span style='opacity: 0.5'>???</span>"}
     
-  return "[" + nPosts + " / " + nImages + " / " + getThreadPage(thisThread, thisBoard, false) + "]";
+  return "[" + nPosts + " / " + nImages + " / " + threadPage + "]";
 
 }
 
@@ -874,8 +877,11 @@ function addCatalogPages() {
 
 	for (i=0;i<threadElements.length;i++) {
 		var threadId = threadElements[i].innerHTML.match(/<a href="[^0-9]*([0-9]+).html?">/)[1];
+		var threadPage = getThreadPage(threadId, thisBoard, true);
 		
-		threadElements[i].children[1].children[0].children[0].innerHTML += " / P: " + getThreadPage(threadId, thisBoard, true);
+		if (threadPage >= 0) {
+			threadElements[i].children[1].children[0].children[0].innerHTML += " / P: " + threadPage; //I know this is awful, but it works (for now)
+		}
 	}
 }
 
