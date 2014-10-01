@@ -183,7 +183,7 @@ function getMenuStats() {
 	var threadPage = getThreadPage(thisThread, thisBoard, false);
 	if (threadPage < 0) {threadPage = "<span style='opacity: 0.5'>???</span>"}
     
-  return "[ <abbr title='Posts' style='border:none'>" + nPosts + "</abbr> / <abbr title='Images' style='border:none'>" + nImages + "</abbr> / <abbr title='Page' style='border:none'>" + threadPage + "</abbr>]"; //I feel like there's a cleaner way to to the hover text
+  return "[<abbr title='Posts' style='border:none'>" + nPosts + "</abbr> / <abbr title='Images' style='border:none'>" + nImages + "</abbr> / <abbr title='Page' style='border:none'>" + threadPage + "</abbr>]"; //I feel like there's a cleaner way to to the hover text
 
 }
 
@@ -238,7 +238,7 @@ function initMenu() {
     updateNode.appendChild(updateTextNode);
     updateNode.id = 'update_secs';
 		updateNode.style.fontFamily = "'Source Code Pro', monospace";
-		updateNode.style.paddingLeft = "1pt";
+		updateNode.style.paddingLeft = "3pt";
     menu.appendChild(updateNode);
     $('#update_secs').attr("title","Update thread");
     $('#update_secs').click(function() { 
