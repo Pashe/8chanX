@@ -864,6 +864,7 @@ function initCatalog() {
 		addCatalogPages();
 		setCatalogTitle();
 		highlightCatalogAutosage();
+		setCatalogImageSize();
 	}
 }
 
@@ -891,6 +892,13 @@ function highlightCatalogAutosage() {
 		eReplies = replyElements[i].innerHTML.match(/R: ([0-9]+)/)[1];
 		if (eReplies>bumpLimit) {replyElements[i].innerHTML = replyElements[i].innerHTML.replace(/R: ([0-9]+)/, "<span style='color:#f00;'>R: $1</span>")};
 	}
+}
+
+function setCatalogImageSize() {
+	$(".grid-li").removeClass("grid-size-vsmall");
+	$(".grid-li").removeClass("grid-size-small");
+	$(".grid-li").removeClass("grid-size-large");
+	$(".grid-li").addClass("grid-size-large");
 }
 
 /*********
