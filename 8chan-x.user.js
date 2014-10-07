@@ -238,7 +238,7 @@ function initMenu() {
     updateNode.appendChild(updateTextNode);
     updateNode.id = 'update_secs';
 		updateNode.style.fontFamily = "'Source Code Pro', monospace";
-		updateNode.style.paddingLeft = "3pt";
+		updateNode.style.paddingLeft = "1.5pt";
     menu.appendChild(updateNode);
     $('#update_secs').attr("title","Update thread");
     $('#update_secs').click(function() { 
