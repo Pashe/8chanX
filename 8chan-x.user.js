@@ -197,9 +197,8 @@ function getMenuStats() {
   if (nPosts >= bumpLimit) {nPosts = hlStyle + nPosts + "</span>";}
 
 	var threadPage = getThreadPage(thisThread, thisBoard, false);
-	if (threadPage < 0) {threadPage = "<span style='opacity: 0.5'>???</span>"}
     
-  return "[<abbr title='Posts' style='border:none'>" + nPosts + "</abbr> / <abbr title='Images' style='border:none'>" + nImages + "</abbr> / <abbr title='Page' style='border:none'>" + threadPage + "</abbr>]"; //I feel like there's a cleaner way to to the hover text
+  return "[<abbr title='Posts' style='border:none'>" + nPosts + "</abbr> / <abbr title='Images' style='border:none'>" + nImages + "</abbr> / <abbr title='Page' style='border:none'>" + (threadPage<1?"<span style='opacity:0.5'>???</span>":threadPage) + "</abbr>]"; //I feel like there's a cleaner way to to the hover text
 
 }
 
@@ -891,9 +890,7 @@ function addCatalogPages() {
 		var threadId = threadElements[i].innerHTML.match(/<a href="[^0-9]*([0-9]+).html?">/)[1];
 		var threadPage = getThreadPage(threadId, thisBoard, true);
 		
-		if (threadPage >= 0) {
-			threadElements[i].children[1].children[0].children[0].innerHTML += " / P: " + threadPage; //I know this is awful, but it works (for now)
-		}
+		threadElements[i].children[1].children[0].children[0].innerHTML += " / P: " + (threadPage<1?"<span style='opacity:0.5'>???</span>":threadPage); //I know this is awful, but it works (for now)
 	}
 }
 
