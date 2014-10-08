@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Pashe's 8chanX
-// @version     1.35.3
+// @version     1.35.4
 // @namespace   https://github.com/Pashe/
 // @description Small userscript to improve 8chan
 // @match       *://8chan.co/*
@@ -26,7 +26,7 @@ var originalPageTitle = document.title;
 var unreadPosts = [];
 var thisBoard = window.location.pathname.split("/")[1];
 try {var thisThread = window.location.pathname.match(/([0-9]+)\.html$/)[1];} catch (e) {var thisThread = -1};
-var bumpLimit = 250;
+var bumpLimit = 300;
 var threads = null;
 var rse = null;
 
