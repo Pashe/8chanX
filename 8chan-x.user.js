@@ -29,6 +29,7 @@ try {var thisThread = window.location.pathname.match(/([0-9]+)\.html$/)[1];} cat
 var bumpLimit = 300;
 var threads = null;
 var rse = null;
+var threadsPerPage = 15;
 
 /**************
 GENERAL / MISC
@@ -66,13 +67,19 @@ function getThreadPage(threadId, boardId, cached) {
 		var threadsRq = $.getJSON("https://8chan.co/" + boardId + "/threads.json");
 		threads = threadsRq.responseJSON;
 	}
+	var precisePages = setting("precisepages");
 	var threadPage = -1;
 
 	for (var tIdx=0; tIdx<threads.length; tIdx++) {
 		posts = threads[tIdx]['threads'];
 		for (pIdx=0; pIdx<posts.length; pIdx++){
 			tno = posts[pIdx]['no'];
-			if (tno == threadId) {threadPage = threads[tIdx]['page']+1};
+			console.log(pIdx);
+			if (precisePages) {
+				if (tno == threadId) {threadPage = (threads[tIdx]['page']+1)+((pIdx)/(threadsPerPage-1)).toFixed(2)};
+			} else {
+				if (tno == threadId) {threadPage = threads[tIdx]['page']+1 };
+			}
 		}
 	}
 	return threadPage;
@@ -95,7 +102,8 @@ var defaultSettings = {
   'imagehover': true,
   'catalogimagehover': true,
   'cataloglinks': false,
-  'threadnewtab': false
+  'threadnewtab': false,
+	'precisepages': true
   //'inlineposts': false
 };
 var settingsMenu = document.createElement('div');
@@ -113,6 +121,7 @@ settingsMenu.innerHTML = prefix
 + '<label><input type="checkbox" name="catalogimagehover">' + _('Show full images on hover on catalog') + '</label><br>'
 + '<label><input type="checkbox" name="cataloglinks">' + _('Link to the catalog in the menu') + '</label><br>'
 + '<label><input type="checkbox" name="threadnewtab">' + _('Open threads in a new tab') + '</label><br>'
++ '<label><input type="checkbox" name="precisepages">' + _('Increase page indicator precision') + '</label><br>'
 //+ '<label><input type="checkbox" name="inlineposts">' + _('Inline quoted posts on click') + '</label><br>'
 + suffix;
 function setting(name) {
