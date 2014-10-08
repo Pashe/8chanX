@@ -878,7 +878,7 @@ window.addEventListener('keydown', function(event) {
   }
 
   if (event.keyCode === KeyEvent.DOM_VK_R) {
-    document.location.reload();
+		if (isOnThread()) {$('#update_thread').click();} else {document.location.reload();}
   } else if (event.keyCode === KeyEvent.DOM_VK_Q) {
     showQR();
     $("#quick-reply textarea").focus();
