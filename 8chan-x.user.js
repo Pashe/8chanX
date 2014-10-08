@@ -64,8 +64,12 @@ function wrapQRSelectionWith(str) {
 
 function getThreadPage(threadId, boardId, cached) {
 	if ((!cached) || (threads == null)) {
-		var threadsRq = $.getJSON("https://8chan.co/" + boardId + "/threads.json");
-		threads = threadsRq.responseJSON;
+		$.ajax({
+			url: "https://8chan.co/" + boardId + "/threads.json",
+			async: false,
+			dataType: "json",
+			success: function (response) {threads = response;}
+		});	
 	}
 	var precisePages = setting("precisepages");
 	var threadPage = -1;
@@ -933,7 +937,6 @@ function addLoadEvent(func) {
 //addLoadEvent(initMenu);
 // As soon as the DOM is ready
 $(document).ready(function() {
-	$.ajaxSetup({async: false});
   initMenu();
   initImprovedPageTitles();
   initThreadLinks();
