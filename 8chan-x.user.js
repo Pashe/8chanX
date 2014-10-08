@@ -222,7 +222,7 @@ function getMenuStats() {
 
 	var threadPage = getThreadPage(thisThread, thisBoard, false);
     
-  return "[<abbr title='Posts' style='border:none'>" + nPosts + "</abbr> / <abbr title='Images' style='border:none'>" + nImages + "</abbr> / <abbr title='Page' style='border:none'>" + (threadPage<1?"<span style='opacity:0.5'>???</span>":threadPage) + "</abbr>]"; //I feel like there's a cleaner way to to the hover text
+  return "<abbr title='Posts' style='border:none'>" + nPosts + "</abbr> / <abbr title='Images' style='border:none'>" + nImages + "</abbr> / <abbr title='Page' style='border:none'>" + (threadPage<1?"<span style='opacity:0.5'>???</span>":threadPage) + "</abbr>"; //I feel like there's a cleaner way to to the hover text
 
 }
 
@@ -245,18 +245,10 @@ function updateMenuStats() {
 function initMenu() {
   // Customize the menu
   var menu = document.getElementsByClassName("boardlist")[0];
-  menu.style.textAlign = 'center';
-  menu.style.position = 'fixed';
-  menu.style.top = '0px';
-  menu.style.left = '-3px';
-  menu.style.width = "100%";
-  menu.style.marginTop = "0px";
-  menu.style.padding = "1pt";
-  menu.style.zIndex='50';
-  $("html").css("margin-top","15px");
   updateMenuStyle();
-  document.querySelector('[data-description="1"]').style.display = 'none';
-  document.querySelector('[data-description="2"]').style.display = 'none';
+  document.querySelector('[data-description="1"]').style.display = 'none'; //b, meta, and int
+  document.querySelector('[data-description="2"]').style.display = 'none'; //twitter
+	setTimeout("document.querySelector('[data-description=\"3\"]').style.display = 'none';", 500); //top boards
 	
   if (isOnCatalog())
     add_favorites();
