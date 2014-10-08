@@ -74,7 +74,6 @@ function getThreadPage(threadId, boardId, cached) {
 		posts = threads[tIdx]['threads'];
 		for (pIdx=0; pIdx<posts.length; pIdx++){
 			tno = posts[pIdx]['no'];
-			console.log(pIdx);
 			if (precisePages) {
 				if (tno == threadId) {threadPage = (threads[tIdx]['page']+1)+((pIdx)/(threadsPerPage-1)).toFixed(2)};
 			} else {
