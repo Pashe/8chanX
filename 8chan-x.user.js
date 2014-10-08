@@ -253,7 +253,7 @@ function initMenu() {
   if (isOnCatalog())
     add_favorites();
   
-  if (setting('cataloglinks'))
+  if (setting('cataloglinks') || isOnCatalog())
   {
     $('.favorite-boards a').each( function (index, data) {
       $(this).attr("href", $(this).attr("href")+"/catalog.html");
