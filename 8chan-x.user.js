@@ -22,6 +22,8 @@
 /*********
 GLOBALS
 *********/
+var unreadFavicon = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAFo9M/3AAAAAXNSR0IArs4c6QAAAd1JREFUOMu9kj1oU1EUgL/z8tM8M1iIYOlQ0pzQXTpVnFshFHSKHSoIRUwKDp11FHTwp0NeGhdFQSoKLkFEV3UQQRBxyg0oAbcQlJo+2/eOS1LUUBREv+nce+45nPvdCwOkEBTagkzzE8VasSp7i6D40MzeA6CBGvuxV6KBPgJOJIv14oJE0ouJDwIkzeyJefbCVd2xfftoTY9roJcAZLYxm+pFvW+D3AdXcdMINpwm2Yt6bzBOuVV3P1/LT0zenPT9ur9MzBFXdcJfkxjZMUQn9GJuMbfTbXY7Iwf0sD4z7DXG3Vwp91k00CZQGnhachW3CTDTmDkURdFH0UBtOK3W9CXCnIicNrNrJnbVG7bO38pn8NgMt8MDscXzJnamXWlfTiKsa6BGHyxh4521Th9Y5r/xW9X56/nxRDrxGGHuR5uCrLcqrTUZyi0EhZOCzJtYVkSeh/3wTpyNxY/9lV1v90EqTHVb51shQKFWWBKRe8A7TwO9oHWNRWRDkLdi0sRYHMuMffUjfwujnN5JTw2LATzxtgZhRjTQPpAJ02Gus9Lpjjz7hpYxrgBTv1z+tsu5FdFAzwIN4AvGDfPskyALGFmMrlt15T+SqDU9ilBC2BbkVetc6+nw4/9TvgNQUr7tUjroFgAAAABJRU5ErkJggg==";
+var readFavicon = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAFo9M/3AAAAAXNSR0IArs4c6QAAAeNJREFUOMu9kk1IVGEUhp/3jj8zukiYIGkh6iftwzZGaw1EqJW5KAxsvhmFgta1DGpRGTF35g5EURBGQRuJqG21iCKIaOUVCqHdYIU/k849LXIMEymCenbncM7hvO85sIF6fTgv6GELfb44qc0gFz6wwN4D4Hxo7MRmi/PhQ+BIU1++NKSkvpjALoAmM3tsCp7H0eShHec4Xzzs8uEFAPXnouZF1b8BYHyIK4UekDW2aVpU/Q3YsTiautc9Wezcm6tkMkHpOEmyP45+6vh7UttTJpfrPJ89MLJWfT27sK3A5fc8NXgFdifbP/xFzoezwPAPnzQWlwszAPty0e666h/lfGiNbZ0vvgANSDphZlfMdDlojO4ev5nGgpla22pbYjZo0sn5SuGinC9Ng50BMEt1zFf8Z/4rv7W6e/xqR6q15RFoYIuZcG0uKpxVI+714VEZgya1S3pWy6zcTpbalSGZWCe439xaq85dP10D6PXFMaG7wLvA+fCc86VEUlnirbBZzEZal9PLGdWXCGy0hbWuRjNAEGhp47vScj5cAdK19Zbswo2J6raz58ujmF0Cun5RfyuuZifkfJgDIuArsmlLgk8SQ8jaMavG0dToH5noThUPktIwiVYV8HKunH/SePx/ynf5T8EXjP2zGwAAAABJRU5ErkJggg==";
 var originalPageTitle = document.title;
 var unreadPosts = [];
 var thisBoard = window.location.pathname.split("/")[1];
@@ -88,6 +90,23 @@ function getThreadPage(threadId, boardId, cached) {
 	return threadPage;
 }
 
+/*!
+* Dynamically changing favicons with JavaScript
+* Works in all A-grade browsers except Safari and Internet Explorer
+* Demo: http://mathiasbynens.be/demo/dynamic-favicons
+* (Stolen from https://gist.github.com/mathiasbynens/428626)
+*/
+function changeFavicon(src) {
+	document.head || (document.head = document.getElementsByTagName('head')[0]);
+	var link = document.createElement('link'),
+	oldLink = document.getElementById('dynamic-favicon');
+	link.id = 'dynamic-favicon';
+	link.rel = 'shortcut icon';
+	link.href = src;
+	if (oldLink) {document.head.removeChild(oldLink);}
+	document.head.appendChild(link);
+}
+
 /**************
 SETTINGS
 **************/
@@ -106,7 +125,8 @@ var defaultSettings = {
   'catalogimagehover': true,
   'cataloglinks': false,
   'threadnewtab': false,
-	'precisepages': true
+	'precisepages': true,
+	'dynamicfavicon': true
   //'inlineposts': false
 };
 var settingsMenu = document.createElement('div');
@@ -125,6 +145,7 @@ settingsMenu.innerHTML = prefix
 + '<label><input type="checkbox" name="cataloglinks">' + _('Link to the catalog in the menu') + '</label><br>'
 + '<label><input type="checkbox" name="threadnewtab">' + _('Open threads in a new tab') + '</label><br>'
 + '<label><input type="checkbox" name="precisepages">' + _('Increase page indicator precision') + '</label><br>'
++ '<label><input type="checkbox" name="dynamicfavicon">' + _('Use dynamic favicon') + '</label><br>'
 //+ '<label><input type="checkbox" name="inlineposts">' + _('Inline quoted posts on click') + '</label><br>'
 + suffix;
 function setting(name) {
@@ -427,15 +448,20 @@ function checkFirstUnread() {
     return false;
 }
 
+var dynamicFavicon = setting("dynamicfavicon");
+
 function checkUnreadPosts() {  
   while (checkFirstUnread());
   
   if (isOnThread())
   {
-    if (unreadPosts.length != 0)
+    if (unreadPosts.length != 0) {
       document.title = "("+unreadPosts.length+") "+originalPageTitle;
-    else
+			if (dynamicFavicon) {changeFavicon(unreadFavicon)};
+    } else {
       document.title = originalPageTitle;
+			if (dynamicFavicon) {changeFavicon(readFavicon)};
+		}
   }
 }
 
@@ -945,4 +971,5 @@ $(document).ready(function() {
   initRevealSpoilers();
   initRevealImageSpoilers();
 	initCatalog();
+	changeFavicon(readFavicon);
 });
