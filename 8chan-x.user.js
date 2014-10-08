@@ -248,7 +248,12 @@ function initMenu() {
   updateMenuStyle();
   document.querySelector('[data-description="1"]').style.display = 'none'; //b, meta, and int
   document.querySelector('[data-description="2"]').style.display = 'none'; //twitter
-	setTimeout("document.querySelector('[data-description=\"3\"]').style.display = 'none';", 500); //top boards
+	var checkPopBoardsExist = setInterval(function() { //popular boards
+		if (document.querySelectorAll('[data-description="3"]').length) {
+			document.querySelector('[data-description="3"]').style.display = 'none';
+			clearInterval(checkPopBoardsExist);
+		}
+	}, 100);
 	
   if (isOnCatalog())
     add_favorites();
