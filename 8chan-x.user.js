@@ -127,7 +127,8 @@ var defaultSettings = {
   'threadnewtab': false,
 	'precisepages': true,
 	'dynamicfavicon': true,
-	'hidefeaturedboards': true
+	'hidefeaturedboards': true,
+	'largecatalogimages': true
   //'inlineposts': false
 };
 var settingsMenu = document.createElement('div');
@@ -148,6 +149,7 @@ settingsMenu.innerHTML = prefix
 + '<label><input type="checkbox" name="precisepages">' + _('Increase page indicator precision') + '</label><br>'
 + '<label><input type="checkbox" name="dynamicfavicon">' + _('Use dynamic favicon') + '</label><br>'
 + '<label><input type="checkbox" name="hidefeaturedboards">' + _('Hide featured boards') + '</label><br>'
++ '<label><input type="checkbox" name="largecatalogimages">' + _('Default to large catalog images') + '</label><br>'
 //+ '<label><input type="checkbox" name="inlineposts">' + _('Inline quoted posts on click') + '</label><br>'
 + suffix;
 function setting(name) {
@@ -938,10 +940,14 @@ function highlightCatalogAutosage() {
 }
 
 function setCatalogImageSize() {
-	$(".grid-li").removeClass("grid-size-vsmall");
-	$(".grid-li").removeClass("grid-size-small");
-	$(".grid-li").removeClass("grid-size-large");
-	$(".grid-li").addClass("grid-size-large");
+	if (setting("largecatalogimages")) {
+		$(".grid-li").removeClass("grid-size-vsmall");
+		$(".grid-li").removeClass("grid-size-small");
+		$(".grid-li").removeClass("grid-size-large");
+		$(".grid-li").addClass("grid-size-large");
+		
+		document.getElementById("image_size").value = "large";
+	}
 }
 
 /*********
