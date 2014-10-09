@@ -126,7 +126,8 @@ var defaultSettings = {
   'cataloglinks': false,
   'threadnewtab': false,
 	'precisepages': true,
-	'dynamicfavicon': true
+	'dynamicfavicon': true,
+	'hidefeaturedboards': true
   //'inlineposts': false
 };
 var settingsMenu = document.createElement('div');
@@ -146,6 +147,7 @@ settingsMenu.innerHTML = prefix
 + '<label><input type="checkbox" name="threadnewtab">' + _('Open threads in a new tab') + '</label><br>'
 + '<label><input type="checkbox" name="precisepages">' + _('Increase page indicator precision') + '</label><br>'
 + '<label><input type="checkbox" name="dynamicfavicon">' + _('Use dynamic favicon') + '</label><br>'
++ '<label><input type="checkbox" name="hidefeaturedboards">' + _('Hide featured boards') + '</label><br>'
 //+ '<label><input type="checkbox" name="inlineposts">' + _('Inline quoted posts on click') + '</label><br>'
 + suffix;
 function setting(name) {
@@ -248,12 +250,14 @@ function initMenu() {
   updateMenuStyle();
   document.querySelector('[data-description="1"]').style.display = 'none'; //b, meta, and int
   document.querySelector('[data-description="2"]').style.display = 'none'; //twitter
-	var checkPopBoardsExist = setInterval(function() { //popular boards
-		if (document.querySelectorAll('[data-description="3"]').length) {
-			document.querySelector('[data-description="3"]').style.display = 'none';
-			clearInterval(checkPopBoardsExist);
-		}
-	}, 100);
+	if (setting("hidefeaturedboards")) {
+		var checkPopBoardsExist = setInterval(function() { //popular boards/top boards/featured boards (what is consistency?)
+			if (document.querySelectorAll('[data-description="3"]').length) {
+				document.querySelector('[data-description="3"]').style.display = 'none';
+				clearInterval(checkPopBoardsExist);
+			}
+		}, 100);
+	}
 	
   if (isOnCatalog())
     add_favorites();
