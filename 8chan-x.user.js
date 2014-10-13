@@ -128,7 +128,8 @@ var defaultSettings = {
 	'precisepages': true,
 	'dynamicfavicon': true,
 	'hidefeaturedboards': true,
-	'largecatalogimages': true
+	'largecatalogimages': true,
+	'searchbyimagelinks': true
   //'inlineposts': false
 };
 var settingsMenu = document.createElement('div');
@@ -150,6 +151,7 @@ settingsMenu.innerHTML = prefix
 + '<label><input type="checkbox" name="dynamicfavicon">' + _('Use dynamic favicon') + '</label><br>'
 + '<label><input type="checkbox" name="hidefeaturedboards">' + _('Hide featured boards') + '</label><br>'
 + '<label><input type="checkbox" name="largecatalogimages">' + _('Default to large catalog images') + '</label><br>'
++ '<label><input type="checkbox" name="searchbyimagelinks">' + _('Add reverse image search links') + '</label><br>'
 //+ '<label><input type="checkbox" name="inlineposts">' + _('Inline quoted posts on click') + '</label><br>'
 + suffix;
 function setting(name) {
@@ -950,6 +952,39 @@ function setCatalogImageSize() {
 	}
 }
 
+function addSbiLinks() {
+if (setting("searchbyimagelinks")) {
+	var sbp = [
+		{
+			"urlPre" : "https://saucenao.com/search.php?db=999&url=",
+			"urlPost": "",
+			"name"   : "SauceNAO"
+		},
+		{
+			"urlPre" : "https://www.tineye.com/search/?url=",
+			"urlPost": "",
+			"name"   : "TinEye"
+		}
+	];
+
+	var posts = document.getElementsByClassName("post-image");
+	for (var pIdx in posts) {
+		for (var sbpIdx in sbp) {
+			var sbiUrl = (sbp[sbpIdx]["urlPre"] + posts[pIdx].parentNode.href + sbp[sbpIdx]["urlPost"]);
+			var sbiText = ("[" + sbp[sbpIdx]["name"] + "]");
+			
+			var sbiElement = document.createElement('a');
+			sbiElement.href = sbiUrl;
+			sbiElement.target = "_blank";
+			sbiElement.style.fontSize = "8pt";
+			sbiElement.innerHTML = sbiText;
+			
+			posts[pIdx].parentNode.appendChild(sbiElement);
+		}
+	}
+}
+}
+
 /*********
 INIT
 *********/
@@ -979,4 +1014,5 @@ $(document).ready(function() {
   initRevealImageSpoilers();
 	initCatalog();
 	changeFavicon(readFavicon);
+	addSbiLinks();
 });
