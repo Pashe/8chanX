@@ -970,7 +970,12 @@ if (setting("searchbyimagelinks")) {
 	var posts = document.getElementsByClassName("post-image");
 	for (var pIdx in posts) {
 		for (var sbpIdx in sbp) {
-			var sbiUrl = (sbp[sbpIdx]["urlPre"] + posts[pIdx].parentNode.href + sbp[sbpIdx]["urlPost"]);
+			try {
+			var imgUrl = posts[pIdx].parentNode.href;
+			var urlPre = sbp[sbpIdx]["urlPre"] || "";
+			var urlPost = sbp[sbpIdx]["urlPost"] || "";
+			
+			var sbiUrl = (urlPre + imgUrl + urlPost);
 			var sbiText = ("[" + sbp[sbpIdx]["name"] + "]");
 			
 			var sbiElement = document.createElement('a');
@@ -980,7 +985,7 @@ if (setting("searchbyimagelinks")) {
 			sbiElement.innerHTML = sbiText;
 			
 			posts[pIdx].parentNode.appendChild(sbiElement);
-		}
+		} catch(e){}}
 	}
 }
 }
