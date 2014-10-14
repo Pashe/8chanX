@@ -955,37 +955,52 @@ function setCatalogImageSize() {
 function initSbiLinks() {
 if (setting("searchbyimagelinks")) {
 	var sbp = [
-		{
-			"urlPre" : "https://saucenao.com/search.php?db=999&url=",
-			"urlPost": "",
-			"name"   : "SauceNAO"
-		},
-		{
-			"urlPre" : "https://www.tineye.com/search/?url=",
-			"urlPost": "",
-			"name"   : "TinEye"
-		}
-	];
+    {
+      "urlPre" : "https://www.google.com/searchbyimage?image_url=",
+      "urlPost": "",
+      "name"   : "Google"
+    },
+    {
+      "urlPre" : "http://iqdb.org/?url=",
+      "urlPost": "",
+      "name"   : "iqdb"
+    },
+    {
+      "urlPre" : "https://saucenao.com/search.php?db=999&url=",
+      "urlPost": "",
+      "name"   : "SauceNAO"
+    },
+    {
+      "urlPre" : "https://www.tineye.com/search/?url=",
+      "urlPost": "",
+      "name"   : "TinEye"
+    }
+  ];
 
-	var posts = document.getElementsByClassName("post-image");
-	for (var pIdx in posts) {
-		for (var sbpIdx in sbp) {
-			try {
-			var imgUrl = posts[pIdx].parentNode.href;
-			var urlPre = sbp[sbpIdx]["urlPre"] || "";
-			var urlPost = sbp[sbpIdx]["urlPost"] || "";
-			
-			var sbiUrl = (urlPre + imgUrl + urlPost);
-			var sbiText = ("[" + sbp[sbpIdx]["name"] + "]");
-			
-			var sbiElement = document.createElement('a');
-			sbiElement.href = sbiUrl;
-			sbiElement.target = "_blank";
-			sbiElement.style.fontSize = "8pt";
-			sbiElement.innerHTML = sbiText;
-			
-			posts[pIdx].parentNode.appendChild(sbiElement);
-		} catch(e){}}
+  var posts = document.getElementsByClassName("post-image");
+  for (var pIdx in posts) {
+    for (var sbpIdx in sbp) {
+      try {
+      var imgUrl = posts[pIdx].src;
+      var urlPre = sbp[sbpIdx]["urlPre"] || "";
+      var urlPost = sbp[sbpIdx]["urlPost"] || "";
+      
+      var sbiUrl = (urlPre + imgUrl + urlPost);
+      var sbiText = ("[" + sbp[sbpIdx]["name"][0] + "]");
+      
+      var spElement = document.createElement('span');
+      spElement.innerHTML = "&nbsp;";
+        
+      var sbiElement = document.createElement('a');
+      sbiElement.href = sbiUrl;
+      sbiElement.title = "Search with "+sbp[sbpIdx]["name"];
+      sbiElement.target = "_blank";
+      sbiElement.style.fontSize = "8pt";
+      sbiElement.innerHTML = sbiText;
+      
+      posts[pIdx].parentNode.parentNode.getElementsByClassName("fileinfo")[0].appendChild(spElement);
+      posts[pIdx].parentNode.parentNode.getElementsByClassName("fileinfo")[0].appendChild(sbiElement);
+    } catch(e){}}
 	}
 }
 }
