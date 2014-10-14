@@ -952,7 +952,7 @@ function setCatalogImageSize() {
 	}
 }
 
-function addSbiLinks() {
+function initSbiLinks() {
 if (setting("searchbyimagelinks")) {
 	var sbp = [
 		{
@@ -1014,5 +1014,5 @@ $(document).ready(function() {
   initRevealImageSpoilers();
 	initCatalog();
 	changeFavicon(readFavicon);
-	addSbiLinks();
+	initSbiLinks();
 });
