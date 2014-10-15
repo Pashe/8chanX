@@ -523,13 +523,23 @@ var imghoverMMove = function(e) {
   var picId = "post-image-"+picTimestamp;
   var hoverPic = $("#"+picId);
   // Create the hovering image if needed, otherwise just update it's position
+	
+	var picRightEdge = hoverPic.width() + e.pageX;
+	var windowWidth = $(window).width();
+	
   if (!hoverPic.length)
   {
     var newpic = pic.clone();
     newpic.attr("id",picId);
     newpic.css('display', 'block').css('position', 'absolute').css('z-index', '200');
     newpic.attr("src",picUrl.replace("/thumb/","/src/"));
-    newpic.css('left', e.pageX).css('top', top);
+		
+		if (picRightEdge > windowWidth) {
+			newpic.css('left', (e.pageX + (windowWidth - picRightEdge))).css('top', top);
+		} else {
+			newpic.css('left', e.pageX).css('top', top);
+		}
+		
     newpic.css('width', 'auto').css('height', 'auto');
     newpic.css('pointer-events','none');
     newpic.css('max-height',$(window).height());
@@ -546,7 +556,12 @@ var imghoverMMove = function(e) {
     } else if (epy > scrollTop + $(window).height() - hoverPic.height() - 15) {
       top = scrollTop + $(window).height() - hoverPic.height() - 15;
     }
-    hoverPic.css('left', e.pageX).css('top', top);
+		
+		if (picRightEdge > windowWidth) {
+			hoverPic.css('left', (e.pageX + (windowWidth - picRightEdge))).css('top', top);
+		} else {
+			hoverPic.css('left', e.pageX).css('top', top);
+		}
   }
 };
 
