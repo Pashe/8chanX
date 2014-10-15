@@ -986,7 +986,7 @@ if (setting("searchbyimagelinks")) {
 			var urlPost = sbp[sbpIdx]["urlPost"] || "";
 			
 			var sbiUrl = (urlPre + imgUrl + urlPost);
-			var sbiText = ("[" + sbp[sbpIdx]["name"][0] + "]");
+			var sbiText = ("[" + sbp[sbpIdx]["name"][0].toUpperCase() + "]");
 			
 			var spElement = document.createElement('span');
 			spElement.innerHTML = "&nbsp;";
