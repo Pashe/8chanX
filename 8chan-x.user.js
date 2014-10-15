@@ -126,7 +126,7 @@ var defaultSettings = {
   'cataloglinks': false,
   'threadnewtab': false,
 	'precisepages': true,
-	'dynamicfavicon': true,
+	'dynamicfavicon': false,
 	'hidefeaturedboards': true,
 	'largecatalogimages': true,
 	'searchbyimagelinks': true
