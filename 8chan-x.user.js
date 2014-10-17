@@ -993,7 +993,7 @@ if (setting("searchbyimagelinks")) {
 		}
 	];
 
-	var posts = document.getElementsByClassName("post-image");
+	var posts = document.querySelectorAll("img.post-image");
 	for (var pIdx in posts) {
 		for (var sbpIdx in sbp) {
 			try {
