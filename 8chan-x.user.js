@@ -1007,7 +1007,6 @@ if (setting("searchbyimagelinks")) {
 }
 
 function addSbiLinks(post) {
-	console.log(post);
 	for (var sbpIdx in sbp) {
 		try {
 		var imgUrl = post.src;
