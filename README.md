@@ -17,7 +17,9 @@ Additionally, this fork adds:
  * Semi-dynamic menu color (more compatible with custom themes)
  * Thread page display on the catalog and in the menu status area
  * Visible autosage on the catalog and in the menu status area
+ * Reverse image search links
  * Many other poorly written hacks
+ * Occasional updates
 
 This is a userscript, you will need <a href="https://addons.mozilla.org/en-US/firefox/addon/greasemonkey/">Greasemonkey</a> (Firefox), <a href="https://chrome.google.com/webstore/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo">Tampermonkey</a> (Chrome), <a href="https://addons.opera.com/en/extensions/details/violent-monkey/">Violentmonkey</a> (Opera) or an equivalent extension to run it
 
