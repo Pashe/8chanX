@@ -1062,4 +1062,5 @@ $(document).ready(function() {
 	changeFavicon(readFavicon);
 	initSbiLinks();
 	if (localStorage.color_ids == undefined) localStorage.color_ids = true;
+	if ((localStorage.videohover == undefined) && setting('imagehover')) localStorage.videohover = true;
 });
