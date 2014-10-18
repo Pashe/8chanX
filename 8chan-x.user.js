@@ -1061,4 +1061,5 @@ $(document).ready(function() {
 	initCatalog();
 	changeFavicon(readFavicon);
 	initSbiLinks();
+	if (localStorage.color_ids == undefined) localStorage.color_ids = true;
 });
