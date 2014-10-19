@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Pashe's 8chanX
-// @version     1.35.9.1413708200
+// @version     1.35.9.1413708400
 // @namespace   https://github.com/Pashe/
 // @description Small userscript to improve 8chan
 // @match       *://8chan.co/*
@@ -254,16 +254,18 @@ function initMenu() {
   // Customize the menu
   var menu = document.getElementsByClassName("boardlist")[0];
   updateMenuStyle();
-  document.querySelector('[data-description="1"]').style.display = 'none'; //b, meta, and int
-  document.querySelector('[data-description="2"]').style.display = 'none'; //twitter
-	if (setting("hidefeaturedboards")) {
-		var checkPopBoardsExist = setInterval(function() { //popular boards/top boards/featured boards (what is consistency?)
-			if (document.querySelectorAll('[data-description="3"]').length) {
-				document.querySelector('[data-description="3"]').style.display = 'none';
-				clearInterval(checkPopBoardsExist);
-			}
-		}, 100);
-	}
+  try{document.querySelector('[data-description="1"]').style.display = 'none';} catch (e) {} //b, meta, and int
+  try{document.querySelector('[data-description="2"]').style.display = 'none';} catch (e) {} //twitter
+	try{
+		if (setting("hidefeaturedboards")) {
+			var checkPopBoardsExist = setInterval(function() { //popular boards/top boards/featured boards (what is consistency?)
+				if (document.querySelectorAll('[data-description="3"]').length) {
+					document.querySelector('[data-description="3"]').style.display = 'none';
+					clearInterval(checkPopBoardsExist);
+				}
+			}, 100);
+		}
+	} catch (e) {}
 	
   if (isOnCatalog())
     add_favorites();
