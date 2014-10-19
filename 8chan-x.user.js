@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Pashe's 8chanX
-// @version     1.35.9.1413708860
+// @version     1.35.9.1413723120
 // @namespace   https://github.com/Pashe/
 // @description Small userscript to improve 8chan
 // @match       *://8chan.co/*
@@ -537,7 +537,7 @@ var imghoverMMove = function(e) {
   {
     var newpic = pic.clone();
     newpic.attr("id",picId);
-    newpic.css('display', 'block').css('position', 'absolute').css('z-index', '200');
+    newpic.css('display', 'block').css('position', 'absolute').css('z-index', '200').css("margin", "0px").css("padding", "0px");
     newpic.attr("src",picUrl.replace("/thumb/","/src/"));
 		
 		if (picRightEdge > windowWidth) {
