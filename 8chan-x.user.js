@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Pashe's 8chanX
-// @version     1.35.9
+// @version     1.35.9.1413678500
 // @namespace   https://github.com/Pashe/
 // @description Small userscript to improve 8chan
 // @match       *://8chan.co/*
@@ -993,9 +993,9 @@ var sbp = [
 
 function initSbiLinks() {
 if (setting("searchbyimagelinks")) {
-	var posts = document.getElementsByClassName("post-image");
+	var posts = $("img.post-image");
 	$(document).on('new_post', function (e, post) {
-		var newPosts = post.getElementsByClassName("post-image");
+		var newPosts = $('#'+$(post).attr('id')+' img.post-image'); 
 		for (var npIdx in newPosts) {
 			addSbiLinks(newPosts[npIdx]);
 		}
