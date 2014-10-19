@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Pashe's 8chanX
-// @version     1.35.9.1413723120
+// @version     1.35.9.1413756760
 // @namespace   https://github.com/Pashe/
 // @description Small userscript to improve 8chan
 // @match       *://8chan.co/*
@@ -133,7 +133,8 @@ var defaultSettings = {
 	'dynamicfavicon': false,
 	'hidefeaturedboards': true,
 	'largecatalogimages': true,
-	'searchbyimagelinks': true
+	'searchbyimagelinks': true,
+	'imagetimeguess':false
   //'inlineposts': false
 };
 var settingsMenu = document.createElement('div');
@@ -156,6 +157,7 @@ settingsMenu.innerHTML = prefix
 + '<label><input type="checkbox" name="hidefeaturedboards">' + _('Hide featured boards') + '</label><br>'
 + '<label><input type="checkbox" name="largecatalogimages">' + _('Default to large catalog images') + '</label><br>'
 + '<label><input type="checkbox" name="searchbyimagelinks">' + _('Add reverse image search links') + '</label><br>'
++ '<label><input type="checkbox" name="imagetimeguess">' + _('Try to guess when an image was originally uploaded based on its filename') + '</label><br>'
 //+ '<label><input type="checkbox" name="inlineposts">' + _('Inline quoted posts on click') + '</label><br>'
 + suffix;
 function setting(name) {
@@ -1041,6 +1043,36 @@ function initQrDrag() {
 	$("#quick-reply").draggable();
 }
 
+function initImageDates() {
+	if (setting("imagetimeguess")) {try {
+	var minTimeStamp = new Date(1985,1).valueOf();
+	var maxTimeStamp = Date.now()+86400000;
+	var selectorString = "p.fileinfo > span.unimportant > a:link";
+	
+	var filenames = document.querySelectorAll(selectorString);
+	for (var fIdx in filenames) {
+		try {
+		var fName = filenames[fIdx].innerHTML;
+		var fTimeStamp = +(fName.match(/^([0-9]{9,13})[^a-zA-Z0-9]?.*$/)[1]);
+		
+		if (fTimeStamp < minTimeStamp) {fTimeStamp *= 1000;} //It's probably not a microsecond timestamp if it's before 1985
+		if ((fTimeStamp < minTimeStamp) || (fTimeStamp > maxTimeStamp)) {continue} //It's probably not a timestamp at all if it's before 1985 or after tomorrow
+		var fDate = new Date(fTimeStamp);
+		
+		var fTimeElement = document.createElement('time');
+		fTimeElement.className = "image-time-guess";
+		fTimeElement.title = fDate.toGMTString();
+		fTimeElement.innerHTML = ", " + $.timeago(fTimeStamp) + ")";
+		fTimeElement.dataset.timestamp = fTimeStamp;
+		fTimeElement.dateTime = fDate.toISOString();
+		
+		document.querySelectorAll(selectorString)[fIdx].parentNode.innerHTML = document.querySelectorAll(selectorString)[fIdx].parentNode.innerHTML.replace(")", "");
+		document.querySelectorAll(selectorString)[fIdx].parentNode.appendChild(fTimeElement);
+		} catch (e) {}
+	}
+	} catch (e) {}}
+}
+
 /*********
 INIT
 *********/
@@ -1072,6 +1104,7 @@ $(document).ready(function() {
 	changeFavicon(readFavicon);
 	initSbiLinks();
 	initQrDrag();
+	initImageDates();
 	if (localStorage.color_ids == undefined) localStorage.color_ids = true;
 	if ((localStorage.videohover == undefined) && setting('imagehover')) localStorage.videohover = true;
 });
