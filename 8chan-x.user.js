@@ -1024,6 +1024,7 @@ function addSbiLinks(post) {
 		sbiElement.title = "Search with "+sbp[sbpIdx]["name"];
 		sbiElement.target = "_blank";
 		sbiElement.style.fontSize = "8pt";
+		sbiElement.className = "sbi_link";
 		sbiElement.innerHTML = sbiText;
 		
 		post.parentNode.parentNode.getElementsByClassName("fileinfo")[0].appendChild(spElement);
