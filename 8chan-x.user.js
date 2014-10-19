@@ -1,11 +1,12 @@
 // ==UserScript==
 // @name        Pashe's 8chanX
-// @version     1.35.9.1413678500
+// @version     1.35.9.1413703800
 // @namespace   https://github.com/Pashe/
 // @description Small userscript to improve 8chan
 // @match       *://8chan.co/*
 // @run-at      document-end
 // @grant       none
+// @require     https://code.jquery.com/ui/1.11.1/jquery-ui.min.js
 // @require     http://timeago.yarp.com/jquery.timeago.js
 // @updateURL   https://github.com/Pashe/8chan-X/raw/master/8chan-x.meta.js
 // @downloadURL https://github.com/Pashe/8chan-X/raw/master/8chan-x.user.js
@@ -1032,6 +1033,10 @@ function addSbiLinks(post) {
 	} catch(e){}}
 }
 
+function initQrDrag() {
+	$("#quick-reply").draggable();
+}
+
 /*********
 INIT
 *********/
@@ -1062,6 +1067,7 @@ $(document).ready(function() {
 	initCatalog();
 	changeFavicon(readFavicon);
 	initSbiLinks();
+	initQrDrag();
 	if (localStorage.color_ids == undefined) localStorage.color_ids = true;
 	if ((localStorage.videohover == undefined) && setting('imagehover')) localStorage.videohover = true;
 });
