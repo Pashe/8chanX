@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Pashe's 8chanX
-// @version     1.35.9.1413703800
+// @version     1.35.9.1413708200
 // @namespace   https://github.com/Pashe/
 // @description Small userscript to improve 8chan
 // @match       *://8chan.co/*
@@ -69,7 +69,7 @@ function wrapQRSelectionWith(str) {
 function getThreadPage(threadId, boardId, cached) {
 	if ((!cached) || (threads == null)) {
 		$.ajax({
-			url: "https://8chan.co/" + boardId + "/threads.json",
+			url: "/" + boardId + "/threads.json",
 			async: false,
 			dataType: "json",
 			success: function (response) {threads = response;}
