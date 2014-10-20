@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Pashe's 8chanX
-// @version     1.35.9.1413764290
+// @version     1.35.9.1413767810
 // @namespace   https://github.com/Pashe/
 // @description Small userscript to improve 8chan
 // @match       *://8chan.co/*
