@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Pashe's 8chanX
-// @version     1.35.9.1413763200
+// @version     1.35.9.1413764290
 // @namespace   https://github.com/Pashe/
 // @description Small userscript to improve 8chan
 // @match       *://8chan.co/*
@@ -158,8 +158,10 @@ settingsMenu.innerHTML = prefix
 + '<label><input type="checkbox" name="largecatalogimages">' + _('Default to large catalog images') + '</label><br>'
 + '<label><input type="checkbox" name="searchbyimagelinks">' + _('Add reverse image search links') + '</label><br>'
 + '<label><input type="checkbox" name="imagetimeguess">' + _('Try to guess when an image was originally uploaded based on its filename') + '</label><br>'
++ '<button id="purgedeadfavorites">' + _('Clean favorites') + '</button>'
 //+ '<label><input type="checkbox" name="inlineposts">' + _('Inline quoted posts on click') + '</label><br>'
 + suffix;
+
 function setting(name) {
   if (localStorage) {
     if (localStorage[name] === undefined) return defaultSettings[name];
@@ -1072,6 +1074,51 @@ function initImageDates() {
 	}
 	} catch (e) {}}
 }
+
+$(document).ready(function() {
+$("#purgedeadfavorites").click(function() {
+	console.log("Working...");
+	var originalText = $("#purgedeadfavorites").text();
+	$("#purgedeadfavorites").text("Working...");
+	$("#purgedeadfavorites").prop("disabled", true);
+	var boards;
+	$.ajax({
+			url: "/boards.json",
+			async: false,
+			dataType: "json",
+			success: function (response) {boards = response;}
+	});	
+	var boardsURIs = [];
+	var favorites = JSON.parse(localStorage.favorites);
+
+	for (var x in boards) {
+		boardsURIs.push(boards[x]['uri']);
+	}
+	
+	if (boardsURIs.length > 0) {
+		for (var i=0; i<favorites.length; i++) {
+			var board = favorites[i];
+			if (($.inArray(board, boardsURIs) == -1)) {
+				$.ajax({
+					url: "/" + board + "/",
+					async: false,
+					statusCode: {404: function() {
+						unfavorite(board);
+						console.log("Purge board /" + board + "/");
+					}},
+					success: function () {console.log("Keep unlisted board /" + board + "/");},
+					type: "HEAD"
+				});
+			} else {
+				console.log("Keep listed board /" + board + "/");
+			}
+		}
+	}
+	console.log("Done");
+	$("#purgedeadfavorites").text(originalText + " - done")
+	$("#purgedeadfavorites").prop("disabled", false);
+});
+});
 
 /*********
 INIT
