@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Pashe's 8chanX
-// @version     1.35.9.1413782110
+// @version     1.35.9.1413793150
 // @namespace   https://github.com/Pashe/
 // @description Small userscript to improve 8chan
 // @match       *://8chan.co/*
@@ -1059,12 +1059,12 @@ function initImageDates() {
 		if ((fTimeStamp < minTimeStamp) || (fTimeStamp > maxTimeStamp)) {continue} //It's probably not a timestamp at all if it's before 1985 or after tomorrow
 		var fDate = new Date(fTimeStamp);
 		
-		var fTimeElement = document.createElement('time');
+		var fTimeElement = document.createElement('span');
 		fTimeElement.className = "image-time-guess";
 		fTimeElement.title = fDate.toGMTString();
 		fTimeElement.innerHTML = ", " + $.timeago(fTimeStamp) + ")";
 		fTimeElement.dataset.timestamp = fTimeStamp;
-		fTimeElement.dateTime = fDate.toISOString();
+		fTimeElement.dataset.isotime = fDate.toISOString();
 		
 		document.querySelectorAll(selectorString)[fIdx].parentNode.innerHTML = document.querySelectorAll(selectorString)[fIdx].parentNode.innerHTML.replace(")", "");
 		document.querySelectorAll(selectorString)[fIdx].parentNode.appendChild(fTimeElement);
