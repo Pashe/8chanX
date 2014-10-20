@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Pashe's 8chanX
-// @version     1.35.9.1413768250
+// @version     1.35.9.1413768720
 // @namespace   https://github.com/Pashe/
 // @description Small userscript to improve 8chan
 // @match       *://8chan.co/*
@@ -135,7 +135,6 @@ var defaultSettings = {
 	'largecatalogimages': true,
 	'searchbyimagelinks': true,
 	'imagetimeguess':false
-  //'inlineposts': false
 };
 var settingsMenu = document.createElement('div');
 var prefix = '',suffix = '',style = 'overflow:auto;height:250px;';
@@ -159,7 +158,6 @@ settingsMenu.innerHTML = prefix
 + '<label><input type="checkbox" name="searchbyimagelinks">' + _('Add reverse image search links') + '</label><br>'
 + '<label><input type="checkbox" name="imagetimeguess">' + _('Try to guess when an image was originally uploaded based on its filename') + '</label><br>'
 + '<button id="purgedeadfavorites">' + _('Clean favorites') + '</button>'
-//+ '<label><input type="checkbox" name="inlineposts">' + _('Inline quoted posts on click') + '</label><br>'
 + suffix;
 
 function setting(name) {
