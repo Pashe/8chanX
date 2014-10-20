@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Pashe's 8chanX
-// @version     1.35.9.1413768720
+// @version     1.35.9.1413781980
 // @namespace   https://github.com/Pashe/
 // @description Small userscript to improve 8chan
 // @match       *://8chan.co/*
@@ -132,7 +132,6 @@ var defaultSettings = {
 	'precisepages': true,
 	'dynamicfavicon': false,
 	'hidefeaturedboards': true,
-	'largecatalogimages': true,
 	'searchbyimagelinks': true,
 	'imagetimeguess':false
 };
@@ -154,7 +153,6 @@ settingsMenu.innerHTML = prefix
 + '<label><input type="checkbox" name="precisepages">' + _('Increase page indicator precision') + '</label><br>'
 + '<label><input type="checkbox" name="dynamicfavicon">' + _('Use dynamic favicon') + '</label><br>'
 + '<label><input type="checkbox" name="hidefeaturedboards">' + _('Hide featured boards') + '</label><br>'
-+ '<label><input type="checkbox" name="largecatalogimages">' + _('Default to large catalog images') + '</label><br>'
 + '<label><input type="checkbox" name="searchbyimagelinks">' + _('Add reverse image search links') + '</label><br>'
 + '<label><input type="checkbox" name="imagetimeguess">' + _('Try to guess when an image was originally uploaded based on its filename') + '</label><br>'
 + '<button id="purgedeadfavorites">' + _('Clean favorites') + '</button>'
@@ -965,14 +963,16 @@ function highlightCatalogAutosage() {
 }
 
 function setCatalogImageSize() {
-	if (setting("largecatalogimages")) {
+		var catalogSize = localStorage["catalogSize"] || "large"
+		
 		$(".grid-li").removeClass("grid-size-vsmall");
 		$(".grid-li").removeClass("grid-size-small");
 		$(".grid-li").removeClass("grid-size-large");
-		$(".grid-li").addClass("grid-size-large");
+		$(".grid-li").addClass("grid-size-" + catalogSize);
 		
-		document.getElementById("image_size").value = "large";
-	}
+		$("#image_size").val(catalogSize);
+		
+		$("#image_size").change (function(){localStorage["catalogSize"] = $("#image_size").val();});
 }
 
 var sbp = [
