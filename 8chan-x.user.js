@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Pashe's 8chanX
-// @version     1.35.9.1413793150
+// @version     1.35.9.1413793290
 // @namespace   https://github.com/Pashe/
 // @description Small userscript to improve 8chan
 // @match       *://8chan.co/*
@@ -945,7 +945,7 @@ function addCatalogPages() {
 		var threadId = threadElements[i].innerHTML.match(/<a href="[^0-9]*([0-9]+).html?">/)[1];
 		var threadPage = getThreadPage(threadId, thisBoard, true);
 		
-		$(threadElements[i]).find("strong").append(" / P: " + (threadPage<1?"<span style='opacity:0.5'>???</span>":threadPage));
+		$(threadElements[i]).find("strong").first().append(" / P: " + (threadPage<1?"<span style='opacity:0.5'>???</span>":threadPage));
 	}
 }
 
