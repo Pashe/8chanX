@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Pashe's 8chanX
-// @version     1.35.9.1413756760
+// @version     1.35.9.1413763200
 // @namespace   https://github.com/Pashe/
 // @description Small userscript to improve 8chan
 // @match       *://8chan.co/*
@@ -138,9 +138,9 @@ var defaultSettings = {
   //'inlineposts': false
 };
 var settingsMenu = document.createElement('div');
-var prefix = '',suffix = '',style = '';
+var prefix = '',suffix = '',style = 'overflow:auto;height:250px;';
 if (window.Options) {
-  var tab = Options.add_tab('8chan X', 'times', _('8chan X'));
+  var tab = Options.add_tab('8chanX', 'times', _('8chanX'));
   $(settingsMenu) .appendTo(tab.content);
 } 
 settingsMenu.innerHTML = prefix
