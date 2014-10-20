@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Pashe's 8chanX
-// @version     1.35.9.1413767810
+// @version     1.35.9.1413768250
 // @namespace   https://github.com/Pashe/
 // @description Small userscript to improve 8chan
 // @match       *://8chan.co/*
@@ -8,7 +8,7 @@
 // @match       *://8ch.net/*
 // @run-at      document-end
 // @grant       none
-// @require     https://code.jquery.com/ui/1.11.1/jquery-ui.min.js
+// @require     https://8chan.co/js/jquery-ui.custom.min.js
 // @require     http://timeago.yarp.com/jquery.timeago.js
 // @updateURL   https://github.com/Pashe/8chan-X/raw/master/8chan-x.meta.js
 // @downloadURL https://github.com/Pashe/8chan-X/raw/master/8chan-x.user.js
