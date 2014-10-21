@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Pashe's 8chanX
-// @version     1.35.9.1413864910
+// @version     1.35.9.1413865140
 // @namespace   https://github.com/Pashe/
 // @description Small userscript to improve 8chan
 // @match       *://8chan.co/*
@@ -138,23 +138,23 @@ var defaultSettings = {
 };
 var settingsMenu = document.createElement('div');
 if (window.Options) {
-  var tab = Options.add_tab('8chanX', 'times', _('8chanX'));
+  var tab = Options.add_tab('8chanX', 'times', '8chanX');
   $(settingsMenu) .appendTo(tab.content);
 } 
 settingsMenu.outerHTML = '<div style="overflow:auto;height:240px;">'
-+ '<label><input type="checkbox" name="relativetime">' + _('Use relative post times') + '</label><br>'
-+ '<label><input type="checkbox" name="revealspoilers">' + _('Reveal text spoilers') + '</label><br>'
-+ '<label><input type="checkbox" name="revealimagespoilers">' + _('Reveal image spoilers') + '</label><br>'
-+ '<label><input type="checkbox" name="imagehover">' + _('Show full images on hover') + '</label><br>'
-+ '<label><input type="checkbox" name="catalogimagehover">' + _('Show full images on hover on catalog') + '</label><br>'
-+ '<label><input type="checkbox" name="cataloglinks">' + _('Link to the catalog in the menu') + '</label><br>'
-+ '<label><input type="checkbox" name="threadnewtab">' + _('Open threads in a new tab') + '</label><br>'
-+ '<label><input type="checkbox" name="precisepages">' + _('Increase page indicator precision') + '</label><br>'
-+ '<label><input type="checkbox" name="dynamicfavicon">' + _('Use dynamic favicon') + '</label><br>'
-+ '<label><input type="checkbox" name="hidefeaturedboards">' + _('Hide featured boards') + '</label><br>'
-+ '<label><input type="checkbox" name="searchbyimagelinks">' + _('Add reverse image search links') + '</label><br>'
-+ '<label><input type="checkbox" name="imagetimeguess">' + _('Try to guess when an image was originally uploaded based on its filename') + '</label><br>'
-+ '<button id="purgedeadfavorites">' + _('Clean favorites') + '</button>'
++ '<label><input type="checkbox" name="relativetime">' + 'Use relative post times' + '</label><br>'
++ '<label><input type="checkbox" name="revealspoilers">' + 'Reveal text spoilers' + '</label><br>'
++ '<label><input type="checkbox" name="revealimagespoilers">' + 'Reveal image spoilers' + '</label><br>'
++ '<label><input type="checkbox" name="imagehover">' + 'Show full images on hover' + '</label><br>'
++ '<label><input type="checkbox" name="catalogimagehover">' + 'Show full images on hover on catalog' + '</label><br>'
++ '<label><input type="checkbox" name="cataloglinks">' + 'Link to the catalog in the menu' + '</label><br>'
++ '<label><input type="checkbox" name="threadnewtab">' + 'Open threads in a new tab' + '</label><br>'
++ '<label><input type="checkbox" name="precisepages">' + 'Increase page indicator precision' + '</label><br>'
++ '<label><input type="checkbox" name="dynamicfavicon">' + 'Use dynamic favicon' + '</label><br>'
++ '<label><input type="checkbox" name="hidefeaturedboards">' + 'Hide featured boards' + '</label><br>'
++ '<label><input type="checkbox" name="searchbyimagelinks">' + 'Add reverse image search links' + '</label><br>'
++ '<label><input type="checkbox" name="imagetimeguess">' + 'Try to guess when an image was originally uploaded based on its filename' + '</label><br>'
++ '<button id="purgedeadfavorites">' + 'Clean favorites' + '</button>'
 + '</div>';
 function setting(name) {
   if (localStorage) {
