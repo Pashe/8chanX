@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Pashe's 8chanX
-// @version     1.35.9.1413854460
+// @version     1.35.9.1413864910
 // @namespace   https://github.com/Pashe/
 // @description Small userscript to improve 8chan
 // @match       *://8chan.co/*
@@ -137,13 +137,11 @@ var defaultSettings = {
 	'imagetimeguess':false
 };
 var settingsMenu = document.createElement('div');
-var prefix = '',suffix = '',style = 'overflow:auto;height:250px;';
 if (window.Options) {
   var tab = Options.add_tab('8chanX', 'times', _('8chanX'));
   $(settingsMenu) .appendTo(tab.content);
 } 
-settingsMenu.innerHTML = prefix
-+ '<div style="' + style + '">'
+settingsMenu.outerHTML = '<div style="overflow:auto;height:240px;">'
 + '<label><input type="checkbox" name="relativetime">' + _('Use relative post times') + '</label><br>'
 + '<label><input type="checkbox" name="revealspoilers">' + _('Reveal text spoilers') + '</label><br>'
 + '<label><input type="checkbox" name="revealimagespoilers">' + _('Reveal image spoilers') + '</label><br>'
@@ -157,8 +155,7 @@ settingsMenu.innerHTML = prefix
 + '<label><input type="checkbox" name="searchbyimagelinks">' + _('Add reverse image search links') + '</label><br>'
 + '<label><input type="checkbox" name="imagetimeguess">' + _('Try to guess when an image was originally uploaded based on its filename') + '</label><br>'
 + '<button id="purgedeadfavorites">' + _('Clean favorites') + '</button>'
-+ suffix;
-
++ '</div>';
 function setting(name) {
   if (localStorage) {
     if (localStorage[name] === undefined) return defaultSettings[name];
