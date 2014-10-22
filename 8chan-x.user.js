@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Pashe's 8chanX
-// @version     1.35.9.1413874480
+// @version     1.35.9.1413940070
 // @namespace   https://github.com/Pashe/
 // @description Small userscript to improve 8chan
 // @match       *://8chan.co/*
@@ -271,7 +271,7 @@ function initMenu() {
   if (isOnCatalog())
     add_favorites();
   
-  if (setting('cataloglinks') || isOnCatalog())
+  if (setting('cataloglinks'))
   {
     $('.favorite-boards a').each( function (index, data) {
       $(this).attr("href", $(this).attr("href")+"/catalog.html");
