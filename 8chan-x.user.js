@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Pashe's 8chanX
-// @version     1.35.9.1413962450
+// @version     1.35.9.1414012460
 // @namespace   https://github.com/Pashe/
 // @description Small userscript to improve 8chan
 // @match       *://8chan.co/*
@@ -933,8 +933,8 @@ function initCatalog() {
 		addCatalogPages();
 		setCatalogTitle();
 		highlightCatalogAutosage();
-		setCatalogImageSize();
 		addCatalogNullImagePlaceholders();
+		setCatalogImageSize();
 	}
 }
 
