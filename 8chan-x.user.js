@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Pashe's 8chanX
-// @version     1.35.9.1413940070
+// @version     1.35.9.1413960080
 // @namespace   https://github.com/Pashe/
 // @description Small userscript to improve 8chan
 // @match       *://8chan.co/*
@@ -963,16 +963,17 @@ function highlightCatalogAutosage() {
 }
 
 function setCatalogImageSize() {
-		var catalogSize = localStorage["catalogSize"] || "large";
-		
-		$(".grid-li").removeClass("grid-size-vsmall");
-		$(".grid-li").removeClass("grid-size-small");
-		$(".grid-li").removeClass("grid-size-large");
-		$(".grid-li").addClass("grid-size-" + catalogSize);
-		
-		$("#image_size").val(catalogSize);
-		
-		$("#image_size").change (function(){localStorage["catalogSize"] = $("#image_size").val();});
+		var catalogStorage = JSON.parse(localStorage["catalog"]);
+		if (!catalogStorage["image_size"]) {
+			catalogStorage["image_size"] = "large";
+			localStorage["catalog"] = JSON.stringify(catalogStorage);
+			
+			$(".grid-li").removeClass("grid-size-vsmall");
+			$(".grid-li").removeClass("grid-size-small");
+			$(".grid-li").removeClass("grid-size-large");
+			$(".grid-li").addClass("grid-size-" + catalogSize);
+			$("#image_size").val(catalogSize);
+		}
 }
 
 function addCatalogNullImagePlaceholders() {
