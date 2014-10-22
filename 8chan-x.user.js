@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Pashe's 8chanX
-// @version     1.35.9.1413960080
+// @version     1.35.9.1413962450
 // @namespace   https://github.com/Pashe/
 // @description Small userscript to improve 8chan
 // @match       *://8chan.co/*
@@ -141,7 +141,7 @@ if (window.Options) {
   var tab = Options.add_tab('8chanX', 'times', '8chanX');
   $(settingsMenu) .appendTo(tab.content);
 } 
-settingsMenu.outerHTML = '<span style="font-size:8pt;">8chanX '+GM_info.script.version+'</span>'
+settingsMenu.innerHTML = '<span style="font-size:8pt;">8chanX '+GM_info.script.version+'</span>'
 + '<div style="overflow:auto;height:240px;">'
 + '<label><input type="checkbox" name="relativetime">' + 'Use relative post times' + '</label><br>'
 + '<label><input type="checkbox" name="revealspoilers">' + 'Reveal text spoilers' + '</label><br>'
