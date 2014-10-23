@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Pashe's 8chanX
-// @version     1.35.9.1414012460
+// @version     1.35.9.1414102470
 // @namespace   https://github.com/Pashe/
 // @description Small userscript to improve 8chan
 // @match       *://8chan.co/*
@@ -1157,4 +1157,5 @@ $(document).ready(function() {
 	initImageDates();
 	if (localStorage.color_ids == undefined) localStorage.color_ids = true;
 	if ((localStorage.videohover == undefined) && setting('imagehover')) localStorage.videohover = true;
+	if (localStorage.useInlining == undefined) localStorage.useInlining = true;
 });
