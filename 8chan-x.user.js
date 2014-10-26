@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Pashe's 8chanX
-// @version     1.35.9.1414102470
+// @version     1.35.9.1414319450
 // @namespace   https://github.com/Pashe/
 // @description Small userscript to improve 8chan
 // @match       *://8chan.co/*
@@ -971,8 +971,8 @@ function setCatalogImageSize() {
 			$(".grid-li").removeClass("grid-size-vsmall");
 			$(".grid-li").removeClass("grid-size-small");
 			$(".grid-li").removeClass("grid-size-large");
-			$(".grid-li").addClass("grid-size-" + catalogSize);
-			$("#image_size").val(catalogSize);
+			$(".grid-li").addClass("grid-size-" + catalogStorage["image_size"]);
+			$("#image_size").val(catalogStorage["image_size"]);
 		}
 }
 
