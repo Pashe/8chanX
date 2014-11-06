@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Pashe's 8chanX
-// @version     1.35.9.1415314050
+// @version     1.35.9.1415315540
 // @namespace   https://github.com/Pashe/
 // @description Small userscript to improve 8chan
 // @match       *://8chan.co/*
@@ -134,7 +134,8 @@ var defaultSettings = {
 	'dynamicfavicon': false,
 	'hidefeaturedboards': true,
 	'searchbyimagelinks': true,
-	'imagetimeguess':false
+	'imagetimeguess':false,
+	'mascoturl':""
 };
 var settingsMenu = document.createElement('div');
 if (window.Options) {
@@ -155,6 +156,7 @@ settingsMenu.innerHTML = '<span style="font-size:8pt;">8chanX '+GM_info.script.v
 + '<label><input type="checkbox" name="hidefeaturedboards">' + 'Hide featured boards' + '</label><br>'
 + '<label><input type="checkbox" name="searchbyimagelinks">' + 'Add reverse image search links' + '</label><br>'
 + '<label><input type="checkbox" name="imagetimeguess">' + 'Try to guess when an image was originally uploaded based on its filename' + '</label><br>'
++ '<label>' + 'Mascot URL' + '<input type="text" name="mascoturl"></label><br>'
 + '<button id="purgedeadfavorites">' + 'Clean favorites' + '</button>'
 + '</div>';
 function setting(name) {
@@ -179,12 +181,16 @@ function refreshSettings() {
     var control = settingsItems[i];
     if (control.type == 'checkbox')
       control.checked = setting(control.name);
+		if (control.type == 'text')
+			control.value = setting(control.name);
   }
 }
 function setupControl(control) {
   if (control.addEventListener) control.addEventListener('change', function (e) {
     if (control.type == 'checkbox')
       changeSetting(control.name, control.checked);
+		 if (control.type == 'text')
+			changeSetting(control.name, control.value);
   }, false);
 }
 refreshSettings();
@@ -914,6 +920,50 @@ function fixTwStyle() {
 	$("#watchlist").css("display", twVis);
 }
 
+function initMascot() {
+if (setting("mascoturl")) {
+	$("head").append(
+		"<style>" +
+		"	form[name=postcontrols] {"+
+		"		margin-right: 22%;"+
+		"	}"+
+		"	div.delete{"+
+		"		padding-right: 6%;"+
+		"	}"+
+		"	div.styles {"+
+		"		float: left;"+
+		"	}"+
+		"	div#eightchanxmascot img {"+
+		"		display: block;"+
+		"		position: fixed;"+
+		"		bottom: 0pt;"+
+		"		right: 0pt;"+
+		"		left: auto;"+
+		"		max-width: 25%;"+
+		"		max-height: 100%;"+
+		"		opacity: 0.8;"+
+		"		z-index: -100;"+
+		"		pointer-events: none;"+
+		"	}"+
+		"</style>"
+	);
+	
+	var mascotHolder = document.createElement("div");
+	var mascotImage = document.createElement("img");
+	var hostElement = document.getElementsByTagName("body")[0];
+
+	mascotHolder.id = "eightchanxmascot"
+	mascotImage.setAttribute('src', setting("mascoturl"));
+
+	mascotHolder.appendChild(mascotImage);
+	hostElement.appendChild(mascotHolder);
+	
+	$(mascotImage).css("display", "block").css("position", "fixed").css("bottom", "0pt").css("right", "0pt").css("left", "auto").css("max-width", "25%").css("max-height", "100%").css("opacity", "0.8").css("z-index", "-100").css("pointer-events", "none");
+	
+	if (isOnCatalog()) {mascotImage.style.zIndex = -100}
+}
+}
+
 $(document).ready(function() {
 $("#purgedeadfavorites").click(function() {
 	console.log("Working...");
@@ -996,4 +1046,5 @@ $(document).ready(function() {
 	if (localStorage.useInlining == undefined) localStorage.useInlining = true;
 	initNotifications();
 	fixTwStyle();
+	initMascot();
 });
