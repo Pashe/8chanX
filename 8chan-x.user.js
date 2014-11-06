@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Pashe's 8chanX
-// @version     1.35.9.1415313150
+// @version     1.35.9.1415314050
 // @namespace   https://github.com/Pashe/
 // @description Small userscript to improve 8chan
 // @match       *://8chan.co/*
@@ -307,6 +307,8 @@ function initMenu() {
     styles[i].onclick = function () {
       changeStyle(this.innerHTML.substring(1, this.innerHTML.length - 1), this);
       updateMenuStyle();
+			
+			fixTwStyle();
     };
   }
 }
@@ -906,6 +908,12 @@ function notifyReplies() {
   });
 };
 
+function fixTwStyle() {
+	var twVis = $("#watchlist").css("display");
+	watchlist.render(true);
+	$("#watchlist").css("display", twVis);
+}
+
 $(document).ready(function() {
 $("#purgedeadfavorites").click(function() {
 	console.log("Working...");
@@ -987,4 +995,5 @@ $(document).ready(function() {
 	if ((localStorage.videohover == undefined) && setting('imagehover')) localStorage.videohover = true;
 	if (localStorage.useInlining == undefined) localStorage.useInlining = true;
 	initNotifications();
+	fixTwStyle();
 });
