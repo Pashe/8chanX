@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Pashe's 8chanX
-// @version     1.35.9.1415244250
+// @version     1.35.9.1415313150
 // @namespace   https://github.com/Pashe/
 // @description Small userscript to improve 8chan
 // @match       *://8chan.co/*
@@ -857,6 +857,55 @@ function initImageDates() {
 	} catch (e) {}}
 }
 
+function initNotifications() {
+	Notification.requestPermission();
+
+	$(document).on('new_post', function(e,post) {
+		var $post = $(post);
+		if ($post.is('div.post.reply')) { // it's a reply
+			$post.each(notifyReplies);
+		}
+		else {
+			//$post.each(notifyReplies); // first OP
+			$post.find('div.post.reply').each(notifyReplies); // then replies
+		}
+	});
+}
+
+function notifyReplies() {
+	/*
+	* taken from https://github.com/ctrlcctrlv/8chan/blob/master/js/show-own-posts.js
+	*
+	* Released under the MIT license
+	* Copyright (c) 2014 Marcin Labanowski <marcin@6irc.net>
+	*/
+	
+  var thread = $(this).parents('[id^="thread_"]').first();
+  if (!thread.length) {
+    thread = $(this);
+  }
+
+  var ownPosts = JSON.parse(localStorage.own_posts || '{}');
+
+  $(this).find('div.body:first a:not([rel="nofollow"])').each(function() {
+    var postID;
+
+    if(postID = $(this).text().match(/^>>(\d+)$/))
+      postID = postID[1];
+    else
+      return;
+
+    if (ownPosts[thisBoard] && ownPosts[thisBoard].indexOf(postID) !== -1) {
+			var replyPost = $(this).closest("div.post");
+			var replyUser = (replyPost.find(".name").text()+replyPost.find(".trip").text());
+			var replyBody = replyPost.find(".body").text();
+			var replyImage = replyPost.find(".post-image").first().attr('src');
+			
+			new Notification(replyUser+" replied to your post", {body:replyBody,icon:replyImage});
+    }
+  });
+};
+
 $(document).ready(function() {
 $("#purgedeadfavorites").click(function() {
 	console.log("Working...");
@@ -937,4 +986,5 @@ $(document).ready(function() {
 	if (localStorage.color_ids == undefined) localStorage.color_ids = true;
 	if ((localStorage.videohover == undefined) && setting('imagehover')) localStorage.videohover = true;
 	if (localStorage.useInlining == undefined) localStorage.useInlining = true;
+	initNotifications();
 });
