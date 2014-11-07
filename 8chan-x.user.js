@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Pashe's 8chanX
-// @version     1.35.9.1415403390
+// @version     1.35.9.1415403740
 // @namespace   https://github.com/Pashe/
 // @description Small userscript to improve 8chan
 // @match       *://8chan.co/*
@@ -700,19 +700,29 @@ window.addEventListener('keydown', function(event) {
   
   // Some shortcuts should only work outside the QR box
   if (activeElem.nodeName == "INPUT" || activeElem.nodeName == "TEXTAREA") {return;}
+	
 	if ((!event.ctrlKey) && (!event.metaKey)) {
-		if (event.keyCode === KeyEvent.DOM_VK_R) {
-			if (isOnThread()) {$('#update_thread').click();} else {document.location.reload();}
-		} else if (event.keyCode === KeyEvent.DOM_VK_Q) {
-			showQR();
-			$("#quick-reply textarea").focus();
-			event.preventDefault();
-		} else if (event.keyCode === KeyEvent.DOM_VK_E) {
-			var shrink = $('#shrink-all-images a');
-			if (shrink.length)
-			shrink.click();
-			else
-			$('#expand-all-images a').click();
+		switch (event.keyCode) {
+			case KeyEvent.DOM_VK_R:
+				if (isOnThread()) {
+					$('#update_thread').click();
+				} else {
+					document.location.reload();
+				}
+				break;
+			case KeyEvent.DOM_VK_Q:
+				showQR();
+				$("#quick-reply textarea").focus();
+				event.preventDefault();
+				break;
+			case KeyEvent.DOM_VK_E:
+				var shrink = $('#shrink-all-images a');
+				if (shrink.length) {
+					shrink.click();
+				} else {
+					$('#expand-all-images a').click();
+				}
+				break;
 		}
 	}
 });
