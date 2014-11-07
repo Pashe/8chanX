@@ -12,7 +12,6 @@ This is a small 8chan userscript, it adds various features and options like:
  * Use catalog links by default in the menu
  
 Additionally, this fork adds:
- * Semi-dynamic menu color (more compatible with custom themes)
  * Thread page display on the catalog and in the menu status area
  * Visible autosage on the catalog and in the menu status area
  * Reverse image search links
@@ -30,4 +29,5 @@ Key(s)  | Function
 ------- | --------
 R       | Reloads the page
 E       | Expands/shrinks all images
+Q       | Opens the quick reply
 Esc     | Closes the quick reply
