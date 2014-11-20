@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Pashe's 8chanX
-// @version     1.35.9.1415403740
+// @version     1.35.9.1416520020
 // @namespace   https://github.com/Pashe/
 // @description Small userscript to improve 8chan
 // @match       *://8chan.co/*
@@ -70,6 +70,13 @@ function wrapQRSelectionWith(str) {
 }
 
 function getThreadPage(threadId, boardId, cached) {
+	if ((threadId == thisThread) && (boardId == thisBoard)) {
+		setTimeout(function() {
+			console.log((document.getElementById("thread_stats_page").innerHTML));
+			return parseInt(document.getElementById("thread_stats_page").innerHTML);
+		}, 1000);
+	}
+	
 	if ((!cached) || (threads == null)) {
 		$.ajax({
 			url: "/" + boardId + "/threads.json",
@@ -130,7 +137,7 @@ var defaultSettings = {
   'catalogimagehover': true,
   'cataloglinks': false,
   'threadnewtab': false,
-	'precisepages': true,
+	'precisepages': false,
 	'dynamicfavicon': false,
 	'hidefeaturedboards': true,
 	'searchbyimagelinks': true,
