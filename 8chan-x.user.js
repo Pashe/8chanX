@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Pashe's 8chanX
-// @version     1.35.9.1416520020
+// @version     1.35.9.1416623860
 // @namespace   https://github.com/Pashe/
 // @description Small userscript to improve 8chan
 // @match       *://8chan.co/*
@@ -1069,4 +1069,5 @@ $(document).ready(function() {
 	initNotifications();
 	fixTwStyle();
 	initMascot();
+	$(document).on('ajax_after_post', function(e, ret) {if (isOnThread())	{$(".watchThread").click();}}); //Auto thread watch
 });
