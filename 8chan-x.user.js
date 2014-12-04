@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Pashe's 8chanX
-// @version     1.35.9.1417688650
+// @version     1.35.9.1417688840
 // @namespace   https://github.com/Pashe/
 // @description Small userscript to improve 8chan
 // @match       *://8chan.co/*
@@ -27,16 +27,21 @@
 /*********
 GLOBALS
 *********/
+//Constants
 var unreadFavicon = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAFo9M/3AAAAAXNSR0IArs4c6QAAAd1JREFUOMu9kj1oU1EUgL/z8tM8M1iIYOlQ0pzQXTpVnFshFHSKHSoIRUwKDp11FHTwp0NeGhdFQSoKLkFEV3UQQRBxyg0oAbcQlJo+2/eOS1LUUBREv+nce+45nPvdCwOkEBTagkzzE8VasSp7i6D40MzeA6CBGvuxV6KBPgJOJIv14oJE0ouJDwIkzeyJefbCVd2xfftoTY9roJcAZLYxm+pFvW+D3AdXcdMINpwm2Yt6bzBOuVV3P1/LT0zenPT9ur9MzBFXdcJfkxjZMUQn9GJuMbfTbXY7Iwf0sD4z7DXG3Vwp91k00CZQGnhachW3CTDTmDkURdFH0UBtOK3W9CXCnIicNrNrJnbVG7bO38pn8NgMt8MDscXzJnamXWlfTiKsa6BGHyxh4521Th9Y5r/xW9X56/nxRDrxGGHuR5uCrLcqrTUZyi0EhZOCzJtYVkSeh/3wTpyNxY/9lV1v90EqTHVb51shQKFWWBKRe8A7TwO9oHWNRWRDkLdi0sRYHMuMffUjfwujnN5JTw2LATzxtgZhRjTQPpAJ02Gus9Lpjjz7hpYxrgBTv1z+tsu5FdFAzwIN4AvGDfPskyALGFmMrlt15T+SqDU9ilBC2BbkVetc6+nw4/9TvgNQUr7tUjroFgAAAABJRU5ErkJggg==";
 var readFavicon = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAFo9M/3AAAAAXNSR0IArs4c6QAAAeNJREFUOMu9kk1IVGEUhp/3jj8zukiYIGkh6iftwzZGaw1EqJW5KAxsvhmFgta1DGpRGTF35g5EURBGQRuJqG21iCKIaOUVCqHdYIU/k849LXIMEymCenbncM7hvO85sIF6fTgv6GELfb44qc0gFz6wwN4D4Hxo7MRmi/PhQ+BIU1++NKSkvpjALoAmM3tsCp7H0eShHec4Xzzs8uEFAPXnouZF1b8BYHyIK4UekDW2aVpU/Q3YsTiautc9Wezcm6tkMkHpOEmyP45+6vh7UttTJpfrPJ89MLJWfT27sK3A5fc8NXgFdifbP/xFzoezwPAPnzQWlwszAPty0e666h/lfGiNbZ0vvgANSDphZlfMdDlojO4ev5nGgpla22pbYjZo0sn5SuGinC9Ng50BMEt1zFf8Z/4rv7W6e/xqR6q15RFoYIuZcG0uKpxVI+714VEZgya1S3pWy6zcTpbalSGZWCe439xaq85dP10D6PXFMaG7wLvA+fCc86VEUlnirbBZzEZal9PLGdWXCGy0hbWuRjNAEGhp47vScj5cAdK19Zbswo2J6raz58ujmF0Cun5RfyuuZifkfJgDIuArsmlLgk8SQ8jaMavG0dToH5noThUPktIwiVYV8HKunH/SePx/ynf5T8EXjP2zGwAAAABJRU5ErkJggg==";
-var originalPageTitle = document.title;
+var threadsPerPage = 15;
+var bumpLimit = 300;
+
+//Initializations
 var unreadPosts = [];
+var rse = null;
+var threads = null;
+
+//Dynamic
+var originalPageTitle = document.title;
 var thisBoard = window.location.pathname.split("/")[1]=="mod.php"?window.location.href.split("/")[4]:window.location.pathname.split("/")[1];
 try {var thisThread = parseInt(window.location.href.match(/([0-9]+)\.html/)[1]);} catch (e) {var thisThread = -1};
-var bumpLimit = 300;
-var threads = null;
-var rse = null;
-var threadsPerPage = 15;
 
 /**************
 GENERAL / MISC
