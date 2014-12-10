@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Pashe's 8chanX v2
-// @version     2.0.0.pa-1418253330
+// @version     2.0.0.pa-1418254290
 // @description Small userscript to improve 8chan
 // @namespace   https://github.com/Pashe/tree/2-0
 // @updateURL   https://github.com/Pashe/8chan-X/raw/2-0/8chan-x.meta.js
@@ -67,6 +67,7 @@ settingsMenu.innerHTML = sprintf('<span style="font-size:8pt;">8chanX %s</span>'
 + '<label><input type="checkbox" name="catalogImageHover">' + 'Image hover on catalog' + '</label><br>'
 + '<label><input type="checkbox" name="reverseImageSearch">' + 'Add reverse image search links' + '</label><br>'
 + '<label><input type="checkbox" name="parseTimestampImage">' + 'Guess original download date of imageboard-style filenames' + '</label><br>'
++ '<label>' + 'Mascot URL: ' + '<input type="text" name="mascotUrl" style="width: 1000pt"></label><br>'
 + '</div>';
 
 var defaultSettings = {
@@ -78,7 +79,8 @@ var defaultSettings = {
 	'imageHover': true,
 	'catalogImageHover': true,
 	'reverseImageSearch': true,
-	'parseTimestampImage': true
+	'parseTimestampImage': true,
+	'mascoturl':""
 };
 
 function getSetting(key) {
@@ -582,6 +584,48 @@ function initNotifications() {
 	Notification.requestPermission();
 }
 
+function initMascot() {
+	if (!getSetting("mascotUrl")) {return;}
+	console.log(getSetting("mascotUrl"));
+	
+	$("head").append(
+		"<style>" +
+		"	form[name=postcontrols] {"+
+		"		margin-right: 22%;"+
+		"	}"+
+		"	div.delete{"+
+		"		padding-right: 6%;"+
+		"	}"+
+		"	div.styles {"+
+		"		float: left;"+
+		"	}"+
+		"	div#chx_mascot img {"+
+		"		display: block;"+
+		"		position: fixed;"+
+		"		bottom: 0pt;"+
+		"		right: 0pt;"+
+		"		left: auto;"+
+		"		max-width: 25%;"+
+		"		max-height: 100%;"+
+		"		opacity: 0.8;"+
+		"		z-index: -100;"+
+		"		pointer-events: none;"+
+		"	}"+
+		"</style>"
+	);
+	
+	var mascotHolder = $('<div id="chx_mascot"></div>');
+	var mascotImage = $('<img></img>');
+	var hostElement = $("body").first();
+	
+	mascotImage.attr("src", getSetting("mascotUrl"));
+	
+	mascotImage.appendTo(mascotHolder);
+	mascotHolder.appendTo(hostElement);
+	
+	if (isOnCatalog()) {mascotImage.css("z-index", "-100");}
+}
+
 ////////////////
 //INIT CALLS
 ////////////////
@@ -597,7 +641,8 @@ $(unsafeWindow.document).ready(function() {
 	initRISLinks();
 	initQrDrag();
 	initParseTimestampImage();
-	initNotifications;
+	initNotifications();
+	initMascot();
 });
 
 ////////////////
