@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Pashe's 8chanX v2
-// @version     2.0.0.pa-1418202120
+// @version     2.0.0.pa-1418250450
 // @description Small userscript to improve 8chan
 // @namespace   https://github.com/Pashe/tree/2-0
 // @updateURL   https://github.com/Pashe/8chan-X/raw/2-0/8chan-x.meta.js
@@ -65,6 +65,7 @@ settingsMenu.innerHTML = sprintf('<span style="font-size:8pt;">8chanX %s</span>'
 + '<label><input type="checkbox" name="revealImageSpoilers">' + 'Reveal image spoilers' + '</label><br>'
 + '<label><input type="checkbox" name="imageHover">' + 'Image hover' + '</label><br>'
 + '<label><input type="checkbox" name="catalogImageHover">' + 'Image hover on catalog' + '</label><br>'
++ '<label><input type="checkbox" name="reverseImageSearch">' + 'Add reverse image search links' + '</label><br>'
 + '</div>';
 
 var defaultSettings = {
@@ -74,7 +75,8 @@ var defaultSettings = {
 	'catalogLinks': true,
 	'revealImageSpoilers': false,
 	'imageHover': true,
-	'catalogImageHover': true
+	'catalogImageHover': true,
+	'reverseImageSearch': true
 };
 
 function getSetting(key) {
@@ -82,7 +84,7 @@ function getSetting(key) {
 }
 
 function setting(key) {
-	console.log(sprintf("setting('%s') is deprecated", key));
+	console.log(sprintf("setting('%s') is deprecated. Please report this.", key));
 	return getSetting(key);
 }
 
@@ -123,19 +125,19 @@ function setupControl(control) {
 //GENERAL FUNCTIONS
 ////////////////
 function strEndsWith(str, s) {
-  return str.length >= s.length && str.substr(str.length - s.length) == s;
+	return str.length >= s.length && str.substr(str.length - s.length) == s;
 }
-  
+
 function isOnCatalog() {
-  return unsafeWindow.active_page === "catalog";
+	return unsafeWindow.active_page === "catalog";
 }
 
 function isOnBoardIndex() {
-  return unsafeWindow.active_page === "index";
+	return unsafeWindow.active_page === "index";
 }
 
 function isOnThread() {
-  return unsafeWindow.active_page === "thread";
+	return unsafeWindow.active_page === "thread";
 }
 
 function printf() {
@@ -298,6 +300,49 @@ var imghoverMOut = function(e) {
 }
 
 ////////////////
+//REVERSE IMAGE SEARCH
+////////////////
+var RISProviders = [
+	{
+		"urlFormat" : "https://www.google.com/searchbyimage?image_url=%s",
+		"name"      : "Google"
+	},
+	{
+		"urlFormat" : "http://iqdb.org/?url=%s",
+		"name"      : "iqdb"
+	},
+	{
+		"urlFormat" : "https://saucenao.com/search.php?db=999&url=%s",
+		"name"      : "SauceNAO"
+	},
+	{
+		"urlFormat" : "https://www.tineye.com/search/?url=%s",
+		"name"      : "TinEye"
+	}
+];
+
+function addRISLinks(image) {
+	for (var providerIdx in RISProviders) {
+		var provider = RISProviders[providerIdx];
+		
+		try {
+			var RISUrl = sprintf(provider["urlFormat"], image.src);
+			var providerText = ("[" + provider["name"][0].toUpperCase() + "]");
+			
+			var RISLink = $('<a class="chx_RISLink"></a>');
+			RISLink.attr("href", RISUrl);
+			RISLink.attr("title", provider["name"]);
+			RISLink.attr("target", "_blank");
+			RISLink.css("font-size", "8pt");
+			RISLink.css("margin-left", "2pt");
+			RISLink.text("[" + provider["name"][0].toUpperCase() + "]");
+			
+			RISLink.appendTo(image.parentNode.parentNode.getElementsByClassName("fileinfo")[0]);
+		} catch (e) {}
+	}
+}
+
+////////////////
 //INIT FUNCTIONS
 ////////////////
 function initSettings() {
@@ -454,6 +499,11 @@ function initCatalog() {
 	$("img").filter("[src='']").attr("src", "data:image/svg+xml;base64,PHN2ZyB4bWxuczpyZGY9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkvMDIvMjItcmRmLXN5bnRheC1ucyMiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgaGVpZ2h0PSIyMDAiIHdpZHRoPSIyMDAiIHZlcnNpb249IjEuMSI+PGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMCwtODYwKSI+PHRleHQgc3R5bGU9ImxldHRlci1zcGFjaW5nOjBweDt0ZXh0LWFuY2hvcjptaWRkbGU7d29yZC1zcGFjaW5nOjBweDt0ZXh0LWFsaWduOmNlbnRlcjsiIHhtbDpzcGFjZT0icHJlc2VydmUiIGZvbnQtc2l6ZT0iNjRweCIgeT0iOTMwIiB4PSI5NSIgZm9udC1mYW1pbHk9IidBZG9iZSBDbGVhbiBVSScsIHNhbnMtc2VyaWYiIGxpbmUtaGVpZ2h0PSIxMjUlIiBmaWxsPSIjMDAwMDAwIj48dHNwYW4geD0iOTUiIHk9IjkyOSI+Tm88L3RzcGFuPjx0c3BhbiB4PSI5NSIgeT0iMTAxMCI+SW1hZ2U8L3RzcGFuPjwvdGV4dD48L2c+PC9zdmc+");
 }
 
+function initRISLinks() {
+	if (!getSetting("reverseImageSearch")) {return;}
+	var posts = $("img.post-image").each(function() {addRISLinks(this);});
+}
+
 ////////////////
 //INIT CALLS
 ////////////////
@@ -466,6 +516,7 @@ $(unsafeWindow.document).ready(function() {
 	initRevealImageSpoilers();
 	initImageHover();
 	initCatalog();
+	initRISLinks();
 });
 
 ////////////////
@@ -486,7 +537,12 @@ function onNewPostImageHover() {
 	});
 }
 
-$(document).on('new_post', function (e, post) {  //TODO: Fix this
+function onNewPostRISLinks(post) {
+	$('#'+$(post).attr('id')+' img.post-image').each(function() {addRISLinks(this);}); 
+}
+
+$(unsafeWindow.document).on('new_post', function (e, post) {  //TODO: Fix this
 	onNewPostRelativeTime();
 	onNewPostImageHover();
+	onNewPostRISLinks(post);
 });
