@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Pashe's 8chanX v2
-// @version     2.0.0.pa-1418188820
+// @version     2.0.0.pa-1418189830
 // @description Small userscript to improve 8chan
 // @namespace   https://github.com/Pashe/tree/2-0
 // @updateURL   https://github.com/Pashe/8chan-X/raw/2-0/8chan-x.meta.js
@@ -15,6 +15,7 @@
 // @require     https://8chan.co/js/jquery.min.js
 // @require     https://8chan.co/js/jquery-ui.custom.min.js
 // @require     https://github.com/alexei/sprintf.js/raw/master/src/sprintf.js
+// @require     https://raw.githubusercontent.com/rmm5t/jquery-timeago/master/jquery.timeago.js
 
 // @match       *://8chan.co/*
 // @match       *://hatechan.co/*
@@ -58,10 +59,12 @@ if (unsafeWindow.Options) {
 settingsMenu.innerHTML = sprintf('<span style="font-size:8pt;">8chanX %s</span>', GM_info.script.version)
 + '<div style="overflow:auto;height:240px;">'
 + '<label><input type="checkbox" name="precisePages">' + 'Increase page indicator precision' + '</label><br>'
++ '<label><input type="checkbox" name="relativeTime">' + 'Use relative post times' + '</label><br>'
 + '</div>';
 
 var defaultSettings = {
-	'precisePages': true
+	'precisePages': true,
+	'relativeTime': true
 };
 
 function getSetting(key) {
@@ -171,19 +174,32 @@ function initSettings() {
 	  setupControl(settingsItems[i]);
 	}
 	if (settingsMenu.addEventListener && !window.Options) {
-	  settingsMenu.addEventListener("mouseover", function (e) {
-		refreshSettings();
-		settingsMenu.getElementsByTagName("a") [0].style.fontWeight = "bold";
-		settingsMenu.getElementsByTagName("div") [0].style.display = "block";
-	  }, false);
-	  settingsMenu.addEventListener("mouseout", function (e) {
-		settingsMenu.getElementsByTagName("a") [0].style.fontWeight = "normal";
-		settingsMenu.getElementsByTagName("div") [0].style.display = "none";
-	  }, false);
+		settingsMenu.addEventListener("mouseover", function (e) {
+			refreshSettings();
+			settingsMenu.getElementsByTagName("a") [0].style.fontWeight = "bold";
+			settingsMenu.getElementsByTagName("div") [0].style.display = "block";
+		}, false);
+		settingsMenu.addEventListener("mouseout", function (e) {
+			settingsMenu.getElementsByTagName("a") [0].style.fontWeight = "normal";
+			settingsMenu.getElementsByTagName("div") [0].style.display = "none";
+		}, false);
 	}
 }
+
+function initRelativeTime() {
+	if (getSetting('relativeTime')) {$("time").timeago();}
+	
+	// Show the relative time for new posts
+	$(unsafeWindow.document).on('new_post', function (e, post) {  //TODO: Test this
+		if (getSetting('relativeTime')) {$("time").timeago();}
+	});
+};
 
 ////////////////
 //INIT CALLS
 ////////////////
 initSettings();
+
+$(unsafeWindow.document).ready(function() {
+	initRelativeTime();
+});
