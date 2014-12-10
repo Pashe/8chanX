@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Pashe's 8chanX v2
-// @version     2.0.0.pa-1418186690
+// @version     2.0.0.pa-1418188820
 // @description Small userscript to improve 8chan
 // @namespace   https://github.com/Pashe/tree/2-0
 // @updateURL   https://github.com/Pashe/8chan-X/raw/2-0/8chan-x.meta.js
@@ -34,6 +34,7 @@
 //GLOBAL VARIABLES
 ////////////////
 //Constants
+var threadsPerPage = 15;
 var bumpLimit = 300;
 
 //Initializations
@@ -43,6 +44,62 @@ var pages = null;
 var originalPageTitle = document.title;
 var thisBoard = unsafeWindow.location.pathname.split("/")[1]=="mod.php"?unsafeWindow.location.href.split("/")[4]:unsafeWindow.location.pathname.split("/")[1];
 try {var thisThread = parseInt(unsafeWindow.location.href.match(/([0-9]+)\.html/)[1]);} catch (e) {var thisThread = -1};
+
+////////////////
+//SETTINGS
+////////////////
+var settingsMenu = unsafeWindow.document.createElement('div');
+
+if (unsafeWindow.Options) {
+	var tab = unsafeWindow.Options.add_tab('8chanX', 'times', '8chanX');
+	$(settingsMenu).appendTo(tab.content);
+}
+
+settingsMenu.innerHTML = sprintf('<span style="font-size:8pt;">8chanX %s</span>', GM_info.script.version)
++ '<div style="overflow:auto;height:240px;">'
++ '<label><input type="checkbox" name="precisePages">' + 'Increase page indicator precision' + '</label><br>'
++ '</div>';
+
+var defaultSettings = {
+	'precisePages': true
+};
+
+function getSetting(key) {
+	return GM_getValue(key, defaultSettings[key]);
+}
+
+function setSetting(key, value) {
+	GM_setValue(key, value);
+}
+
+function refreshSettings() {
+	var settingsItems = settingsMenu.getElementsByTagName("input");
+	for (i in settingsItems) {
+		var control = settingsItems[i];
+		
+		switch (control.type) {
+			case "checkbox":
+				control.checked = getSetting(control.name);
+				break;
+			default:
+				control.value = getSetting(control.name);
+				break;
+		}
+	}
+}
+
+function setupControl(control) {
+	if (control.addEventListener) control.addEventListener("change", function (e) {
+		switch (control.type) {
+			case "checkbox":
+				setSetting(control.name, control.checked);
+				break;
+			default:
+				setSetting(control.name, control.value);
+				break;
+		}
+	}, false);
+}
 
 ////////////////
 //GENERAL FUNCTIONS
@@ -73,8 +130,7 @@ function printf() {
 
 function getThreadPage(threadId, boardId, cached) {
 	var threadPage = -1;
-	//var precisePages = setting("precisepages");
-	var precisePages = true;
+	var precisePages = getSetting("precisePages");
 	
 	if ((!cached) || (pages == null)) {
 		$.ajax({
@@ -104,3 +160,30 @@ function getThreadPage(threadId, boardId, cached) {
 	}
 	return threadPage;
 }
+
+////////////////
+//INIT FUNCTIONS
+////////////////
+function initSettings() {
+	refreshSettings();
+	var settingsItems = settingsMenu.getElementsByTagName("input");
+	for (var i = 0; i < settingsItems.length; i++) {
+	  setupControl(settingsItems[i]);
+	}
+	if (settingsMenu.addEventListener && !window.Options) {
+	  settingsMenu.addEventListener("mouseover", function (e) {
+		refreshSettings();
+		settingsMenu.getElementsByTagName("a") [0].style.fontWeight = "bold";
+		settingsMenu.getElementsByTagName("div") [0].style.display = "block";
+	  }, false);
+	  settingsMenu.addEventListener("mouseout", function (e) {
+		settingsMenu.getElementsByTagName("a") [0].style.fontWeight = "normal";
+		settingsMenu.getElementsByTagName("div") [0].style.display = "none";
+	  }, false);
+	}
+}
+
+////////////////
+//INIT CALLS
+////////////////
+initSettings();
