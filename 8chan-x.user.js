@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Pashe's 8chanX v2
-// @version     2.0.0.pa-1418194830
+// @version     2.0.0.pa-1418195810
 // @description Small userscript to improve 8chan
 // @namespace   https://github.com/Pashe/tree/2-0
 // @updateURL   https://github.com/Pashe/8chan-X/raw/2-0/8chan-x.meta.js
@@ -42,7 +42,7 @@ var bumpLimit = 300;
 var pages = null;
 
 //Dynamic
-var originalPageTitle = document.title;
+var originalPageTitle = unsafeWindow.document.title;
 var thisBoard = unsafeWindow.location.pathname.split("/")[1]=="mod.php"?unsafeWindow.location.href.split("/")[4]:unsafeWindow.location.pathname.split("/")[1];
 try {var thisThread = parseInt(unsafeWindow.location.href.match(/([0-9]+)\.html/)[1]);} catch (e) {var thisThread = -1};
 
@@ -216,11 +216,6 @@ function initSettings() {
 
 function initRelativeTime() {
 	if (getSetting('relativeTime')) {$("time").timeago();}
-	
-	// Show the relative time for new posts
-	$(document).on('new_post', function (e, post) {  //TODO: Fix this
-		if (getSetting('relativeTime')) {$("time").timeago();}
-	});
 };
 
 function initMenu() {
@@ -262,6 +257,21 @@ function initMenu() {
 	}
 }
 
+function initImprovedPageTitles() {
+	if (isOnThread()) {
+		try {
+			unsafeWindow.document.title = unsafeWindow.document.location.pathname.match(/\/(.*?)\//)[0] + " - " + (function(){
+				var op = $(".op").text();
+				var subject = op ? $(".subject").text() : null;
+				var body = op ? $(".body").text() : null;
+				return subject ? subject : body ? body.length > 128 ? body.substr(0, 128) + "..." : body : "8chan";
+			})();
+		} catch (e) {
+			unsafeWindow.document.title = originalPageTitle;
+		}
+	}
+}
+
 ////////////////
 //INIT CALLS
 ////////////////
@@ -270,4 +280,12 @@ initSettings();
 $(unsafeWindow.document).ready(function() {
 	initRelativeTime();
 	initMenu();
+	//initImprovedPageTitles();
+});
+
+////////////////
+//EVENT HANDLERS
+////////////////
+$(document).on('new_post', function (e, post) {  //TODO: Fix this
+	if (getSetting('relativeTime')) {$("time").timeago();}
 });
