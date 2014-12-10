@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Pashe's 8chanX v2
-// @version     2.0.0.pa-1418250450
+// @version     2.0.0.pa-1418252510
 // @description Small userscript to improve 8chan
 // @namespace   https://github.com/Pashe/tree/2-0
 // @updateURL   https://github.com/Pashe/8chan-X/raw/2-0/8chan-x.meta.js
@@ -66,6 +66,7 @@ settingsMenu.innerHTML = sprintf('<span style="font-size:8pt;">8chanX %s</span>'
 + '<label><input type="checkbox" name="imageHover">' + 'Image hover' + '</label><br>'
 + '<label><input type="checkbox" name="catalogImageHover">' + 'Image hover on catalog' + '</label><br>'
 + '<label><input type="checkbox" name="reverseImageSearch">' + 'Add reverse image search links' + '</label><br>'
++ '<label><input type="checkbox" name="parseTimestampImage">' + 'Guess original download date of imageboard-style filenames' + '</label><br>'
 + '</div>';
 
 var defaultSettings = {
@@ -76,7 +77,8 @@ var defaultSettings = {
 	'revealImageSpoilers': false,
 	'imageHover': true,
 	'catalogImageHover': true,
-	'reverseImageSearch': true
+	'reverseImageSearch': true,
+	'parseTimestampImage': true
 };
 
 function getSetting(key) {
@@ -504,6 +506,42 @@ function initRISLinks() {
 	var posts = $("img.post-image").each(function() {addRISLinks(this);});
 }
 
+function initQrDrag() {
+	$("#quick-reply").draggable();
+}
+
+function initParseTimestampImage() {
+	//if (!getSetting("parseTimestampImage")) {break;}
+	try {
+		var minTimestamp = new Date(1985,1).valueOf();
+		var maxTimestamp = Date.now()+(24*60*60*1000);
+		
+		$("p.fileinfo > span.unimportant > a:link").each(function() {
+			$this = $(this);
+			var filename = $this.text();
+			
+			if (!filename.match(/^([0-9]{9,13})[^a-zA-Z0-9]?.*$/)) {return;}
+			var timestamp = parseInt(filename.match(/^([0-9]{9,13})[^a-zA-Z0-9]?.*$/)[1]);
+			
+			if (timestamp < minTimestamp) {timestamp *= 1000;}
+			if ((timestamp < minTimestamp) || (timestamp > maxTimestamp)) {return;}
+			
+			var fileDate = new Date(timestamp);
+			
+			var fileTimeElement = $('<span class="chx_PTIStamp"></span>');
+			fileTimeElement.attr("title", fileDate.toGMTString());
+			fileTimeElement.attr("data-timestamp", timestamp);
+			fileTimeElement.attr("data-isotime", fileDate.toISOString());
+			fileTimeElement.text(", " + $.timeago(timestamp) + ")");
+			fileTimeElement.appendTo($this.parent());
+			
+			$this.parent().html(function(e, html) {
+				return html.replace(")", "")
+			});
+		});
+	} catch (e) {}
+}
+
 ////////////////
 //INIT CALLS
 ////////////////
@@ -517,6 +555,8 @@ $(unsafeWindow.document).ready(function() {
 	initImageHover();
 	initCatalog();
 	initRISLinks();
+	initQrDrag();
+	initParseTimestampImage();
 });
 
 ////////////////
