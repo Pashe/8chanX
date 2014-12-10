@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Pashe's 8chanX v2
-// @version     2.0.0.pa-1418189830
+// @version     2.0.0.pa-1418194830
 // @description Small userscript to improve 8chan
 // @namespace   https://github.com/Pashe/tree/2-0
 // @updateURL   https://github.com/Pashe/8chan-X/raw/2-0/8chan-x.meta.js
@@ -60,11 +60,15 @@ settingsMenu.innerHTML = sprintf('<span style="font-size:8pt;">8chanX %s</span>'
 + '<div style="overflow:auto;height:240px;">'
 + '<label><input type="checkbox" name="precisePages">' + 'Increase page indicator precision' + '</label><br>'
 + '<label><input type="checkbox" name="relativeTime">' + 'Use relative post times' + '</label><br>'
++ '<label><input type="checkbox" name="hideTopBoards">' + 'Hide top boards' + '</label><br>'
++ '<label><input type="checkbox" name="catalogLinks">' + 'Force catalog links' + '</label><br>'
 + '</div>';
 
 var defaultSettings = {
 	'precisePages': true,
-	'relativeTime': true
+	'relativeTime': true,
+	'hideTopBoards': true,
+	'catalogLinks': true
 };
 
 function getSetting(key) {
@@ -112,15 +116,15 @@ function strEndsWith(str, s) {
 }
   
 function isOnCatalog() {
-  return active_page === "catalog";
+  return unsafeWindow.active_page === "catalog";
 }
 
 function isOnBoardIndex() {
-  return active_page === "index";
+  return unsafeWindow.active_page === "index";
 }
 
 function isOnThread() {
-  return active_page === "thread";
+  return unsafeWindow.active_page === "thread";
 }
 
 function printf() {
@@ -165,6 +169,30 @@ function getThreadPage(threadId, boardId, cached) {
 }
 
 ////////////////
+//MENU BAR
+////////////////
+function getMenuStats() {
+	var nPosts = document.getElementsByClassName("post reply").length;
+	var nImages = document.getElementsByClassName("post-image").length;
+	var hlStyle = "<span style='color:#f00;font-weight:bold;'>";
+	
+	if (nPosts >= bumpLimit) {nPosts = hlStyle + nPosts + "</span>";}
+	
+	var threadPage = getThreadPage(thisThread, thisBoard, false);
+	
+	return sprintf(
+		 '<span title="Posts">%s</span> / '
+		+'<span title="Images">%s</span> / '
+		+'<span title="Page">%s</span>',
+		nPosts, nImages, (threadPage<1?"<span style='opacity:0.5'>???</span>":threadPage));
+}
+
+function updateMenuStats() {
+	var stats = document.getElementById("menuStats");
+	stats.innerHTML = getMenuStats();
+}
+
+////////////////
 //INIT FUNCTIONS
 ////////////////
 function initSettings() {
@@ -190,10 +218,49 @@ function initRelativeTime() {
 	if (getSetting('relativeTime')) {$("time").timeago();}
 	
 	// Show the relative time for new posts
-	$(unsafeWindow.document).on('new_post', function (e, post) {  //TODO: Test this
+	$(document).on('new_post', function (e, post) {  //TODO: Fix this
 		if (getSetting('relativeTime')) {$("time").timeago();}
 	});
 };
+
+function initMenu() {
+	var menu = unsafeWindow.document.getElementsByClassName("boardlist")[0];
+	var $menu = $(menu);
+	
+	$("[data-description='1'], [data-description='2']").hide();
+	if (getSetting("hideTopBoards")) {
+		var checkTopBoardsExist = setInterval(function() {
+			if ($("[data-description='3']")[0]) {
+				$("[data-description='3']").hide();
+				clearInterval(checkTopBoardsExist);
+			}
+		}, 500);
+	}
+	
+	if (getSetting('catalogLinks') && !isOnCatalog()) {
+		$('.favorite-boards a').each( function (index, data) {
+			$(this).attr("href", $(this).attr("href")+"/catalog.html");
+		});
+	}
+	
+	if (isOnThread()) {
+		$('#update_secs').remove();
+		
+		var updateNode = $("<span></span>");
+		updateNode.attr("id", "update_secs");
+		updateNode.css("font-family", "'Source Code Pro', monospace");
+		updateNode.css("padding-left", "3pt");
+		updateNode.attr("title","Update thread");
+		updateNode.click(function() {$('#update_thread').click();});
+		updateNode.appendTo($menu);
+		
+		var statsNode = $("<span></span>");
+		statsNode.html(getMenuStats());
+		statsNode.attr("id", "menuStats");
+		statsNode.css("padding-left", "3pt");
+		statsNode.appendTo($menu);
+	}
+}
 
 ////////////////
 //INIT CALLS
@@ -202,4 +269,5 @@ initSettings();
 
 $(unsafeWindow.document).ready(function() {
 	initRelativeTime();
+	initMenu();
 });
