@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Pashe's 8chanX v2
-// @version     2.0.0.pa-1418197050
+// @version     2.0.0.pa-1418198610
 // @description Small userscript to improve 8chan
 // @namespace   https://github.com/Pashe/tree/2-0
 // @updateURL   https://github.com/Pashe/8chan-X/raw/2-0/8chan-x.meta.js
@@ -63,6 +63,8 @@ settingsMenu.innerHTML = sprintf('<span style="font-size:8pt;">8chanX %s</span>'
 + '<label><input type="checkbox" name="hideTopBoards">' + 'Hide top boards' + '</label><br>'
 + '<label><input type="checkbox" name="catalogLinks">' + 'Force catalog links' + '</label><br>'
 + '<label><input type="checkbox" name="revealImageSpoilers">' + 'Reveal image spoilers' + '</label><br>'
++ '<label><input type="checkbox" name="imageHover">' + 'Image hover' + '</label><br>'
++ '<label><input type="checkbox" name="catalogImageHover">' + 'Image hover on catalog' + '</label><br>'
 + '</div>';
 
 var defaultSettings = {
@@ -70,7 +72,9 @@ var defaultSettings = {
 	'relativeTime': true,
 	'hideTopBoards': true,
 	'catalogLinks': true,
-	'revealImageSpoilers': false
+	'revealImageSpoilers': false,
+	'imageHover': true,
+	'catalogImageHover': true
 };
 
 function getSetting(key) {
@@ -200,6 +204,100 @@ function updateMenuStats() {
 }
 
 ////////////////
+//IMAGE HOVER
+////////////////
+var imghoverMMove = function(e) { //TODO: Cleanup
+	if (!getSetting('imageHover') && !getSetting('catalogImageHover')) {return;}
+	
+	var pic;
+	if ($(this)[0].tagName == "IMG") {pic = $(this);}
+	else if ($(this)[0].tagName == "CANVAS") {pic = $(this).next();}
+	
+	var picUrl = pic.attr("src");
+	if (picUrl.indexOf('spoiler.png') >= 0) {picUrl = $(this).parent().attr("href");}
+	
+	pic.parent().removeData("expanded");
+	if (pic.parent().data("expanded")) {
+		return;
+	}
+	
+	picUrl = picUrl.replace("/src/","/thumb/");
+	if (picUrl.indexOf('/thumb/') == -1) {
+		return;
+	}
+	
+	var picTimestamp = picUrl.substr(picUrl.indexOf("/thumb/")+7);
+	var picTimestamp = picTimestamp.substr(0, picTimestamp.lastIndexOf("."));
+	
+	var picId = "post-image-"+picTimestamp;
+	var hoverPic = $("#"+picId);
+	
+	var picRightEdge = hoverPic.width() + e.pageX;
+	var windowWidth = $(window).width();
+	
+	if (!hoverPic.length) {
+		var newpic = pic.clone();
+		newpic.attr("id",picId);
+		newpic.css('display', 'block').css('position', 'absolute').css('z-index', '200').css("margin", "0px").css("padding", "0px");
+		newpic.attr("src",picUrl.replace("/thumb/","/src/"));
+		
+		if (picRightEdge > windowWidth) {
+			newpic.css('left', (e.pageX + (windowWidth - picRightEdge))).css('top', top);
+		} else {
+			newpic.css('left', e.pageX).css('top', top);
+		}
+		
+		newpic.css('width', 'auto').css('height', 'auto');
+		newpic.css('pointer-events','none');
+		newpic.css('max-height',$(window).height());
+		newpic.css('max-width',$(window).width());
+		newpic.insertAfter(pic);
+	} else {
+		var scrollTop = $(window).scrollTop();
+		var epy = e.pageY;
+		var top = epy;
+		if (epy < scrollTop + 15) {
+		  top = scrollTop;
+		} else if (epy > scrollTop + $(window).height() - hoverPic.height() - 15) {
+		  top = scrollTop + $(window).height() - hoverPic.height() - 15;
+		}
+		
+		if (picRightEdge > windowWidth) {
+			hoverPic.css('left', (e.pageX + (windowWidth - picRightEdge))).css('top', top);
+		} else {
+			hoverPic.css('left', e.pageX).css('top', top);
+		}
+	}
+}
+
+var imghoverMOut = function(e) {
+	var pic;
+	if ($(this)[0].tagName == "IMG") {pic = $(this);}
+	else if ($(this)[0].tagName == "CANVAS") {pic = $(this).next();}
+	
+	var picUrl = pic.attr("src");
+	if (picUrl.indexOf('spoiler.png') >= 0) {picUrl = $(this).parent().attr("href");}
+	picUrl = picUrl.replace("/src/","/thumb/");
+	
+	var picTimestamp = picUrl.substr(picUrl.indexOf("/thumb/")+7);
+	var picTimestamp = picTimestamp.substr(0, picTimestamp.lastIndexOf("."));
+	var picId = "post-image-"+picTimestamp;
+	
+	var hoverPic = $("#"+picId);
+	if (hoverPic.length) {hoverPic.remove();}
+	
+	if ($(this).hasClass('unanimated')) {
+		$($(this).parent().children()).each( function (index, data) { //Oh Jesus what the fuck
+			if ($(this).parent().data("expanded") != "true") {
+				$(this).mousemove(imghoverMMove);
+				$(this).mouseout(imghoverMOut);
+				$(this).click(imghoverMOut);
+			}
+		});
+	}
+}
+
+////////////////
 //INIT FUNCTIONS
 ////////////////
 function initSettings() {
@@ -295,6 +393,29 @@ function initRevealImageSpoilers() {
 	});
 }
 
+function initImageHover() { //TODO: Cleanup
+	if (!getSetting("imageHover") && !getSetting("catalogImageHover")) {return;}
+	
+	var selector = '';
+	if (getSetting("imageHover")) selector += "img.post-image, canvas.post-image";
+	
+	if (getSetting('catalogimagehover') && isOnCatalog()) {
+		if (selector != '') {selector += ', ';}
+		selector += '.thread-image';
+		$('.theme-catalog div.thread').each(function() {
+			$(this).css('position','inherit');
+		});
+	}
+	
+	$(selector).each( function (index, data) {
+		if ($(this).parent().data("expanded") != "true") {
+			$(this).mousemove(imghoverMMove);
+			$(this).mouseout(imghoverMOut);
+			$(this).click(imghoverMOut);
+		}
+	});
+}
+
 ////////////////
 //INIT CALLS
 ////////////////
@@ -305,11 +426,28 @@ $(unsafeWindow.document).ready(function() {
 	initMenu();
 	//initImprovedPageTitles();
 	initRevealImageSpoilers();
+	initImageHover();
 });
 
 ////////////////
 //EVENT HANDLERS
 ////////////////
-$(document).on('new_post', function (e, post) {  //TODO: Fix this
+function onNewPostRelativeTime() {
 	if (getSetting('relativeTime')) {$("time").timeago();}
+}
+
+function onNewPostImageHover() {
+	if (!setting('imagehover')) {return;}
+	$('#'+$(post).attr('id')+' .post-image').each( function (index, data) {
+		if ($(this).parent().data("expanded") != "true") {
+			$(this).mousemove(imghoverMMove);
+			$(this).mouseout(imghoverMOut);
+			$(this).click(imghoverMOut);
+		}
+	});
+}
+
+$(document).on('new_post', function (e, post) {  //TODO: Fix this
+	onNewPostRelativeTime();
+	onNewPostImageHover();
 });
