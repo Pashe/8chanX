@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Pashe's 8chanX v2
-// @version     2.0.0.pa-1418254290
+// @version     2.0.0.pa-1418254610
 // @description Small userscript to improve 8chan
 // @namespace   https://github.com/Pashe/tree/2-0
 // @updateURL   https://github.com/Pashe/8chan-X/raw/2-0/8chan-x.meta.js
@@ -68,6 +68,7 @@ settingsMenu.innerHTML = sprintf('<span style="font-size:8pt;">8chanX %s</span>'
 + '<label><input type="checkbox" name="reverseImageSearch">' + 'Add reverse image search links' + '</label><br>'
 + '<label><input type="checkbox" name="parseTimestampImage">' + 'Guess original download date of imageboard-style filenames' + '</label><br>'
 + '<label>' + 'Mascot URL: ' + '<input type="text" name="mascotUrl" style="width: 1000pt"></label><br>'
++ '<button id="purgeDeadFavorites">' + 'Clean favorites' + '</button>'
 + '</div>';
 
 var defaultSettings = {
@@ -626,6 +627,51 @@ function initMascot() {
 	if (isOnCatalog()) {mascotImage.css("z-index", "-100");}
 }
 
+function initpurgeDeadFavorites() {
+	$("#purgeDeadFavorites").click(function() {
+		console.log("Working...");
+		var originalText = $("#purgeDeadFavorites").text();
+		$("#purgeDeadFavorites").text("Working...");
+		$("#purgeDeadFavorites").prop("disabled", true);
+		var boards;
+		$.ajax({
+				url: "/boards.json",
+				async: false,
+				dataType: "json",
+				success: function (response) {boards = response;}
+		});	
+		var boardsURIs = [];
+		var favorites = JSON.parse(localStorage.favorites);
+
+		for (var x in boards) {
+			boardsURIs.push(boards[x]['uri']);
+		}
+		
+		if (boardsURIs.length > 0) {
+			for (var i=0; i<favorites.length; i++) {
+				var board = favorites[i];
+				if (($.inArray(board, boardsURIs) == -1)) {
+					$.ajax({
+						url: "/" + board + "/",
+						async: false,
+						statusCode: {404: function() {
+							unfavorite(board);
+							console.log("Purge board /" + board + "/");
+						}},
+						success: function () {console.log("Keep unlisted board /" + board + "/");},
+						type: "HEAD"
+					});
+				} else {
+					console.log("Keep listed board /" + board + "/");
+				}
+			}
+		}
+		console.log("Done");
+		$("#purgeDeadFavorites").text(originalText + " - done")
+		$("#purgeDeadFavorites").prop("disabled", false);
+	});
+}
+
 ////////////////
 //INIT CALLS
 ////////////////
@@ -643,6 +689,7 @@ $(unsafeWindow.document).ready(function() {
 	initParseTimestampImage();
 	initNotifications();
 	initMascot();
+	initpurgeDeadFavorites();
 });
 
 ////////////////
