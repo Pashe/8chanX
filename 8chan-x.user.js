@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Pashe's 8chanX v2
-// @version     2.0.0.pa-1418254610
+// @version     2.0.0.pa-1418254870
 // @description Small userscript to improve 8chan
 // @namespace   https://github.com/Pashe/tree/2-0
 // @updateURL   https://github.com/Pashe/8chan-X/raw/2-0/8chan-x.meta.js
@@ -420,7 +420,7 @@ function initMenu() {
 				$("[data-description='3']").hide();
 				clearInterval(checkTopBoardsExist);
 			}
-		}, 500);
+		}, 100);
 	}
 	
 	if (getSetting('catalogLinks') && !isOnCatalog()) {
@@ -672,6 +672,12 @@ function initpurgeDeadFavorites() {
 	});
 }
 
+function initDefaultSettings() {
+	if (unsafeWindow.localStorage.color_ids == undefined) unsafeWindow.localStorage.color_ids = true;
+	if ((unsafeWindow.localStorage.videohover == undefined) && getSetting('imageHover')) unsafeWindow.localStorage.videohover = true;
+	if (unsafeWindow.localStorage.useInlining == undefined) unsafeWindow.localStorage.useInlining = true;
+}
+
 ////////////////
 //INIT CALLS
 ////////////////
@@ -690,6 +696,7 @@ $(unsafeWindow.document).ready(function() {
 	initNotifications();
 	initMascot();
 	initpurgeDeadFavorites();
+	initDefaultSettings();
 });
 
 ////////////////
