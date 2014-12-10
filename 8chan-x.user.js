@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Pashe's 8chanX v2
-// @version     2.0.0.pa-1418252510
+// @version     2.0.0.pa-1418253330
 // @description Small userscript to improve 8chan
 // @namespace   https://github.com/Pashe/tree/2-0
 // @updateURL   https://github.com/Pashe/8chan-X/raw/2-0/8chan-x.meta.js
@@ -345,6 +345,42 @@ function addRISLinks(image) {
 }
 
 ////////////////
+//NOTIFICATIONS
+////////////////
+function notifyReplies() {
+	/*
+	* taken from https://github.com/ctrlcctrlv/8chan/blob/master/js/show-own-posts.js
+	*
+	* Released under the MIT license
+	* Copyright (c) 2014 Marcin Labanowski <marcin@6irc.net>
+	*/
+	
+	var thread = $(this).parents('[id^="thread_"]').first();
+	if (!thread.length) {thread = $(this);}
+	
+	var ownPosts = JSON.parse(unsafeWindow.localStorage.own_posts || '{}');
+	
+	$(this).find('div.body:first a:not([rel="nofollow"])').each(function() {
+		var postID;
+		
+		if(postID = $(this).text().match(/^>>(\d+)$/)) {
+			postID = postID[1];
+		} else {
+			return;
+		}
+		
+		if (ownPosts[thisBoard] && ownPosts[thisBoard].indexOf(postID) !== -1) {
+			var replyPost = $(this).closest("div.post");
+			var replyUser = (replyPost.find(".name").text()+replyPost.find(".trip").text());
+			var replyBody = replyPost.find(".body").text();
+			var replyImage = replyPost.find(".post-image").first().attr('src');
+			
+			new Notification(replyUser+" replied to your post", {body:replyBody,icon:replyImage});
+		}
+	});
+}
+
+////////////////
 //INIT FUNCTIONS
 ////////////////
 function initSettings() {
@@ -542,6 +578,10 @@ function initParseTimestampImage() {
 	} catch (e) {}
 }
 
+function initNotifications() {
+	Notification.requestPermission();
+}
+
 ////////////////
 //INIT CALLS
 ////////////////
@@ -557,6 +597,7 @@ $(unsafeWindow.document).ready(function() {
 	initRISLinks();
 	initQrDrag();
 	initParseTimestampImage();
+	initNotifications;
 });
 
 ////////////////
@@ -579,6 +620,15 @@ function onNewPostImageHover() {
 
 function onNewPostRISLinks(post) {
 	$('#'+$(post).attr('id')+' img.post-image').each(function() {addRISLinks(this);}); 
+}
+
+function onNewPostNotifications(post) {
+	var $post = $(post);
+	if ($post.is('div.post.reply')) {
+		$post.each(notifyReplies);
+	} else {
+		$post.find('div.post.reply').each(notifyReplies);
+	}
 }
 
 $(unsafeWindow.document).on('new_post', function (e, post) {  //TODO: Fix this
