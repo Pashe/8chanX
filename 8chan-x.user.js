@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Pashe's 8chanX v2
-// @version     2.0.0.pa-1418195810
+// @version     2.0.0.pa-1418197050
 // @description Small userscript to improve 8chan
 // @namespace   https://github.com/Pashe/tree/2-0
 // @updateURL   https://github.com/Pashe/8chan-X/raw/2-0/8chan-x.meta.js
@@ -62,17 +62,24 @@ settingsMenu.innerHTML = sprintf('<span style="font-size:8pt;">8chanX %s</span>'
 + '<label><input type="checkbox" name="relativeTime">' + 'Use relative post times' + '</label><br>'
 + '<label><input type="checkbox" name="hideTopBoards">' + 'Hide top boards' + '</label><br>'
 + '<label><input type="checkbox" name="catalogLinks">' + 'Force catalog links' + '</label><br>'
++ '<label><input type="checkbox" name="revealImageSpoilers">' + 'Reveal image spoilers' + '</label><br>'
 + '</div>';
 
 var defaultSettings = {
 	'precisePages': true,
 	'relativeTime': true,
 	'hideTopBoards': true,
-	'catalogLinks': true
+	'catalogLinks': true,
+	'revealImageSpoilers': false
 };
 
 function getSetting(key) {
 	return GM_getValue(key, defaultSettings[key]);
+}
+
+function setting(key) {
+	console.log(sprintf("setting('%s') is deprecated", key));
+	return getSetting(key);
 }
 
 function setSetting(key, value) {
@@ -272,6 +279,22 @@ function initImprovedPageTitles() {
 	}
 }
 
+function initRevealImageSpoilers() {
+	if (!getSetting('revealImageSpoilers')) {return;}
+	
+	$('.post-image').each(function() {
+		var pic;
+		if ($(this)[0].tagName == "IMG") {pic = $(this);}
+		else if ($(this)[0].tagName == "CANVAS") {pic = $(this).next();}
+		
+		var picUrl = pic.attr("src");
+		if (picUrl.indexOf('spoiler.png') >= 0) {
+			pic.attr("src", $(this).parent().attr("href"));
+			pic.addClass("8chanx-spoilered-image");
+		}
+	});
+}
+
 ////////////////
 //INIT CALLS
 ////////////////
@@ -281,6 +304,7 @@ $(unsafeWindow.document).ready(function() {
 	initRelativeTime();
 	initMenu();
 	//initImprovedPageTitles();
+	initRevealImageSpoilers();
 });
 
 ////////////////
