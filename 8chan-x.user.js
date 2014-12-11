@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Pashe's 8chanX v2
-// @version     2.0.0.1418286280
+// @version     2.0.0.1418338080
 // @description Small userscript to improve 8chan
 // @icon        https://github.com/Pashe/8chan-X/raw/2-0/images/logo.svg
 // @namespace   https://github.com/Pashe/8chan-X/tree/2-0
@@ -83,7 +83,7 @@ var defaultSettings = {
 	'catalogImageHover': true,
 	'reverseImageSearch': true,
 	'parseTimestampImage': true,
-	'mascoturl':""
+	'mascotUrl':""
 };
 
 function getSetting(key) {
@@ -716,7 +716,7 @@ $(unsafeWindow.document).ready(function() {
 	initImageHover();
 	initCatalog();
 	initRISLinks();
-	initQrDrag();
+	//initQrDrag();
 	initParseTimestampImage();
 	initNotifications();
 	initMascot();
