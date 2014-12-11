@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Pashe's 8chanX v2
-// @version     2.0.0.1418274180
+// @version     2.0.0.1418286220
 // @description Small userscript to improve 8chan
 // @icon        https://github.com/Pashe/8chan-X/raw/2-0/images/logo.svg
 // @namespace   https://github.com/Pashe/8chan-X/tree/2-0
@@ -740,9 +740,14 @@ function onNewPostNotifications(post) {
 	}
 }
 
+function onNewPostMenu() {
+	updateMenuStats();
+}
+
 unsafeWindow.$(document).on('new_post', function (e, post) {
 	onNewPostRelativeTime();
 	onNewPostImageHover(post);
 	onNewPostRISLinks(post);
 	onNewPostNotifications(post);
+	onNewPostMenu();
 });
