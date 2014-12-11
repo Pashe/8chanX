@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Pashe's 8chanX v2
-// @version     2.0.0.pa-1418254870
+// @version     2.0.0.pa-1418271260
 // @description Small userscript to improve 8chan
 // @namespace   https://github.com/Pashe/tree/2-0
 // @updateURL   https://github.com/Pashe/8chan-X/raw/2-0/8chan-x.meta.js
@@ -85,7 +85,11 @@ var defaultSettings = {
 };
 
 function getSetting(key) {
-	return GM_getValue(key, defaultSettings[key]);
+	if (GM_getValue(key)) {
+		return JSON.parse(GM_getValue(key));
+	} else {
+		return defaultSettings[key];
+	}
 }
 
 function setting(key) {
@@ -94,7 +98,7 @@ function setting(key) {
 }
 
 function setSetting(key, value) {
-	GM_setValue(key, value);
+	GM_setValue(key, JSON.stringify(value));
 }
 
 function refreshSettings() {
@@ -587,7 +591,6 @@ function initNotifications() {
 
 function initMascot() {
 	if (!getSetting("mascotUrl")) {return;}
-	console.log(getSetting("mascotUrl"));
 	
 	$("head").append(
 		"<style>" +
@@ -706,9 +709,9 @@ function onNewPostRelativeTime() {
 	if (getSetting('relativeTime')) {$("time").timeago();}
 }
 
-function onNewPostImageHover() {
-	if (!setting('imagehover')) {return;}
-	$('#'+$(post).attr('id')+' .post-image').each( function (index, data) {
+function onNewPostImageHover(post) {
+	if (!getSetting("imageHover")) {return;}
+	$("#"+$(post).attr("id")+" .post-image").each( function (index, data) {
 		if ($(this).parent().data("expanded") != "true") {
 			$(this).mousemove(imghoverMMove);
 			$(this).mouseout(imghoverMOut);
@@ -718,7 +721,7 @@ function onNewPostImageHover() {
 }
 
 function onNewPostRISLinks(post) {
-	$('#'+$(post).attr('id')+' img.post-image').each(function() {addRISLinks(this);}); 
+	$("#"+$(post).attr("id")+" img.post-image").each(function() {addRISLinks(this);}); 
 }
 
 function onNewPostNotifications(post) {
@@ -730,8 +733,9 @@ function onNewPostNotifications(post) {
 	}
 }
 
-$(unsafeWindow.document).on('new_post', function (e, post) {  //TODO: Fix this
+unsafeWindow.$(document).on('new_post', function (e, post) {
 	onNewPostRelativeTime();
-	onNewPostImageHover();
+	onNewPostImageHover(post);
 	onNewPostRISLinks(post);
+	onNewPostNotifications(post);
 });
