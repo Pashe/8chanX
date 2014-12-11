@@ -1,21 +1,23 @@
 // ==UserScript==
 // @name        Pashe's 8chanX v2
-// @version     2.0.0.pa-1418271260
+// @version     2.0.0.pa-1418273950
 // @description Small userscript to improve 8chan
+// @icon        https://github.com/Pashe/8chan-X/raw/2-0/images/logo.svg
 // @namespace   https://github.com/Pashe/tree/2-0
 // @updateURL   https://github.com/Pashe/8chan-X/raw/2-0/8chan-x.meta.js
 // @downloadURL https://github.com/Pashe/8chan-X/raw/2-0/8chan-x.user.js
 
-// @grant       GM_deleteValue
 // @grant       GM_getValue
-// @grant       GM_listValues
 // @grant       GM_setValue
+// @grant       GM_getResourceURL
 // @grant       unsafeWindow
 
 // @require     https://8chan.co/js/jquery.min.js
 // @require     https://8chan.co/js/jquery-ui.custom.min.js
 // @require     https://github.com/alexei/sprintf.js/raw/master/src/sprintf.js
 // @require     https://raw.githubusercontent.com/rmm5t/jquery-timeago/master/jquery.timeago.js
+
+// @resource    normalFavicon https://github.com/Pashe/8chan-X/raw/2-0/images/favicon.png
 
 // @match       *://8chan.co/*
 // @match       *://hatechan.co/*
@@ -681,6 +683,10 @@ function initDefaultSettings() {
 	if (unsafeWindow.localStorage.useInlining == undefined) unsafeWindow.localStorage.useInlining = true;
 }
 
+function initFavicon() {
+	$('<link></link>').attr("rel", "shortcut icon").attr("href", GM_getResourceURL("normalFavicon")).appendTo($("head").first());
+}
+
 ////////////////
 //INIT CALLS
 ////////////////
@@ -700,6 +706,7 @@ $(unsafeWindow.document).ready(function() {
 	initMascot();
 	initpurgeDeadFavorites();
 	initDefaultSettings();
+	initFavicon();
 });
 
 ////////////////
