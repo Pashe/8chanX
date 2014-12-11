@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Pashe's 8chanX v2
-// @version     2.0.0.1418286220
+// @version     2.0.0.1418286280
 // @description Small userscript to improve 8chan
 // @icon        https://github.com/Pashe/8chan-X/raw/2-0/images/logo.svg
 // @namespace   https://github.com/Pashe/8chan-X/tree/2-0
@@ -687,6 +687,22 @@ function initFavicon() {
 	$('<link></link>').attr("rel", "shortcut icon").attr("href", GM_getResourceURL("normalFavicon")).appendTo($("head").first());
 }
 
+function initFlagIcons() {
+	//Thanks to the anon from >>>/tech/60489 who wrote this
+	var board = window.location.pathname.replace(/^\/([^/]+).*?$/, "$1");
+	var custom_flag_url = window.location.origin + '/static/custom-flags/' + board + '/';
+	var dropdown_options = document.getElementById('user_flag').childNodes;
+
+	if (!dropdown_options || !dropdown_options.length) return;
+
+	for (var i = 0; i < dropdown_options.length; i++) {
+			var opt = dropdown_options[i];
+			opt.style.paddingLeft = '20px';
+			if (opt.value)
+					opt.style.background = 'no-repeat left center url(' + custom_flag_url + opt.value + '.png)';
+	}
+}
+
 ////////////////
 //INIT CALLS
 ////////////////
@@ -707,6 +723,7 @@ $(unsafeWindow.document).ready(function() {
 	initpurgeDeadFavorites();
 	initDefaultSettings();
 	initFavicon();
+	initFlagIcons();
 });
 
 ////////////////
