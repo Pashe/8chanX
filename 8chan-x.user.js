@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Pashe's 8chanX v2
-// @version     2.0.0.1418338080
+// @version     2.0.0.1418346690
 // @description Small userscript to improve 8chan
 // @icon        https://github.com/Pashe/8chan-X/raw/2-0/images/logo.svg
 // @namespace   https://github.com/Pashe/8chan-X/tree/2-0
@@ -120,16 +120,18 @@ function refreshSettings() {
 }
 
 function setupControl(control) {
-	if (control.addEventListener) control.addEventListener("change", function (e) {
-		switch (control.type) {
-			case "checkbox":
-				setSetting(control.name, control.checked);
-				break;
-			default:
-				setSetting(control.name, control.value);
-				break;
-		}
-	}, false);
+	switch (control.type) {
+		case "checkbox":
+			$(control).on("change", function () {
+				setSetting(this.name, this.checked);
+			});
+			break;
+		default:
+			$(control).on("input", function () {
+				setSetting(this.name, this.value);
+			});
+			break;
+	}
 }
 
 ////////////////
