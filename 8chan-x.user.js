@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Pashe's 8chanX v2
-// @version     2.0.0.1418346690
+// @version     2.0.0.1418362350
 // @description Small userscript to improve 8chan
 // @icon        https://github.com/Pashe/8chan-X/raw/2-0/images/logo.svg
 // @namespace   https://github.com/Pashe/8chan-X/tree/2-0
@@ -207,15 +207,14 @@ function getMenuStats() {
 	var threadPage = getThreadPage(thisThread, thisBoard, false);
 	
 	return sprintf(
-		 '<span title="Posts">%s</span> / '
-		+'<span title="Images">%s</span> / '
-		+'<span title="Page">%s</span>',
+		 '<span title="Posts" id="chx_menuPosts">%s</span> / '
+		+'<span title="Images" id="chx_menuImages">%s</span> / '
+		+'<span title="Page" id="chx_menuPage">%s</span>',
 		nPosts, nImages, (threadPage<1?"<span style='opacity:0.5'>???</span>":threadPage));
 }
 
 function updateMenuStats() {
-	var stats = document.getElementById("menuStats");
-	stats.innerHTML = getMenuStats();
+	$("#menuStats").html(getMenuStats());
 }
 
 ////////////////
@@ -729,7 +728,7 @@ $(unsafeWindow.document).ready(function() {
 });
 
 ////////////////
-//EVENT HANDLERS
+//EVENT HANDLER FUNCTIONS
 ////////////////
 function onNewPostRelativeTime() {
 	if (getSetting('relativeTime')) {$("time").timeago();}
@@ -763,10 +762,21 @@ function onNewPostMenu() {
 	updateMenuStats();
 }
 
+function intervalMenu() {
+	updateMenuStats();
+}
+
+////////////////
+//EVENT HANDLERS
+////////////////
 unsafeWindow.$(document).on('new_post', function (e, post) {
 	onNewPostRelativeTime();
 	onNewPostImageHover(post);
 	onNewPostRISLinks(post);
 	onNewPostNotifications(post);
-	onNewPostMenu();
+	//onNewPostMenu();
 });
+
+if (isOnThread()) {
+	setInterval(intervalMenu, (1.5*60*1000));
+}
