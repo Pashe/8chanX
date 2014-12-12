@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Pashe's 8chanX v2
-// @version     2.0.0.1418362350
+// @version     2.0.0.1418373640
 // @description Small userscript to improve 8chan
 // @icon        https://github.com/Pashe/8chan-X/raw/2-0/images/logo.svg
 // @namespace   https://github.com/Pashe/8chan-X/tree/2-0
@@ -37,11 +37,10 @@
 //GLOBAL VARIABLES
 ////////////////
 //Constants
-var threadsPerPage = 15;
 var bumpLimit = 300;
 
 //Initializations
-var pages = null;
+var cachedPages = null;
 
 //Dynamic
 var originalPageTitle = unsafeWindow.document.title;
@@ -162,17 +161,21 @@ function printf() {
 }
 
 function getThreadPage(threadId, boardId, cached) {
-	var threadPage = -1;
-	var precisePages = getSetting("precisePages");
-	
-	if ((!cached) || (pages == null)) {
+	if ((!cached) || (cachedPages == null)) {
 		$.ajax({
 			url: "/" + boardId + "/threads.json",
 			async: false,
 			dataType: "json",
-			success: function (response) {pages = response;}
+			success: function (response) {cachedPages = response;}
 		});
 	}
+	
+	return calcThreadPage(cachedPages, threadId);
+}
+
+function calcThreadPage(pages, threadId) {
+	threadPage = -1;
+	var precisePages = getSetting("precisePages");
 	
 	for (var pageIdx in pages) {
 		if (threadPage != -1) {break}
@@ -194,27 +197,38 @@ function getThreadPage(threadId, boardId, cached) {
 	return threadPage;
 }
 
+function getThreadPosts(threadId, boardId, cached) {
+	return $(".post").length;
+}
+
+function getThreadImages(threadId, boardId, cached) {
+	return $(".post-image").length;
+}
+
 ////////////////
 //MENU BAR
 ////////////////
-function getMenuStats() {
-	var nPosts = document.getElementsByClassName("post reply").length;
-	var nImages = document.getElementsByClassName("post-image").length;
-	var hlStyle = "<span style='color:#f00;font-weight:bold;'>";
-	
-	if (nPosts >= bumpLimit) {nPosts = hlStyle + nPosts + "</span>";}
-	
-	var threadPage = getThreadPage(thisThread, thisBoard, false);
-	
-	return sprintf(
-		 '<span title="Posts" id="chx_menuPosts">%s</span> / '
-		+'<span title="Images" id="chx_menuImages">%s</span> / '
-		+'<span title="Page" id="chx_menuPage">%s</span>',
-		nPosts, nImages, (threadPage<1?"<span style='opacity:0.5'>???</span>":threadPage));
-}
-
 function updateMenuStats() {
-	$("#menuStats").html(getMenuStats());
+	var nPosts = getThreadPosts(thisThread, thisBoard, false);
+	if (nPosts >= bumpLimit) {nPosts = sprintf('<span style="color:#f00;font-weight:bold;">%d</span>', nPosts);}
+	
+	$("#chx_menuPosts").html(nPosts);
+	$("#chx_menuImages").html(getThreadImages(thisThread, thisBoard, false));
+	
+	$.ajax({
+		url: "/" + thisBoard + "/threads.json",
+		async: true,
+		dataType: "json",
+		success: function (response) {
+			cachedPages = response;
+			
+			var nPage = calcThreadPage(response, thisThread);
+			if (nPage < 1 ) {nPage = "<span style='opacity:0.5'>???</span>"}
+			
+			$("#chx_menuPage").html(nPage);
+		}
+	});
+	
 }
 
 ////////////////
@@ -448,10 +462,16 @@ function initMenu() {
 		updateNode.appendTo($menu);
 		
 		var statsNode = $("<span></span>");
-		statsNode.html(getMenuStats());
+		statsNode.html(
+			 '<span title="Posts" id="chx_menuPosts">---</span> / '
+			+'<span title="Images" id="chx_menuImages">---</span> / '
+			+'<span title="Page" id="chx_menuPage">---</span>'
+		);
 		statsNode.attr("id", "menuStats");
 		statsNode.css("padding-left", "3pt");
 		statsNode.appendTo($menu);
+		
+		updateMenuStats();
 	}
 }
 
