@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Pashe's 8chanX v2
-// @version     2.0.0.1418373860
+// @version     2.0.0.1418375370
 // @description Small userscript to improve 8chan
 // @icon        https://github.com/Pashe/8chan-X/raw/2-0/images/logo.svg
 // @namespace   https://github.com/Pashe/8chan-X/tree/2-0
@@ -326,6 +326,31 @@ var imghoverMOut = function(e) {
 }
 
 ////////////////
+//KEYBOARD SHORTCUTS
+////////////////
+function reloadPage() {
+	if (isOnThread()) {
+		unsafeWindow.$('#update_thread').click();
+	} else {
+		document.location.reload();
+	}
+}
+
+function showQR() {
+	unsafeWindow.$(window).trigger('cite');
+	$("#quick-reply textarea").focus();
+}
+
+function toggleExpandAll() {
+	var shrink = unsafeWindow.$('#shrink-all-images a');
+	if (shrink.length) {
+		shrink.click();
+	} else {
+		unsafeWindow.$('#expand-all-images a').click();
+	}
+}
+
+////////////////
 //REVERSE IMAGE SEARCH
 ////////////////
 var RISProviders = [
@@ -525,6 +550,31 @@ function initImageHover() { //TODO: Cleanup
 			$(this).mousemove(imghoverMMove);
 			$(this).mouseout(imghoverMOut);
 			$(this).click(imghoverMOut);
+		}
+	});
+}
+
+function initKeyboardShortcuts() {
+	$(document).keydown(function(e) {
+		
+		if (e.keyCode == 27) {
+			$('#quick-reply').remove();
+		}
+		
+		if (e.target.nodeName == "INPUT" || e.target.nodeName == "TEXTAREA") {return;}
+		if ((!e.ctrlKey) && (!e.metaKey)) {
+			switch (e.keyCode) {
+				case 82:
+					reloadPage();
+					break;
+				case 81:
+					showQR();
+					e.preventDefault();
+					break;
+				case 69:
+					toggleExpandAll()
+					break;
+			}
 		}
 	});
 }
@@ -736,6 +786,7 @@ $(unsafeWindow.document).ready(function() {
 	//initImprovedPageTitles();
 	initRevealImageSpoilers();
 	initImageHover();
+	initKeyboardShortcuts();
 	initCatalog();
 	initRISLinks();
 	//initQrDrag();
