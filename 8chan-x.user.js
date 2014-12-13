@@ -147,7 +147,8 @@ var defaultSettings = {
 	'hidefeaturedboards': true,
 	'searchbyimagelinks': true,
 	'imagetimeguess':false,
-	'mascoturl':""
+	'mascoturl':"",
+	'autowatchthreads': false
 };
 var settingsMenu = document.createElement('div');
 if (window.Options) {
@@ -168,6 +169,7 @@ settingsMenu.innerHTML = '<span style="font-size:8pt;">8chanX '+GM_info.script.v
 + '<label><input type="checkbox" name="hidefeaturedboards">' + 'Hide featured boards' + '</label><br>'
 + '<label><input type="checkbox" name="searchbyimagelinks">' + 'Add reverse image search links' + '</label><br>'
 + '<label><input type="checkbox" name="imagetimeguess">' + 'Try to guess when an image was originally uploaded based on its filename' + '</label><br>'
++ '<label><input type="checkbox" name="autowatchthreads">' + 'Automatically watch posted-in threads' + '</label><br>'
 + '<label>' + 'Mascot URL' + '<input type="text" name="mascoturl"></label><br>'
 + '<button id="purgedeadfavorites">' + 'Clean favorites' + '</button>'
 + '</div>';
@@ -1074,5 +1076,5 @@ $(document).ready(function() {
 	initNotifications();
 	fixTwStyle();
 	initMascot();
-	$(document).on('ajax_after_post', function(e, ret) {if (isOnThread())	{$(".watchThread").click();}}); //Auto thread watch
+	$(document).on('ajax_after_post', function(e, ret) {if (isOnThread() && setting('autowatchthreads'))	{$(".watchThread").click();}}); //Auto thread watch
 });
