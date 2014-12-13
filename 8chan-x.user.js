@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Pashe's 8chanX v2
-// @version     2.0.0.1418375370
+// @version     2.0.0.1418443230
 // @description Small userscript to improve 8chan
 // @icon        https://github.com/Pashe/8chan-X/raw/2-0/images/logo.svg
 // @namespace   https://github.com/Pashe/8chan-X/tree/2-0
@@ -537,7 +537,7 @@ function initImageHover() { //TODO: Cleanup
 	var selector = '';
 	if (getSetting("imageHover")) selector += "img.post-image, canvas.post-image";
 	
-	if (getSetting('catalogimagehover') && isOnCatalog()) {
+	if (getSetting('catalogImageHover') && isOnCatalog()) {
 		if (selector != '') {selector += ', ';}
 		selector += '.thread-image';
 		$('.theme-catalog div.thread').each(function() {
