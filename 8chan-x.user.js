@@ -152,7 +152,7 @@ function isOnThread() {
 	return unsafeWindow.active_page === "thread";
 }
 
-function printf() {
+function printf() { //alexei et al, 3BSD
 	var key = arguments[0], cache = sprintf.cache
 	if (!(cache[key] && cache.hasOwnProperty(key))) {
 		cache[key] = sprintf.parse(key)
@@ -160,7 +160,7 @@ function printf() {
 	console.log(sprintf.format.call(null, cache[key], arguments))
 }
 
-function getThreadPage(threadId, boardId, cached) {
+function getThreadPage(threadId, boardId, cached) { //Pashe, WTFPL
 	if ((!cached) || (cachedPages == null)) {
 		$.ajax({
 			url: "/" + boardId + "/threads.json",
@@ -173,7 +173,7 @@ function getThreadPage(threadId, boardId, cached) {
 	return calcThreadPage(cachedPages, threadId);
 }
 
-function calcThreadPage(pages, threadId) {
+function calcThreadPage(pages, threadId) { //Pashe, WTFPL
 	threadPage = -1;
 	var precisePages = getSetting("precisePages");
 	
@@ -197,18 +197,18 @@ function calcThreadPage(pages, threadId) {
 	return threadPage;
 }
 
-function getThreadPosts(threadId, boardId, cached) {
+function getThreadPosts(threadId, boardId, cached) { //Pashe, WTFPL
 	return $(".post").length;
 }
 
-function getThreadImages(threadId, boardId, cached) {
+function getThreadImages(threadId, boardId, cached) { //Pashe, WTFPL
 	return $(".post-image").length;
 }
 
 ////////////////
 //MENU BAR
 ////////////////
-function updateMenuStats() {
+function updateMenuStats() { //Pashe, WTFPL
 	var nPosts = getThreadPosts(thisThread, thisBoard, false);
 	if (nPosts >= bumpLimit) {nPosts = sprintf('<span style="color:#f00;font-weight:bold;">%d</span>', nPosts);}
 	
@@ -234,7 +234,7 @@ function updateMenuStats() {
 ////////////////
 //IMAGE HOVER
 ////////////////
-var imghoverMMove = function(e) { //TODO: Cleanup
+var imghoverMMove = function(e) { //Tux et al, MIT //TODO: Cleanup
 	if (!getSetting('imageHover') && !getSetting('catalogImageHover')) {return;}
 	
 	var pic;
@@ -298,7 +298,7 @@ var imghoverMMove = function(e) { //TODO: Cleanup
 	}
 }
 
-var imghoverMOut = function(e) {
+var imghoverMOut = function(e) { //Tux et al, MIT
 	var pic;
 	if ($(this)[0].tagName == "IMG") {pic = $(this);}
 	else if ($(this)[0].tagName == "CANVAS") {pic = $(this).next();}
@@ -328,7 +328,7 @@ var imghoverMOut = function(e) {
 ////////////////
 //KEYBOARD SHORTCUTS
 ////////////////
-function reloadPage() {
+function reloadPage() { //Pashe, WTFPL
 	if (isOnThread()) {
 		unsafeWindow.$('#update_thread').click();
 	} else {
@@ -336,12 +336,12 @@ function reloadPage() {
 	}
 }
 
-function showQR() {
+function showQR() { //Pashe, WTFPL
 	unsafeWindow.$(window).trigger('cite');
 	$("#quick-reply textarea").focus();
 }
 
-function toggleExpandAll() {
+function toggleExpandAll() { //Tux et al, MIT
 	var shrink = unsafeWindow.$('#shrink-all-images a');
 	if (shrink.length) {
 		shrink.click();
@@ -372,7 +372,7 @@ var RISProviders = [
 	}
 ];
 
-function addRISLinks(image) {
+function addRISLinks(image) { //Pashe, 7185, WTFPL
 	for (var providerIdx in RISProviders) {
 		var provider = RISProviders[providerIdx];
 		
@@ -455,7 +455,7 @@ function initRelativeTime() {
 	if (getSetting('relativeTime')) {$("time").timeago();}
 };
 
-function initMenu() {
+function initMenu() { //Pashe, WTFPL
 	var menu = unsafeWindow.document.getElementsByClassName("boardlist")[0];
 	var $menu = $(menu);
 	
@@ -515,7 +515,7 @@ function initImprovedPageTitles() {
 	}
 }
 
-function initRevealImageSpoilers() {
+function initRevealImageSpoilers() { //Tux et al, MIT
 	if (!getSetting('revealImageSpoilers')) {return;}
 	
 	$('.post-image').each(function() {
@@ -531,7 +531,7 @@ function initRevealImageSpoilers() {
 	});
 }
 
-function initImageHover() { //TODO: Cleanup
+function initImageHover() { //Tux et al, MIT //TODO: Cleanup
 	if (!getSetting("imageHover") && !getSetting("catalogImageHover")) {return;}
 	
 	var selector = '';
@@ -554,7 +554,7 @@ function initImageHover() { //TODO: Cleanup
 	});
 }
 
-function initKeyboardShortcuts() {
+function initKeyboardShortcuts() { //Pashe, heavily influenced by Tux et al, WTFPL
 	$(document).keydown(function(e) {
 		
 		if (e.keyCode == 27) {
@@ -579,7 +579,7 @@ function initKeyboardShortcuts() {
 	});
 }
 
-function initCatalog() {
+function initCatalog() { //Pashe, WTFPL
 	if (!isOnCatalog()) {return;}
 	
 	//addCatalogPages
@@ -617,7 +617,7 @@ function initCatalog() {
 	$("img").filter("[src='']").attr("src", "data:image/svg+xml;base64,PHN2ZyB4bWxuczpyZGY9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkvMDIvMjItcmRmLXN5bnRheC1ucyMiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgaGVpZ2h0PSIyMDAiIHdpZHRoPSIyMDAiIHZlcnNpb249IjEuMSI+PGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMCwtODYwKSI+PHRleHQgc3R5bGU9ImxldHRlci1zcGFjaW5nOjBweDt0ZXh0LWFuY2hvcjptaWRkbGU7d29yZC1zcGFjaW5nOjBweDt0ZXh0LWFsaWduOmNlbnRlcjsiIHhtbDpzcGFjZT0icHJlc2VydmUiIGZvbnQtc2l6ZT0iNjRweCIgeT0iOTMwIiB4PSI5NSIgZm9udC1mYW1pbHk9IidBZG9iZSBDbGVhbiBVSScsIHNhbnMtc2VyaWYiIGxpbmUtaGVpZ2h0PSIxMjUlIiBmaWxsPSIjMDAwMDAwIj48dHNwYW4geD0iOTUiIHk9IjkyOSI+Tm88L3RzcGFuPjx0c3BhbiB4PSI5NSIgeT0iMTAxMCI+SW1hZ2U8L3RzcGFuPjwvdGV4dD48L2c+PC9zdmc+");
 }
 
-function initRISLinks() {
+function initRISLinks() { //Pashe, 7185, WTFPL
 	if (!getSetting("reverseImageSearch")) {return;}
 	var posts = $("img.post-image").each(function() {addRISLinks(this);});
 }
@@ -626,7 +626,7 @@ function initQrDrag() {
 	$("#quick-reply").draggable();
 }
 
-function initParseTimestampImage() {
+function initParseTimestampImage() { //Pashe, WTFPL
 	//if (!getSetting("parseTimestampImage")) {break;}
 	try {
 		var minTimestamp = new Date(1985,1).valueOf();
@@ -662,7 +662,7 @@ function initNotifications() {
 	Notification.requestPermission();
 }
 
-function initMascot() {
+function initMascot() { //Pashe, based on an anonymous contribution, WTFPL
 	if (!getSetting("mascotUrl")) {return;}
 	
 	$("head").append(
@@ -703,7 +703,7 @@ function initMascot() {
 	if (isOnCatalog()) {mascotImage.css("z-index", "-100");}
 }
 
-function initpurgeDeadFavorites() {
+function initpurgeDeadFavorites() { //Pashe, WTFPL
 	$("#purgeDeadFavorites").click(function() {
 		console.log("Working...");
 		var originalText = $("#purgeDeadFavorites").text();
@@ -748,19 +748,18 @@ function initpurgeDeadFavorites() {
 	});
 }
 
-function initDefaultSettings() {
+function initDefaultSettings() { //Pashe, WTFPL
 	if (unsafeWindow.localStorage.color_ids == undefined) unsafeWindow.localStorage.color_ids = true;
 	if ((unsafeWindow.localStorage.videohover == undefined) && getSetting('imageHover')) unsafeWindow.localStorage.videohover = true;
 	if (unsafeWindow.localStorage.useInlining == undefined) unsafeWindow.localStorage.useInlining = true;
 }
 
-function initFavicon() {
+function initFavicon() { //Pashe, WTFPL
 	var faviconUrl = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAFo9M/3AAAAAXNSR0IArs4c6QAAAeNJREFUOMu9kk1IVGEUhp/3jj8zukiYIGkh6iftwzZGaw1EqJW5KAxsvhmFgta1DGpRGTF35g5EURBGQRuJqG21iCKIaOUVCqHdYIU/k849LXIMEymCenbncM7hvO85sIF6fTgv6GELfb44qc0gFz6wwN4D4Hxo7MRmi/PhQ+BIU1++NKSkvpjALoAmM3tsCp7H0eShHec4Xzzs8uEFAPXnouZF1b8BYHyIK4UekDW2aVpU/Q3YsTiautc9Wezcm6tkMkHpOEmyP45+6vh7UttTJpfrPJ89MLJWfT27sK3A5fc8NXgFdifbP/xFzoezwPAPnzQWlwszAPty0e666h/lfGiNbZ0vvgANSDphZlfMdDlojO4ev5nGgpla22pbYjZo0sn5SuGinC9Ng50BMEt1zFf8Z/4rv7W6e/xqR6q15RFoYIuZcG0uKpxVI+714VEZgya1S3pWy6zcTpbalSGZWCe439xaq85dP10D6PXFMaG7wLvA+fCc86VEUlnirbBZzEZal9PLGdWXCGy0hbWuRjNAEGhp47vScj5cAdK19Zbswo2J6raz58ujmF0Cun5RfyuuZifkfJgDIuArsmlLgk8SQ8jaMavG0dToH5noThUPktIwiVYV8HKunH/SePx/ynf5T8EXjP2zGwAAAABJRU5ErkJggg==";
 	$('<link></link>').attr("rel", "shortcut icon").attr("href", faviconUrl).appendTo($("head").first());
 }
 
-function initFlagIcons() {
-	//Thanks to the anon from >>>/tech/60489 who wrote this
+function initFlagIcons() { //Anon from >>>/tech/60489, presumably WTFPL or similar
 	var board = window.location.pathname.replace(/^\/([^/]+).*?$/, "$1");
 	var custom_flag_url = window.location.origin + '/static/custom-flags/' + board + '/';
 	var dropdown_options = document.getElementById('user_flag').childNodes;
@@ -806,7 +805,7 @@ function onNewPostRelativeTime() {
 	if (getSetting('relativeTime')) {$("time").timeago();}
 }
 
-function onNewPostImageHover(post) {
+function onNewPostImageHover(post) { //Tux et al, MIT
 	if (!getSetting("imageHover")) {return;}
 	$("#"+$(post).attr("id")+" .post-image").each( function (index, data) {
 		if ($(this).parent().data("expanded") != "true") {
@@ -817,7 +816,7 @@ function onNewPostImageHover(post) {
 	});
 }
 
-function onNewPostRISLinks(post) {
+function onNewPostRISLinks(post) { //Pashe, 7185, WTFPL
 	$("#"+$(post).attr("id")+" img.post-image").each(function() {addRISLinks(this);}); 
 }
 
