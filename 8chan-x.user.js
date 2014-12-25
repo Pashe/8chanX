@@ -1,16 +1,13 @@
 // ==UserScript==
-// @name        Pashe's 8chanX v2
-// @version     2.0.0.1418443230
+// @name        Pashe's 8chanX v2 [pure]
+// @version     2.0.0.1419465870
 // @description Small userscript to improve 8chan
 // @icon        https://github.com/Pashe/8chan-X/raw/2-0/images/logo.svg
 // @namespace   https://github.com/Pashe/8chan-X/tree/2-0
-// @updateURL   https://github.com/Pashe/8chan-X/raw/2-0/8chan-x.meta.js
-// @downloadURL https://github.com/Pashe/8chan-X/raw/2-0/8chan-x.user.js
+// @updateURL   https://github.com/Pashe/8chan-X/raw/2-0_pure/8chan-x.meta.js
+// @downloadURL https://github.com/Pashe/8chan-X/raw/2-0_pure/8chan-x.user.js
 
-// @grant       GM_getValue
-// @grant       GM_setValue
-// @grant       GM_getResourceURL
-// @grant       unsafeWindow
+// @grant       none
 
 // @require     https://8chan.co/js/jquery.min.js
 // @require     https://8chan.co/js/jquery-ui.custom.min.js
@@ -43,17 +40,17 @@ var bumpLimit = 300;
 var cachedPages = null;
 
 //Dynamic
-var originalPageTitle = unsafeWindow.document.title;
-var thisBoard = unsafeWindow.location.pathname.split("/")[1]=="mod.php"?unsafeWindow.location.href.split("/")[4]:unsafeWindow.location.pathname.split("/")[1];
-try {var thisThread = parseInt(unsafeWindow.location.href.match(/([0-9]+)\.html/)[1]);} catch (e) {var thisThread = -1};
+var originalPageTitle = window.document.title;
+var thisBoard = window.location.pathname.split("/")[1]=="mod.php"?window.location.href.split("/")[4]:window.location.pathname.split("/")[1];
+try {var thisThread = parseInt(window.location.href.match(/([0-9]+)\.html/)[1]);} catch (e) {var thisThread = -1};
 
 ////////////////
 //SETTINGS
 ////////////////
-var settingsMenu = unsafeWindow.document.createElement('div');
+var settingsMenu = window.document.createElement('div');
 
-if (unsafeWindow.Options) {
-	var tab = unsafeWindow.Options.add_tab('8chanX', 'times', '8chanX');
+if (window.Options) {
+	var tab = window.Options.add_tab('8chanX', 'times', '8chanX');
 	$(settingsMenu).appendTo(tab.content);
 }
 
@@ -86,8 +83,8 @@ var defaultSettings = {
 };
 
 function getSetting(key) {
-	if (GM_getValue(key)) {
-		return JSON.parse(GM_getValue(key));
+	if (localStorage.getItem(key)) {
+		return JSON.parse(localStorage.getItem(key));
 	} else {
 		return defaultSettings[key];
 	}
@@ -99,7 +96,7 @@ function setting(key) {
 }
 
 function setSetting(key, value) {
-	GM_setValue(key, JSON.stringify(value));
+	localStorage.setItem(key, JSON.stringify(value));
 }
 
 function refreshSettings() {
@@ -141,15 +138,15 @@ function strEndsWith(str, s) {
 }
 
 function isOnCatalog() {
-	return unsafeWindow.active_page === "catalog";
+	return window.active_page === "catalog";
 }
 
 function isOnBoardIndex() {
-	return unsafeWindow.active_page === "index";
+	return window.active_page === "index";
 }
 
 function isOnThread() {
-	return unsafeWindow.active_page === "thread";
+	return window.active_page === "thread";
 }
 
 function printf() { //alexei et al, 3BSD
@@ -330,23 +327,23 @@ var imghoverMOut = function(e) { //Tux et al, MIT
 ////////////////
 function reloadPage() { //Pashe, WTFPL
 	if (isOnThread()) {
-		unsafeWindow.$('#update_thread').click();
+		window.$('#update_thread').click();
 	} else {
 		document.location.reload();
 	}
 }
 
 function showQR() { //Pashe, WTFPL
-	unsafeWindow.$(window).trigger('cite');
+	window.$(window).trigger('cite');
 	$("#quick-reply textarea").focus();
 }
 
 function toggleExpandAll() { //Tux et al, MIT
-	var shrink = unsafeWindow.$('#shrink-all-images a');
+	var shrink = window.$('#shrink-all-images a');
 	if (shrink.length) {
 		shrink.click();
 	} else {
-		unsafeWindow.$('#expand-all-images a').click();
+		window.$('#expand-all-images a').click();
 	}
 }
 
@@ -407,7 +404,7 @@ function notifyReplies() {
 	var thread = $(this).parents('[id^="thread_"]').first();
 	if (!thread.length) {thread = $(this);}
 	
-	var ownPosts = JSON.parse(unsafeWindow.localStorage.own_posts || '{}');
+	var ownPosts = JSON.parse(window.localStorage.own_posts || '{}');
 	
 	$(this).find('div.body:first a:not([rel="nofollow"])').each(function() {
 		var postID;
@@ -456,7 +453,7 @@ function initRelativeTime() {
 };
 
 function initMenu() { //Pashe, WTFPL
-	var menu = unsafeWindow.document.getElementsByClassName("boardlist")[0];
+	var menu = window.document.getElementsByClassName("boardlist")[0];
 	var $menu = $(menu);
 	
 	$("[data-description='1'], [data-description='2']").hide();
@@ -503,14 +500,14 @@ function initMenu() { //Pashe, WTFPL
 function initImprovedPageTitles() {
 	if (isOnThread()) {
 		try {
-			unsafeWindow.document.title = unsafeWindow.document.location.pathname.match(/\/(.*?)\//)[0] + " - " + (function(){
+			window.document.title = window.document.location.pathname.match(/\/(.*?)\//)[0] + " - " + (function(){
 				var op = $(".op").text();
 				var subject = op ? $(".subject").text() : null;
 				var body = op ? $(".body").text() : null;
 				return subject ? subject : body ? body.length > 128 ? body.substr(0, 128) + "..." : body : "8chan";
 			})();
 		} catch (e) {
-			unsafeWindow.document.title = originalPageTitle;
+			window.document.title = originalPageTitle;
 		}
 	}
 }
@@ -749,9 +746,9 @@ function initpurgeDeadFavorites() { //Pashe, WTFPL
 }
 
 function initDefaultSettings() { //Pashe, WTFPL
-	if (unsafeWindow.localStorage.color_ids == undefined) unsafeWindow.localStorage.color_ids = true;
-	if ((unsafeWindow.localStorage.videohover == undefined) && getSetting('imageHover')) unsafeWindow.localStorage.videohover = true;
-	if (unsafeWindow.localStorage.useInlining == undefined) unsafeWindow.localStorage.useInlining = true;
+	if (window.localStorage.color_ids == undefined) window.localStorage.color_ids = true;
+	if ((window.localStorage.videohover == undefined) && getSetting('imageHover')) window.localStorage.videohover = true;
+	if (window.localStorage.useInlining == undefined) window.localStorage.useInlining = true;
 }
 
 function initFavicon() { //Pashe, WTFPL
@@ -779,7 +776,7 @@ function initFlagIcons() { //Anon from >>>/tech/60489, presumably WTFPL or simil
 ////////////////
 initSettings();
 
-$(unsafeWindow.document).ready(function() {
+$(window.document).ready(function() {
 	initRelativeTime();
 	initMenu();
 	//initImprovedPageTitles();
@@ -840,7 +837,7 @@ function intervalMenu() {
 ////////////////
 //EVENT HANDLERS
 ////////////////
-unsafeWindow.$(document).on('new_post', function (e, post) {
+window.$(document).on('new_post', function (e, post) {
 	onNewPostRelativeTime();
 	onNewPostImageHover(post);
 	onNewPostRISLinks(post);
