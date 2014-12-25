@@ -1,7 +1,7 @@
 #8chanX 2.0
-##<a href="https://github.com/Pashe/8chan-X/raw/2-0/8chan-x.user.js">Install</a>
+##<a href="https://github.com/Pashe/8chan-X/raw/2-0_pure/8chan-x.user.js">Install</a>
 
-This version of the script does not work on versions of Firefox past 30. <a href="https://github.com/Pashe/8chan-X/tree/master">Version 1.x</a> still works, though.
+This version of the script should work on versions of Firefox past 30. <a href="https://github.com/Pashe/8chan-X/tree/master">Version 1.x</a> still works, though.
 ***
 
 This is a small 8chan userscript, it adds various features and options like:
