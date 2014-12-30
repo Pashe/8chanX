@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Pashe's 8chanX v2 [pure]
-// @version     2.0.0.1419928490
+// @version     2.0.0.1419929020
 // @description Small userscript to improve 8chan
 // @icon        https://github.com/Pashe/8chan-X/raw/2-0/images/logo.svg
 // @namespace   https://github.com/Pashe/8chan-X/tree/2-0
@@ -84,8 +84,8 @@ var defaultSettings = {
 };
 
 function getSetting(key) {
-	if (localStorage.getItem(key)) {
-		return JSON.parse(localStorage.getItem(key));
+	if (localStorage.getItem("chx_"+key)) {
+		return JSON.parse(localStorage.getItem("chx_"+key));
 	} else {
 		return defaultSettings[key];
 	}
@@ -97,7 +97,7 @@ function setting(key) {
 }
 
 function setSetting(key, value) {
-	localStorage.setItem(key, JSON.stringify(value));
+	localStorage.setItem("chx_"+key, JSON.stringify(value));
 }
 
 function refreshSettings() {
