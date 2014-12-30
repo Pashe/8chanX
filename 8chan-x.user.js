@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Pashe's 8chanX v2
-// @version     2.0.0.1419927400
+// @version     2.0.0.1419927650
 // @description Small userscript to improve 8chan
 // @icon        https://github.com/Pashe/8chan-X/raw/2-0/images/logo.svg
 // @namespace   https://github.com/Pashe/8chan-X/tree/2-0
@@ -67,6 +67,7 @@ settingsMenu.innerHTML = sprintf('<span style="font-size:8pt;">8chanX %s</span>'
 + '<label><input type="checkbox" name="imageHover">' + 'Image hover' + '</label><br>'
 + '<label><input type="checkbox" name="catalogImageHover">' + 'Image hover on catalog' + '</label><br>'
 + '<label><input type="checkbox" name="reverseImageSearch">' + 'Add reverse image search links' + '</label><br>'
++ '<label><input type="checkbox" name="keyboardShortcutsEnabled">' + 'Enable keyboard shortcuts' + '</label><br>'
 + '<label><input type="checkbox" name="parseTimestampImage">' + 'Guess original download date of imageboard-style filenames' + '</label><br>'
 + '<label>' + 'Mascot URL: ' + '<input type="text" name="mascotUrl" style="width: 1000pt"></label><br>'
 + '<button id="purgeDeadFavorites">' + 'Clean favorites' + '</button>'
@@ -82,7 +83,8 @@ var defaultSettings = {
 	'catalogImageHover': true,
 	'reverseImageSearch': true,
 	'parseTimestampImage': true,
-	'mascotUrl':""
+	'mascotUrl':"",
+	'keyboardShortcutsEnabled': true
 };
 
 function getSetting(key) {
@@ -560,6 +562,8 @@ function initImageHover() { //Tux et al, MIT //TODO: Cleanup
 }
 
 function initKeyboardShortcuts() { //Pashe, heavily influenced by Tux et al, WTFPL
+	if (!getSetting("keyboardShortcutsEnabled")) {return;}
+	
 	$(document).keydown(function(e) {
 		
 		if (e.keyCode == 27) {
