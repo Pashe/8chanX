@@ -34,5 +34,6 @@ Key(s)  | Function
 ------- | --------
 R       | Reloads the page
 E       | Expands/shrinks all images
+C       | Navigates to the catalog
 Q       | Opens the quick reply
 Esc     | Closes the quick reply
