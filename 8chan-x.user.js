@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Pashe's 8chanX v2
-// @version     2.0.0.1419743320
+// @version     2.0.0.1419927400
 // @description Small userscript to improve 8chan
 // @icon        https://github.com/Pashe/8chan-X/raw/2-0/images/logo.svg
 // @namespace   https://github.com/Pashe/8chan-X/tree/2-0
@@ -350,6 +350,11 @@ function toggleExpandAll() { //Tux et al, MIT
 	}
 }
 
+function goToCatalog() { //Pashe, WTFPL
+	if (isOnCatalog()) {return;}
+	unsafeWindow.location = sprintf("/%s/catalog.html", thisBoard);
+}
+
 ////////////////
 //REVERSE IMAGE SEARCH
 ////////////////
@@ -572,7 +577,10 @@ function initKeyboardShortcuts() { //Pashe, heavily influenced by Tux et al, WTF
 					e.preventDefault();
 					break;
 				case 69:
-					toggleExpandAll()
+					toggleExpandAll();
+					break;
+				case 67:
+					goToCatalog();
 					break;
 			}
 		}
