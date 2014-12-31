@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Pashe's 8chanX v2 [pure]
-// @version     2.0.0.1419929020
+// @version     2.0.0.1419990530
 // @description Small userscript to improve 8chan
 // @icon        https://github.com/Pashe/8chan-X/raw/2-0/images/logo.svg
 // @namespace   https://github.com/Pashe/8chan-X/tree/2-0
@@ -65,7 +65,7 @@ settingsMenu.innerHTML = sprintf('<span style="font-size:8pt;">8chanX %s pure</s
 + '<label><input type="checkbox" name="reverseImageSearch">' + 'Add reverse image search links' + '</label><br>'
 + '<label><input type="checkbox" name="keyboardShortcutsEnabled">' + 'Enable keyboard shortcuts' + '</label><br>'
 + '<label><input type="checkbox" name="parseTimestampImage">' + 'Guess original download date of imageboard-style filenames' + '</label><br>'
-+ '<label>' + 'Mascot URL: ' + '<input type="text" name="mascotUrl" style="width: 1000pt"></label><br>'
++ '<label>' + 'Mascot URL(s) (pipe separated):<br />' + '<input type="text" name="mascotUrl" style="width: 1000pt"></label><br>'
 + '<button id="purgeDeadFavorites">' + 'Clean favorites' + '</button>'
 + '</div>';
 
@@ -673,6 +673,9 @@ function initNotifications() {
 function initMascot() { //Pashe, based on an anonymous contribution, WTFPL
 	if (!getSetting("mascotUrl")) {return;}
 	
+	var mascotUrls = getSetting("mascotUrl").split("|");
+	var mascotUrl = mascotUrls[Math.floor((Math.random()*mascotUrls.length))];
+	
 	$("head").append(
 		"<style>" +
 		"	form[name=postcontrols] {"+
@@ -703,7 +706,7 @@ function initMascot() { //Pashe, based on an anonymous contribution, WTFPL
 	var mascotImage = $('<img></img>');
 	var hostElement = $("body").first();
 	
-	mascotImage.attr("src", getSetting("mascotUrl"));
+	mascotImage.attr("src", mascotUrl);
 	
 	mascotImage.appendTo(mascotHolder);
 	mascotHolder.appendTo(hostElement);
