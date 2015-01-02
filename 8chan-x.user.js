@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Pashe's 8chanX v2 [pure]
-// @version     2.0.0.1420173640
+// @version     2.0.0.1420237530
 // @description Small userscript to improve 8chan
 // @icon        https://github.com/Pashe/8chan-X/raw/2-0/images/logo.svg
 // @namespace   https://github.com/Pashe/8chan-X/tree/2-0
@@ -12,6 +12,7 @@
 // @require     https://8chan.co/js/jquery-ui.custom.min.js
 // @require     https://github.com/alexei/sprintf.js/raw/master/src/sprintf.js
 // @require     https://raw.githubusercontent.com/rmm5t/jquery-timeago/master/jquery.timeago.js
+// @require     https://raw.githubusercontent.com/samsonjs/strftime/master/strftime.js
 
 // @resource    normalFavicon https://github.com/Pashe/8chan-X/raw/2-0/images/favicon.png
 
@@ -441,10 +442,6 @@ function notifyReplies() {
 }
 
 ////////////////
-//INIT FUNCTIONS
-////////////////
-
-////////////////
 //GALLERY
 ////////////////
 function refreshGalleryImages() {
@@ -459,6 +456,10 @@ function refreshGalleryImages() {
 		}
 	})
 }
+
+////////////////
+//INIT FUNCTIONS
+////////////////
 
 function initSettings() {
 	refreshSettings();
