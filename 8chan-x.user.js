@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Pashe's 8chanX v2
-// @version     2.0.0.1420171410
+// @version     2.0.0.1420173000
 // @description Small userscript to improve 8chan
 // @icon        https://github.com/Pashe/8chan-X/raw/2-0/images/logo.svg
 // @namespace   https://github.com/Pashe/8chan-X/tree/2-0
@@ -16,6 +16,7 @@
 // @require     https://8chan.co/js/jquery-ui.custom.min.js
 // @require     https://github.com/alexei/sprintf.js/raw/master/src/sprintf.js
 // @require     https://raw.githubusercontent.com/rmm5t/jquery-timeago/master/jquery.timeago.js
+// @require     https://raw.githubusercontent.com/samsonjs/strftime/master/strftime.js
 
 // @resource    normalFavicon https://github.com/Pashe/8chan-X/raw/2-0/images/favicon.png
 
@@ -41,7 +42,7 @@ var bumpLimit = 300;
 
 //Initializations
 var cachedPages = null;
-var	galleryImages;
+var galleryImages;
 
 //Dynamic
 var originalPageTitle = unsafeWindow.document.title;
@@ -61,7 +62,6 @@ if (unsafeWindow.Options) {
 settingsMenu.innerHTML = sprintf('<span style="font-size:8pt;">8chanX %s</span>', GM_info.script.version)
 + '<div style="overflow:auto;height:240px;">'
 + '<label><input type="checkbox" name="precisePages">' + 'Increase page indicator precision' + '</label><br>'
-+ '<label><input type="checkbox" name="relativeTime">' + 'Use relative post times' + '</label><br>'
 + '<label><input type="checkbox" name="hideTopBoards">' + 'Hide top boards' + '</label><br>'
 + '<label><input type="checkbox" name="catalogLinks">' + 'Force catalog links' + '</label><br>'
 + '<label><input type="checkbox" name="revealImageSpoilers">' + 'Reveal image spoilers' + '</label><br>'
@@ -70,13 +70,14 @@ settingsMenu.innerHTML = sprintf('<span style="font-size:8pt;">8chanX %s</span>'
 + '<label><input type="checkbox" name="reverseImageSearch">' + 'Add reverse image search links' + '</label><br>'
 + '<label><input type="checkbox" name="keyboardShortcutsEnabled">' + 'Enable keyboard shortcuts' + '</label><br>'
 + '<label><input type="checkbox" name="parseTimestampImage">' + 'Guess original download date of imageboard-style filenames' + '</label><br>'
++ '<label><input type="checkbox" name="localTime">' + 'Use local time' + '</label><br>'
++ '<label>' + '<a href="http://strftime.net/">Date format</a> (relative dates when empty):<br />' + '<input type="text" name="dateFormat" style="width: 1000pt"></label><br>'
 + '<label>' + 'Mascot URL(s) (pipe separated):<br />' + '<input type="text" name="mascotUrl" style="width: 1000pt"></label><br>'
 + '<button id="purgeDeadFavorites">' + 'Clean favorites' + '</button>'
 + '</div>';
 
 var defaultSettings = {
 	'precisePages': true,
-	'relativeTime': true,
 	'hideTopBoards': true,
 	'catalogLinks': true,
 	'revealImageSpoilers': false,
@@ -84,6 +85,8 @@ var defaultSettings = {
 	'catalogImageHover': true,
 	'reverseImageSearch': true,
 	'parseTimestampImage': true,
+	'localTime': true,
+	'dateFormat':"",
 	'mascotUrl':"",
 	'keyboardShortcutsEnabled': true
 };
@@ -467,21 +470,10 @@ function initSettings() {
 	for (var i = 0; i < settingsItems.length; i++) {
 	  setupControl(settingsItems[i]);
 	}
-	if (settingsMenu.addEventListener && !window.Options) {
-		settingsMenu.addEventListener("mouseover", function (e) {
-			refreshSettings();
-			settingsMenu.getElementsByTagName("a") [0].style.fontWeight = "bold";
-			settingsMenu.getElementsByTagName("div") [0].style.display = "block";
-		}, false);
-		settingsMenu.addEventListener("mouseout", function (e) {
-			settingsMenu.getElementsByTagName("a") [0].style.fontWeight = "normal";
-			settingsMenu.getElementsByTagName("div") [0].style.display = "none";
-		}, false);
-	}
 }
 
 function initRelativeTime() {
-	if (getSetting('relativeTime')) {$("time").timeago();}
+	if (!getSetting("dateFormat")) {$("time").timeago();}
 };
 
 function initMenu() { //Pashe, WTFPL
@@ -856,6 +848,24 @@ function initGallery() {
 	}
 }
 
+function initFormattedTime() {
+	if (!getSetting("dateFormat")) {return;}
+	
+	$("time").text(function() {
+		//%Y-%m-%d %H:%M:%S is nice
+		
+		$this = $(this);
+		
+		var thisDate = new Date($this.attr("datetime"));
+		
+		if (getSetting("localTime")) {
+			return strftime(getSetting("dateFormat"), thisDate);
+		} else {
+			return strftimeUTC(getSetting("dateFormat"), thisDate);
+		}
+	});
+}
+
 ////////////////
 //INIT CALLS
 ////////////////
@@ -878,13 +888,14 @@ $(unsafeWindow.document).ready(function() {
 	initDefaultSettings();
 	initFavicon();
 	initFlagIcons();
+	initFormattedTime();
 });
 
 ////////////////
 //EVENT HANDLER FUNCTIONS
 ////////////////
 function onNewPostRelativeTime() {
-	if (getSetting('relativeTime')) {$("time").timeago();}
+	if (!getSetting("dateFormat")) {$("time").timeago();}
 }
 
 function onNewPostImageHover(post) { //Tux et al, MIT
@@ -915,6 +926,10 @@ function onNewPostMenu() {
 	updateMenuStats();
 }
 
+function onNewPostFormattedTime() {
+	initFormattedTime();
+}
+
 function intervalMenu() {
 	updateMenuStats();
 }
@@ -927,6 +942,7 @@ unsafeWindow.$(document).on('new_post', function (e, post) {
 	onNewPostImageHover(post);
 	onNewPostRISLinks(post);
 	onNewPostNotifications(post);
+	onNewPostFormattedTime();
 	//onNewPostMenu();
 });
 
