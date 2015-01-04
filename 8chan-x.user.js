@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Pashe's 8chanX v2
-// @version     2.0.0.1420173000
+// @version     2.0.0.1420358720
 // @description Small userscript to improve 8chan
 // @icon        https://github.com/Pashe/8chan-X/raw/2-0/images/logo.svg
 // @namespace   https://github.com/Pashe/8chan-X/tree/2-0
@@ -461,6 +461,61 @@ function refreshGalleryImages() {
 	})
 }
 
+function openGallery() {
+	refreshGalleryImages();
+	
+	var galleryHolder = $("<div id='chx_gallery'></div>");
+	galleryHolder.appendTo($("body"));
+	
+	galleryHolder.css({
+		"background-color": "rgba(0,0,0,0.8)",
+		"overflow":         "auto",
+		"z-index":          "101",
+		"position":         "fixed",
+		"left":             "0",
+		"top":              "0",
+		"width":            "100%",
+		"height":           "100%"
+	});
+	
+	for (i in galleryImages) {
+		var thumbHolder = $('<div class="chx_galleryThumbHolder"></div>')
+		var thumbLink = $(sprintf('<a class="chx_galleryThumbLink" href="%s"></a>', galleryImages[i]["full"]));
+		var thumbImage = $(sprintf('<img class="chx_galleryThumbImage" src="%s" />', galleryImages[i]["thumbnail"]));
+		
+		thumbImage.css({
+			"max-height": "100%",
+			"max-width":  "100%",
+			"margin":     "auto auto auto auto",
+			"display":    "block"
+		});
+		
+		thumbHolder.css({
+			"padding": "0pt 0pt 2pt 2pt",
+			"height":   "128px",
+			"width":    "128px",
+			"overflow": "hidden",
+			"float":    "left"
+		});
+		
+		thumbImage.appendTo(thumbLink);
+		thumbLink.appendTo(thumbHolder);
+		thumbHolder.appendTo(galleryHolder);
+	}
+}
+
+function closeGallery() {
+	$("#chx_gallery").remove();
+}
+
+function toggleGallery() {
+	if ($("#chx_gallery").length) {
+		closeGallery();
+	} else {
+		openGallery();
+	}
+}
+
 ////////////////
 //INIT FUNCTIONS
 ////////////////
@@ -582,6 +637,7 @@ function initKeyboardShortcuts() { //Pashe, heavily influenced by Tux et al, WTF
 		
 		if (e.keyCode == 27) {
 			$('#quick-reply').remove();
+			closeGallery();
 		}
 		
 		if (e.target.nodeName == "INPUT" || e.target.nodeName == "TEXTAREA") {return;}
@@ -595,7 +651,7 @@ function initKeyboardShortcuts() { //Pashe, heavily influenced by Tux et al, WTF
 					e.preventDefault();
 					break;
 				case 71:
-					initGallery();
+					toggleGallery();
 					break;
 				case 69:
 					toggleExpandAll();
@@ -803,48 +859,6 @@ function initFlagIcons() { //Anon from >>>/tech/60489, presumably WTFPL or simil
 			opt.style.paddingLeft = '20px';
 			if (opt.value)
 					opt.style.background = 'no-repeat left center url(' + custom_flag_url + opt.value + '.png)';
-	}
-}
-
-function initGallery() {
-	refreshGalleryImages();
-	
-	var galleryHolder = $("<div id='chx_gallery'></div>");
-	galleryHolder.appendTo($("body"));
-	
-	galleryHolder.css({
-		"background-color": "rgba(0,0,0,0.7)",
-		"z-index":          "101",
-		"position":         "fixed",
-		"left":             "0",
-		"top":              "0",
-		"width":            "100%",
-		"height":           "100%"
-	});
-	
-	for (i in galleryImages) {
-		var thumbHolder = $('<div class="chx_galleryThumbHolder"></div>')
-		var thumbLink = $(sprintf('<a class="chx_galleryThumbLink" href="%s"></a>', galleryImages[i]["full"]));
-		var thumbImage = $(sprintf('<img class="chx_galleryThumbImage" src="%s" />', galleryImages[i]["thumbnail"]));
-		
-		thumbImage.css({
-			"max-height": "100%",
-			"max-width":  "100%",
-			"margin":     "auto",
-			"display":    "block"
-		});
-		
-		thumbHolder.css({
-			"border":    "2pt solid #888",
-			"height":    "128px",
-			"width":     "128px",
-			"overflow":  "hidden",
-			"float":     "left"
-		});
-		
-		thumbImage.appendTo(thumbLink);
-		thumbLink.appendTo(thumbHolder);
-		thumbHolder.appendTo(galleryHolder);
 	}
 }
 
