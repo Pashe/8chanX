@@ -1,5 +1,5 @@
 #8chanX 2.0 Pure
-##<a href="https://github.com/Pashe/8chan-X/raw/2-0_pure/8chan-x.user.js">Install</a>
+##<a href="https://github.com/Pashe/8chanX/raw/2-0_pure/8chan-x.user.js">Install</a>
 
 This branch of the script should work on versions of Firefox past 30, and is meant to replace <a href="https://github.com/Pashe/8chan-X/tree/master">Version 1.x</a>. It accomplishes this by replacing all of the Greasemonkey features with native equivalents (e.g. GM_setValue -> localStorage.setItem) so it isn't forced into a sandbox. Really, it should just use the new sandbox functions, but the main branches work on Chrome and 27, and those are the only browsers I care about.
 ***
