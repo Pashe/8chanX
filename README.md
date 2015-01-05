@@ -1,5 +1,5 @@
 #8chanX
-##<a href="https://github.com/Pashe/8chan-X/raw/master/8chan-x.user.js">Install</a>
+##<a href="https://github.com/Pashe/8chanX/raw/master/8chan-x.user.js">Install</a>
 ***
 
 This is a small 8chan userscript, it adds various features and options like:
