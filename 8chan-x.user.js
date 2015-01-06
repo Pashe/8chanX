@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Pashe's 8chanX v2
-// @version     2.0.0.1420498430
+// @version     2.0.0.1420503630
 // @description Small userscript to improve 8chan
 // @icon        https://github.com/Pashe/8chanX/raw/2-0/images/logo.svg
 // @namespace   https://github.com/Pashe/8chanX/tree/2-0
@@ -70,6 +70,8 @@ settingsMenu.innerHTML = sprintf('<span style="font-size:8pt;">8chanX %s</span>'
 + '<label><input type="checkbox" name="reverseImageSearch">' + 'Add reverse image search links' + '</label><br>'
 + '<label><input type="checkbox" name="keyboardShortcutsEnabled">' + 'Enable keyboard shortcuts' + '</label><br>'
 + '<label><input type="checkbox" name="parseTimestampImage">' + 'Guess original download date of imageboard-style filenames' + '</label><br>'
++ '<label><input type="checkbox" name="filterTrips">' + 'Filter tripfags' + '</label> '
++ '<label><input type="checkbox" name="filterTripsRecursive">' + 'recursively' + '</label><br>'
 + '<label><input type="checkbox" name="localTime">' + 'Use local time' + '</label><br>'
 + '<label>' + '<a href="http://strftime.net/">Date format</a> (relative dates when empty):<br />' + '<input type="text" name="dateFormat" style="width: 1000pt"></label><br>'
 + '<label>' + 'Mascot URL(s) (pipe separated):<br />' + '<input type="text" name="mascotUrl" style="width: 1000pt"></label><br>'
@@ -88,7 +90,9 @@ var defaultSettings = {
 	'localTime': true,
 	'dateFormat':"",
 	'mascotUrl':"",
-	'keyboardShortcutsEnabled': true
+	'keyboardShortcutsEnabled': true,
+	'filterTrips': false,
+	'filterTripsRecursive': true
 };
 
 function getSetting(key) {
@@ -517,6 +521,38 @@ function toggleGallery() {
 }
 
 ////////////////
+//FILTERS
+////////////////
+function tripFilter() { //Pashe, WTFPL //Don't expect this to be here for long
+	$(this).each(function () {
+			$this = $(this);
+			
+			var thisPost = {
+				// name:  $this.find("span.name").text(),
+				trip:  $this.find("span.trip").text(),
+				// cap:   $this.find("span.capcode").text(),
+				// email: $this.find("a.email").attr("href"),
+				// flag:  $this.find("img.flag").attr("title"),
+				// date:  $this.find("time").attr("datetime"),
+				// no:    $this.find("a.post_no").first().next().text(),
+				ment:  $this.find(".mentioned").text().length?$this.find(".mentioned").text().replace(/>>/g, "").replace(/ $/, "").split(" "):[],
+				// sub:   $this.find("span.subject").text(),
+				// body:  $this.find("div.body").text()
+			};
+			
+			if (thisPost.trip && (thisPost.trip != "!!tKlE5XtNKE")) { //You still have to tolerate me
+				console.log(thisPost.trip);
+				if (thisPost.ment.length && getSetting("filterTripsRecursive")) {
+					for (var i in thisPost.ment) {
+						$("#reply_"+thisPost.ment[i]).hide();
+					}
+				}
+				$this.hide();
+			}
+	});
+}
+
+////////////////
 //INIT FUNCTIONS
 ////////////////
 function initSettings() {
@@ -862,7 +898,7 @@ function initFlagIcons() { //Anon from >>>/tech/60489, presumably WTFPL or simil
 	}
 }
 
-function initFormattedTime() {
+function initFormattedTime() { //Pashe, WTFPL
 	if (!getSetting("dateFormat")) {return;}
 	
 	$("time").text(function() {
@@ -878,6 +914,12 @@ function initFormattedTime() {
 			return strftimeUTC(getSetting("dateFormat"), thisDate);
 		}
 	});
+}
+
+function initFilter() { //Pashe, WTFPL
+	if (!getSetting("filterTrips")) {return;}
+	
+	$(".post").each(tripFilter);
 }
 
 ////////////////
@@ -903,6 +945,7 @@ $(unsafeWindow.document).ready(function() {
 	initFavicon();
 	initFlagIcons();
 	initFormattedTime();
+	initFilter();
 });
 
 ////////////////
@@ -942,6 +985,12 @@ function onNewPostMenu() {
 
 function onNewPostFormattedTime() {
 	initFormattedTime();
+}
+
+function onNewPostFilter(post) { //Pashe, WTFPL
+	if (!getSetting("filterTrips")) {return;}
+	
+	$(post).each(tripFilter);
 }
 
 function intervalMenu() {
