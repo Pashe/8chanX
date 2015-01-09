@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Pashe's 8chanX v2
-// @version     2.0.0.1420503630
+// @version     2.0.0.1420790820
 // @description Small userscript to improve 8chan
 // @icon        https://github.com/Pashe/8chanX/raw/2-0/images/logo.svg
 // @namespace   https://github.com/Pashe/8chanX/tree/2-0
@@ -884,6 +884,8 @@ function initFavicon() { //Pashe, WTFPL
 }
 
 function initFlagIcons() { //Anon from >>>/tech/60489, presumably WTFPL or similar
+	if (!$("#user_flag").length) {return;}
+	
 	var board = window.location.pathname.replace(/^\/([^/]+).*?$/, "$1");
 	var custom_flag_url = window.location.origin + '/static/custom-flags/' + board + '/';
 	var dropdown_options = document.getElementById('user_flag').childNodes;
