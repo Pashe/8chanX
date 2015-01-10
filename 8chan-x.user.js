@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Pashe's 8chanX v2
-// @version     2.0.0.1420854080
+// @version     2.0.0.1420868060
 // @description Small userscript to improve 8chan
 // @icon        https://github.com/Pashe/8chanX/raw/2-0/images/logo.svg
 // @namespace   https://github.com/Pashe/8chanX/tree/2-0
@@ -24,6 +24,7 @@
 // @match       *://hatechan.co/*
 // @match       *://jp.8chan.co/*
 // @match       *://8ch.net/*
+// @match       *://h.8chan.co/*
 // ==/UserScript==
 
 /*Contributors
