@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Pashe's 8chanX v2 [pure]
-// @version     2.0.0.1420854230
+// @version     2.0.0.1420882300
 // @description Small userscript to improve 8chan
 // @icon        https://github.com/Pashe/8chanX/raw/2-0/images/logo.svg
 // @namespace   https://github.com/Pashe/8chanX/tree/2-0
@@ -20,6 +20,7 @@
 // @match       *://hatechan.co/*
 // @match       *://jp.8chan.co/*
 // @match       *://8ch.net/*
+// @match       *://h.8chan.co/*
 // ==/UserScript==
 
 /*Contributors
@@ -521,12 +522,19 @@ function toggleGallery() {
 ////////////////
 function tripFilter(post) { //Pashe, WTFPL
 	if (post.trip && (post.trip != "!!tKlE5XtNKE")) { //You still have to tolerate me
-		if (post.ment.length && getSetting("filterTripsRecursive")) {
-			for (var i in post.ment) {
-				$("#reply_"+post.ment[i]).hide();
-			}
+		hidePost(post, getSetting("filterTripsRecursive"));
+	}
+}
+
+function hidePost(post, recursive) { //Pashe, WTFPL
+	post.jqObj.hide();
+	post.jqObj.next("br").remove();
+	
+	if (recursive && post.ment.length) {
+		for (var i in post.ment) {
+			$("#reply_"+post.ment[i]).hide();
+			$("#reply_"+post.ment[i]).next("br").remove();
 		}
-		$this.hide();
 	}
 }
 
@@ -912,7 +920,9 @@ function initFilter() { //Pashe, WTFPL
 			// no:    $this.find("a.post_no").first().next().text(),
 			ment:  $this.find(".mentioned").text().length?$this.find(".mentioned").text().replace(/>>/g, "").replace(/ $/, "").split(" "):[],
 			// sub:   $this.find("span.subject").text(),
-			// body:  $this.find("div.body").text()
+			// body:  $this.find("div.body").text(),
+			jqObj: $this,
+			//stdObj: this,
 		};
 		
 		if (getSetting("filterTrips")) {tripFilter(thisPost);}
