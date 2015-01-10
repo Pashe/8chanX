@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Pashe's 8chanX v2 [pure]
-// @version     2.0.0.1420791400
+// @version     2.0.0.1420854230
 // @description Small userscript to improve 8chan
 // @icon        https://github.com/Pashe/8chanX/raw/2-0/images/logo.svg
 // @namespace   https://github.com/Pashe/8chanX/tree/2-0
@@ -915,7 +915,7 @@ function initFilter() { //Pashe, WTFPL
 			// body:  $this.find("div.body").text()
 		};
 		
-		if (initFilter) {tripFilter(thisPost);}
+		if (getSetting("filterTrips")) {tripFilter(thisPost);}
 	});
 }
 
