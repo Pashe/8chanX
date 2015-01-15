@@ -21,6 +21,7 @@
 // @match       *://jp.8chan.co/*
 // @match       *://8ch.net/*
 // @match       *://h.8chan.co/*
+// @match       *://h.8ch.net/*
 // ==/UserScript==
 
 /*Contributors
