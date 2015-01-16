@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Pashe's 8chanX v2
-// @version     2.0.0.1421401600
+// @version     2.0.0.1421401660
 // @description Small userscript to improve 8chan
 // @icon        https://github.com/Pashe/8chanX/raw/2-0/images/logo.svg
 // @namespace   https://github.com/Pashe/8chanX/tree/2-0
@@ -47,8 +47,9 @@ var cachedPages = null;
 var galleryImages;
 
 //Dynamic
+var isMod = (unsafeWindow.location.pathname.split("/")[1]=="mod.php");
 var originalPageTitle = unsafeWindow.document.title;
-var thisBoard = unsafeWindow.location.pathname.split("/")[1]=="mod.php"?unsafeWindow.location.href.split("/")[4]:unsafeWindow.location.pathname.split("/")[1];
+var thisBoard = isMod?unsafeWindow.location.href.split("/")[4]:unsafeWindow.location.pathname.split("/")[1];
 try {var thisThread = parseInt(unsafeWindow.location.href.match(/([0-9]+)\.html/)[1]);} catch (e) {var thisThread = -1};
 
 ////////////////
@@ -928,7 +929,8 @@ function initFormattedTime() { //Pashe, WTFPL
 }
 
 function initFilter() { //Pashe, WTFPL
-	var filterTrips = getSetting("filterTrips");
+	if (isMod) {return;}
+	var filterTrips = (getSetting("filterTrips"));
 	
 	$(".post").each(function() {
 		$this = $(this);
