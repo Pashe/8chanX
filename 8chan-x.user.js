@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Pashe's 8chanX v2 [pure]
-// @version     2.0.0.1420882300
+// @version     2.0.0.1421401820
 // @description Small userscript to improve 8chan
 // @icon        https://github.com/Pashe/8chanX/raw/2-0/images/logo.svg
 // @namespace   https://github.com/Pashe/8chanX/tree/2-0
@@ -43,8 +43,9 @@ var cachedPages = null;
 var galleryImages;
 
 //Dynamic
+var isMod = (window.location.pathname.split("/")[1]=="mod.php");
 var originalPageTitle = window.document.title;
-var thisBoard = window.location.pathname.split("/")[1]=="mod.php"?window.location.href.split("/")[4]:window.location.pathname.split("/")[1];
+var thisBoard = isMod?window.location.href.split("/")[4]:window.location.pathname.split("/")[1];
 try {var thisThread = parseInt(window.location.href.match(/([0-9]+)\.html/)[1]);} catch (e) {var thisThread = -1};
 
 ////////////////
@@ -450,6 +451,13 @@ function notifyReplies() {
 ////////////////
 //GALLERY
 ////////////////
+var fileExtensionStyles = {
+	"jpg":  {"background-color": "#0f0", "color": "#000"}, "jpeg": {"background-color": "#0f0", "color": "#000"},
+	"png":  {"background-color": "#00f", "color": "#fff"},
+	"webm": {"background-color": "#f00", "color": "#000"}, "mp4": {"background-color": "#a00", "color": "#000"},
+	"gif": {"background-color": "#ff0", "color": "#000"},
+};
+
 function refreshGalleryImages() {
 	galleryImages = [];
 	
@@ -480,28 +488,40 @@ function openGallery() {
 		"height":           "100%"
 	});
 	
+	galleryHolder.click(closeGallery);
+	
 	for (i in galleryImages) {
-		var thumbHolder = $('<div class="chx_galleryThumbHolder"></div>')
+		var fileExtension = galleryImages[i]["full"].match(/\.([a-z0-9]+)(&loop.*)?$/i)!=null?galleryImages[i]["full"].match(/\.([a-z0-9]+)(&loop.*)?$/i)[1]:"???";
+		
+		var thumbHolder = $('<div class="chx_galleryThumbHolder"></div>');
 		var thumbLink = $(sprintf('<a class="chx_galleryThumbLink" href="%s"></a>', galleryImages[i]["full"]));
 		var thumbImage = $(sprintf('<img class="chx_galleryThumbImage" src="%s" />', galleryImages[i]["thumbnail"]));
+		var metadataSpan = $(sprintf('<span>%s</span>', fileExtension));
 		
 		thumbImage.css({
-			"max-height": "100%",
-			"max-width":  "100%",
+			"max-height": "128px",
+			"max-width":  "128px",
 			"margin":     "auto auto auto auto",
 			"display":    "block"
 		});
 		
 		thumbHolder.css({
-			"padding": "0pt 0pt 2pt 2pt",
-			"height":   "128px",
-			"width":    "128px",
-			"overflow": "hidden",
-			"float":    "left"
+			"padding":    "0pt 0pt 0pt 0pt",
+			"height":     "155px",
+			"width":      "128px",
+			"overflow":   "hidden",
+			"float":      "left",
+			"text-align": "center",
+			"color":      "#fff"
 		});
+		
+		if (fileExtensionStyles.hasOwnProperty(fileExtension)) {
+			metadataSpan.css(fileExtensionStyles[fileExtension]).css({"padding": "0pt 5pt 2pt 5pt", "border-radius": "2pt", "font-weight": "bolder"});
+		}
 		
 		thumbImage.appendTo(thumbLink);
 		thumbLink.appendTo(thumbHolder);
+		metadataSpan.appendTo(thumbHolder);
 		thumbHolder.appendTo(galleryHolder);
 	}
 }
@@ -906,7 +926,8 @@ function initFormattedTime() { //Pashe, WTFPL
 }
 
 function initFilter() { //Pashe, WTFPL
-	var filterTrips = getSetting("filterTrips");
+	if (isMod) {return;}
+	var filterTrips = (getSetting("filterTrips"));
 	
 	$(".post").each(function() {
 		$this = $(this);
