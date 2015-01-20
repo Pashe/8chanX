@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Pashe's 8chanX v2
-// @version     2.0.0.1421731650
+// @version     2.0.0.1421793910
 // @description Small userscript to improve 8chan
 // @icon        https://github.com/Pashe/8chanX/raw/2-0/images/logo.svg
 // @namespace   https://github.com/Pashe/8chanX/tree/2-0
@@ -64,7 +64,6 @@ if (unsafeWindow.Options) {
 settingsMenu.innerHTML = sprintf('<span style="font-size:8pt;">8chanX %s</span>', GM_info.script.version)
 + '<div style="overflow:auto;height:240px;">'
 + '<label><input type="checkbox" name="precisePages">' + 'Increase page indicator precision' + '</label><br>'
-+ '<label><input type="checkbox" name="hideTopBoards">' + 'Hide top boards' + '</label><br>'
 + '<label><input type="checkbox" name="catalogLinks">' + 'Force catalog links' + '</label><br>'
 + '<label><input type="checkbox" name="revealImageSpoilers">' + 'Reveal image spoilers' + '</label><br>'
 + '<label><input type="checkbox" name="imageHover">' + 'Image hover' + '</label><br>'
@@ -82,7 +81,6 @@ settingsMenu.innerHTML = sprintf('<span style="font-size:8pt;">8chanX %s</span>'
 
 var defaultSettings = {
 	'precisePages': true,
-	'hideTopBoards': true,
 	'catalogLinks': true,
 	'revealImageSpoilers': false,
 	'imageHover': true,
@@ -650,14 +648,6 @@ function initMenu() { //Pashe, WTFPL
 	var $menu = $(menu);
 	
 	$("[data-description='1'], [data-description='2']").hide();
-	if (getSetting("hideTopBoards")) {
-		var checkTopBoardsExist = setInterval(function() {
-			if ($("[data-description='3']")[0]) {
-				$("[data-description='3']").hide();
-				clearInterval(checkTopBoardsExist);
-			}
-		}, 100);
-	}
 	
 	if (getSetting('catalogLinks') && !isOnCatalog()) {
 		$('.favorite-boards a').each( function (index, data) {
