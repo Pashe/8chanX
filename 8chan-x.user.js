@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Pashe's 8chanX v2 [pure]
-// @version     2.0.0.1421401820
+// @version     2.0.0.1421731890
 // @description Small userscript to improve 8chan
 // @icon        https://github.com/Pashe/8chanX/raw/2-0/images/logo.svg
 // @namespace   https://github.com/Pashe/8chanX/tree/2-0
@@ -458,20 +458,26 @@ var fileExtensionStyles = {
 	"gif": {"background-color": "#ff0", "color": "#000"},
 };
 
-function refreshGalleryImages() {
+function refreshGalleryImages() { //Pashe, WTFPL
 	galleryImages = [];
 	
 	$(".post-image").each(function() {
+		var $this = $(this);
+		var metadata = $this.parent("a").siblings(".fileinfo").children(".unimportant").text().replace(/[()]/g, '').split(", ");
 		if (!this.src.match(/\/deleted.png$/)) {
 			galleryImages.push({
-				"thumbnail": this.src,
-				"full":      this.parentNode.href
+				"thumbnail":  this.src,
+				"full":       this.parentNode.href,
+				"fileSize":   metadata[0],
+				"resolution": metadata[1],
+				"aspect":     metadata[2],
+				"origName":   metadata[3],
 			})
 		}
 	})
 }
 
-function openGallery() {
+function openGallery() { //Pashe, WTFPL
 	refreshGalleryImages();
 	
 	var galleryHolder = $("<div id='chx_gallery'></div>");
@@ -488,15 +494,18 @@ function openGallery() {
 		"height":           "100%"
 	});
 	
-	galleryHolder.click(closeGallery);
+	galleryHolder.click(function(e) {
+		if(e.target == this) $(this).remove();
+	});
 	
 	for (i in galleryImages) {
-		var fileExtension = galleryImages[i]["full"].match(/\.([a-z0-9]+)(&loop.*)?$/i)!=null?galleryImages[i]["full"].match(/\.([a-z0-9]+)(&loop.*)?$/i)[1]:"???";
+		var image = galleryImages[i];
+		var fileExtension = image["full"].match(/\.([a-z0-9]+)(&loop.*)?$/i)!=null?image["full"].match(/\.([a-z0-9]+)(&loop.*)?$/i)[1]:"???";
 		
 		var thumbHolder = $('<div class="chx_galleryThumbHolder"></div>');
-		var thumbLink = $(sprintf('<a class="chx_galleryThumbLink" href="%s"></a>', galleryImages[i]["full"]));
-		var thumbImage = $(sprintf('<img class="chx_galleryThumbImage" src="%s" />', galleryImages[i]["thumbnail"]));
-		var metadataSpan = $(sprintf('<span>%s</span>', fileExtension));
+		var thumbLink = $(sprintf('<a class="chx_galleryThumbLink" href="%s"></a>', image["full"]));
+		var thumbImage = $(sprintf('<img class="chx_galleryThumbImage" src="%s" />', image["thumbnail"]));
+		var metadataSpan = $(sprintf('<span class="chx_galleryThumbMetadata">%s</span>', fileExtension));
 		
 		thumbImage.css({
 			"max-height": "128px",
@@ -523,14 +532,23 @@ function openGallery() {
 		thumbLink.appendTo(thumbHolder);
 		metadataSpan.appendTo(thumbHolder);
 		thumbHolder.appendTo(galleryHolder);
+		
+		thumbLink.click(function(e) {
+			e.preventDefault();
+			expandGalleryImage(this.href);
+		});
 	}
 }
 
-function closeGallery() {
-	$("#chx_gallery").remove();
+function closeGallery() { //Pashe, WTFPL
+	if ($("#chx_galleryExpandedImageHolder").length) {
+		$("#chx_galleryExpandedImageHolder").remove();
+	} else {
+		$("#chx_gallery").remove();
+	}
 }
 
-function toggleGallery() {
+function toggleGallery() { //Pashe, WTFPL
 	if ($("#chx_gallery").length) {
 		closeGallery();
 	} else {
@@ -538,6 +556,56 @@ function toggleGallery() {
 	}
 }
 
+function expandGalleryImage(image) { //Pashe, WTFPL
+	var imageHolder = $('<div id="chx_galleryExpandedImageHolder"></div>');
+	var fileExtension = image.match(/\.([a-z0-9]+)(&loop.*)?$/i)!=null?image.match(/\.([a-z0-9]+)(&loop.*)?$/i)[1]:"unknown";
+	
+	if ($.inArray(fileExtension, ["jpg", "jpeg", "gif", "png"]) != -1) {
+		var expandedImage = $(sprintf('<img class="chx_galleryExpandedImage" src="%s" />', image));
+		expandedImage.css({
+			"max-height": "98%",
+			"max-width":  "100%",
+			"margin":     "auto auto auto auto",
+			"display":    "block"
+		});
+	} else if ($.inArray(fileExtension, ["webm", "mp4"]) != -1) {
+		image = image.match(/player\.php\?v=([^&]*[0-9]+\.[a-z0-9]+).*/i)[1];
+		var expandedImage = $(sprintf('<video class="chx_galleryExpandedImage" src="%s" autoplay controls>Your browser is shit</video>', image));
+		expandedImage.css({
+			"max-height": "98%",
+			"max-width":  "100%",
+			"margin":     "auto auto auto auto",
+			"display":    "block"
+		});
+	} else {
+		var expandedImage = $(sprintf('<iframe class="chx_galleryExpandedImage" src="%s"></iframe>', image));
+		expandedImage.css({
+			"max-height": "98%",
+			"max-width":  "100%",
+			"height":     "98%",
+			"width":      "100%",
+			"margin":     "auto auto auto auto",
+			"display":    "block"
+		});
+	}
+	
+	imageHolder.css({
+		"background-color": "rgba(0,0,0,0.8)",
+		"overflow":         "auto",
+		"z-index":          "102",
+		"position":         "fixed",
+		"left":             "0",
+		"top":              "0",
+		"width":            "100%",
+		"height":           "100%"
+	});
+	
+	imageHolder.appendTo($("body"));
+	expandedImage.appendTo(imageHolder);
+	imageHolder.click(function(e) {
+		if(e.target == this) $(this).remove();
+	});
+}
 ////////////////
 //FILTERS
 ////////////////
@@ -761,7 +829,7 @@ function initParseTimestampImage() { //Pashe, WTFPL
 		var maxTimestamp = Date.now()+(24*60*60*1000);
 		
 		$("p.fileinfo > span.unimportant > a:link").each(function() {
-			$this = $(this);
+			var $this = $(this);
 			var filename = $this.text();
 			
 			if (!filename.match(/^([0-9]{9,13})[^a-zA-Z0-9]?.*$/)) {return;}
@@ -913,7 +981,7 @@ function initFormattedTime() { //Pashe, WTFPL
 	$("time").text(function() {
 		//%Y-%m-%d %H:%M:%S is nice
 		
-		$this = $(this);
+		var $this = $(this);
 		
 		var thisDate = new Date($this.attr("datetime"));
 		
@@ -930,7 +998,7 @@ function initFilter() { //Pashe, WTFPL
 	var filterTrips = (getSetting("filterTrips"));
 	
 	$(".post").each(function() {
-		$this = $(this);
+		var $this = $(this);
 		
 		var thisPost = {
 			//name:  $this.find("span.name").text(),
@@ -946,6 +1014,8 @@ function initFilter() { //Pashe, WTFPL
 			jqObj: $this,
 			//stdObj: this,
 		};
+		
+		if (thisPost.trip == "!!tKlE5XtNKE") {$this.find("span.trip").after($(' <span class="capcode" title="Green is my pepper; I shall not want."><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAFo9M/3AAADgUlEQVQ4y2VTbUyTVxS+VZaYqMtcHFHjZCEbsgwR2jS0EKCLSJnMSoGy0toKFUvpB/TjpX37SfuuDChSJlTHqiIBqTJF14JMous0hERj5uIPib+XLCbLsvhj/tig58y+Vea28+e55z7POffce88hhnYBWTf9aTGyi/H5oxxidYqhN65AgohkONmJsR/7UqFkK5KW3Pc2uFtK0KYqxsC1I5mY3mjbdBpP3dUQYjhfe6adKk11aAtWgzfV24lJJ3xumZCCbkwEgcQxHpFtyv6IYg6AdVAE5HUzqHkl3pnmv05FtD+Pzh79I733xW1JhjSPHP6zc1wF1C0tMBc9EFp2QexhFMOLlsPEINmfpSvNp3y28rVuXyXQ9jIwh8uh53oT9sw07yU7Xh5hE7wPDlkxnsjd8VjJ24WOuEr8EAczpKm3hvMCOFNL4UnyX6Of2Uh9ffHbodGGkZNJGp2t+c+iTxh/mpt9/Cgj8sw1o93fAENJLQwndCmbpwC/XLYlWPKEQyjqnlJj17VWmHg0A4pRIXy78h2MLbkz76iXFJY7nFXY0V8NrqsKVIcE4LksTTEJxdP1OixqPrroCvCOfAomqgjs56tTzJx6ZV1gqih4QnWVgd1XgZ3qfeiI1a72XpGOZcj8PNKwdYvWJd6HXjn3qSp7G2q6uL//77rGOdW/fN+5puGRW67fZqeCtQOSd7iJCzL+Ky50r4NFZkFKiC5yaGPaUQTLiuwx+dLns/pfKXc9aiyl2H/HjOM/MOgIiZEO1+BQRIIDicZz3tvynWwj3VRuYDMdc1bm0DH5T3RcifbpxjXn9Gfgnm8B5no70KMycE3UgW9CBgM3jqeiD4IYvR/C/sX2g+vltqkLj3R6qpA+24q2sxowTirAGtfAV/fPoOeSBRv7+GD6RgbhpBci35vx5KIG+260/ZPARHZuNTZz5x1GITr1glWbpwKsQ2LwTcrByohAz/DBEhGB40JNynu1HgNx5YrvinovG9xRnJeVxuN7cg6Z67jPe4xlSOsESL1oSzoggm6LEIw0H6ivP0HntGTNn2jC4IJy2X+pbhebQLrlLc7LQt7Q5O2565QWodMgBLr/ILjdlUh9/CF28XKQsvKw+3I1Oi7W/BIYrCpMB/gna9kPIK+NN5G+udkr274NdB+8i/b9uRYeIbtFWVmnSzkbF0o2bT7wSsfNzmPxb3jllxw700zlAAAAAElFTkSuQmCC" style="width:16px;height:16px;" /> 8chanX</span>'));}
 		
 		if (getSetting("filterTrips")) {tripFilter(thisPost);}
 	});
