@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Pashe's 8chanX v2
-// @version     2.0.0.1421731440
+// @version     2.0.0.1421731650
 // @description Small userscript to improve 8chan
 // @icon        https://github.com/Pashe/8chanX/raw/2-0/images/logo.svg
 // @namespace   https://github.com/Pashe/8chanX/tree/2-0
@@ -832,7 +832,7 @@ function initParseTimestampImage() { //Pashe, WTFPL
 		var maxTimestamp = Date.now()+(24*60*60*1000);
 		
 		$("p.fileinfo > span.unimportant > a:link").each(function() {
-			$this = $(this);
+			var $this = $(this);
 			var filename = $this.text();
 			
 			if (!filename.match(/^([0-9]{9,13})[^a-zA-Z0-9]?.*$/)) {return;}
@@ -984,7 +984,7 @@ function initFormattedTime() { //Pashe, WTFPL
 	$("time").text(function() {
 		//%Y-%m-%d %H:%M:%S is nice
 		
-		$this = $(this);
+		var $this = $(this);
 		
 		var thisDate = new Date($this.attr("datetime"));
 		
@@ -1001,7 +1001,7 @@ function initFilter() { //Pashe, WTFPL
 	var filterTrips = (getSetting("filterTrips"));
 	
 	$(".post").each(function() {
-		$this = $(this);
+		var $this = $(this);
 		
 		var thisPost = {
 			//name:  $this.find("span.name").text(),
