@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Pashe's 8chanX v2
-// @version     2.0.0.1421463610
+// @version     2.0.0.1421731440
 // @description Small userscript to improve 8chan
 // @icon        https://github.com/Pashe/8chanX/raw/2-0/images/logo.svg
 // @namespace   https://github.com/Pashe/8chanX/tree/2-0
@@ -461,20 +461,26 @@ var fileExtensionStyles = {
 	"gif": {"background-color": "#ff0", "color": "#000"},
 };
 
-function refreshGalleryImages() {
+function refreshGalleryImages() { //Pashe, WTFPL
 	galleryImages = [];
 	
 	$(".post-image").each(function() {
+		var $this = $(this);
+		var metadata = $this.parent("a").siblings(".fileinfo").children(".unimportant").text().replace(/[()]/g, '').split(", ");
 		if (!this.src.match(/\/deleted.png$/)) {
 			galleryImages.push({
-				"thumbnail": this.src,
-				"full":      this.parentNode.href
+				"thumbnail":  this.src,
+				"full":       this.parentNode.href,
+				"fileSize":   metadata[0],
+				"resolution": metadata[1],
+				"aspect":     metadata[2],
+				"origName":   metadata[3],
 			})
 		}
 	})
 }
 
-function openGallery() {
+function openGallery() { //Pashe, WTFPL
 	refreshGalleryImages();
 	
 	var galleryHolder = $("<div id='chx_gallery'></div>");
@@ -491,15 +497,18 @@ function openGallery() {
 		"height":           "100%"
 	});
 	
-	galleryHolder.click(closeGallery);
+	galleryHolder.click(function(e) {
+		if(e.target == this) $(this).remove();
+	});
 	
 	for (i in galleryImages) {
-		var fileExtension = galleryImages[i]["full"].match(/\.([a-z0-9]+)(&loop.*)?$/i)!=null?galleryImages[i]["full"].match(/\.([a-z0-9]+)(&loop.*)?$/i)[1]:"???";
+		var image = galleryImages[i];
+		var fileExtension = image["full"].match(/\.([a-z0-9]+)(&loop.*)?$/i)!=null?image["full"].match(/\.([a-z0-9]+)(&loop.*)?$/i)[1]:"???";
 		
 		var thumbHolder = $('<div class="chx_galleryThumbHolder"></div>');
-		var thumbLink = $(sprintf('<a class="chx_galleryThumbLink" href="%s"></a>', galleryImages[i]["full"]));
-		var thumbImage = $(sprintf('<img class="chx_galleryThumbImage" src="%s" />', galleryImages[i]["thumbnail"]));
-		var metadataSpan = $(sprintf('<span>%s</span>', fileExtension));
+		var thumbLink = $(sprintf('<a class="chx_galleryThumbLink" href="%s"></a>', image["full"]));
+		var thumbImage = $(sprintf('<img class="chx_galleryThumbImage" src="%s" />', image["thumbnail"]));
+		var metadataSpan = $(sprintf('<span class="chx_galleryThumbMetadata">%s</span>', fileExtension));
 		
 		thumbImage.css({
 			"max-height": "128px",
@@ -526,14 +535,23 @@ function openGallery() {
 		thumbLink.appendTo(thumbHolder);
 		metadataSpan.appendTo(thumbHolder);
 		thumbHolder.appendTo(galleryHolder);
+		
+		thumbLink.click(function(e) {
+			e.preventDefault();
+			expandGalleryImage(this.href);
+		});
 	}
 }
 
-function closeGallery() {
-	$("#chx_gallery").remove();
+function closeGallery() { //Pashe, WTFPL
+	if ($("#chx_galleryExpandedImageHolder").length) {
+		$("#chx_galleryExpandedImageHolder").remove();
+	} else {
+		$("#chx_gallery").remove();
+	}
 }
 
-function toggleGallery() {
+function toggleGallery() { //Pashe, WTFPL
 	if ($("#chx_gallery").length) {
 		closeGallery();
 	} else {
@@ -541,6 +559,56 @@ function toggleGallery() {
 	}
 }
 
+function expandGalleryImage(image) { //Pashe, WTFPL
+	var imageHolder = $('<div id="chx_galleryExpandedImageHolder"></div>');
+	var fileExtension = image.match(/\.([a-z0-9]+)(&loop.*)?$/i)!=null?image.match(/\.([a-z0-9]+)(&loop.*)?$/i)[1]:"unknown";
+	
+	if ($.inArray(fileExtension, ["jpg", "jpeg", "gif", "png"]) != -1) {
+		var expandedImage = $(sprintf('<img class="chx_galleryExpandedImage" src="%s" />', image));
+		expandedImage.css({
+			"max-height": "98%",
+			"max-width":  "100%",
+			"margin":     "auto auto auto auto",
+			"display":    "block"
+		});
+	} else if ($.inArray(fileExtension, ["webm", "mp4"]) != -1) {
+		image = image.match(/player\.php\?v=([^&]*[0-9]+\.[a-z0-9]+).*/i)[1];
+		var expandedImage = $(sprintf('<video class="chx_galleryExpandedImage" src="%s" autoplay controls>Your browser is shit</video>', image));
+		expandedImage.css({
+			"max-height": "98%",
+			"max-width":  "100%",
+			"margin":     "auto auto auto auto",
+			"display":    "block"
+		});
+	} else {
+		var expandedImage = $(sprintf('<iframe class="chx_galleryExpandedImage" src="%s"></iframe>', image));
+		expandedImage.css({
+			"max-height": "98%",
+			"max-width":  "100%",
+			"height":     "98%",
+			"width":      "100%",
+			"margin":     "auto auto auto auto",
+			"display":    "block"
+		});
+	}
+	
+	imageHolder.css({
+		"background-color": "rgba(0,0,0,0.8)",
+		"overflow":         "auto",
+		"z-index":          "102",
+		"position":         "fixed",
+		"left":             "0",
+		"top":              "0",
+		"width":            "100%",
+		"height":           "100%"
+	});
+	
+	imageHolder.appendTo($("body"));
+	expandedImage.appendTo(imageHolder);
+	imageHolder.click(function(e) {
+		if(e.target == this) $(this).remove();
+	});
+}
 ////////////////
 //FILTERS
 ////////////////
