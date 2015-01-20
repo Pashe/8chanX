@@ -1024,21 +1024,32 @@ function initFilter() { //Pashe, WTFPL
 	});
 }
 
+function initBRLocalStorage() { //Pashe, WTFPL
+	if (!unsafeWindow.localStorage.hasOwnProperty("color_ids")) {
+		var savedLocalStorage = getSetting("localStorage");
+		unsafeWindow.localStorage.clear();
+		for (key in savedLocalStorage) {
+			unsafeWindow.localStorage[key] = savedLocalStorage[key];
+		}
+	} else {
+		setSetting("localStorage", unsafeWindow.localStorage);
+	}
+}
+
 ////////////////
 //INIT CALLS
 ////////////////
 initSettings();
 
 $(unsafeWindow.document).ready(function() {
+	initBRLocalStorage();
 	initRelativeTime();
 	initMenu();
-	//initImprovedPageTitles();
 	initRevealImageSpoilers();
 	initImageHover();
 	initKeyboardShortcuts();
 	initCatalog();
 	initRISLinks();
-	//initQrDrag();
 	initParseTimestampImage();
 	initNotifications();
 	initMascot();
@@ -1108,7 +1119,6 @@ unsafeWindow.$(document).on('new_post', function (e, post) {
 	onNewPostRISLinks(post);
 	onNewPostNotifications(post);
 	onNewPostFormattedTime();
-	//onNewPostMenu();
 });
 
 if (isOnThread()) {
