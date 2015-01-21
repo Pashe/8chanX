@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Pashe's 8chanX v2 [pure]
-// @version     2.0.0.1421731890
+// @version     2.0.0.1421804610
 // @description Small userscript to improve 8chan
 // @icon        https://github.com/Pashe/8chanX/raw/2-0/images/logo.svg
 // @namespace   https://github.com/Pashe/8chanX/tree/2-0
@@ -41,6 +41,7 @@ var bumpLimit = 300;
 //Initializations
 var cachedPages = null;
 var galleryImages;
+var galleryImageIndex;
 
 //Dynamic
 var isMod = (window.location.pathname.split("/")[1]=="mod.php");
@@ -61,7 +62,6 @@ if (window.Options) {
 settingsMenu.innerHTML = sprintf('<span style="font-size:8pt;">8chanX %s pure</span>', GM_info.script.version)
 + '<div style="overflow:auto;height:240px;">'
 + '<label><input type="checkbox" name="precisePages">' + 'Increase page indicator precision' + '</label><br>'
-+ '<label><input type="checkbox" name="hideTopBoards">' + 'Hide top boards' + '</label><br>'
 + '<label><input type="checkbox" name="catalogLinks">' + 'Force catalog links' + '</label><br>'
 + '<label><input type="checkbox" name="revealImageSpoilers">' + 'Reveal image spoilers' + '</label><br>'
 + '<label><input type="checkbox" name="imageHover">' + 'Image hover' + '</label><br>'
@@ -79,7 +79,6 @@ settingsMenu.innerHTML = sprintf('<span style="font-size:8pt;">8chanX %s pure</s
 
 var defaultSettings = {
 	'precisePages': true,
-	'hideTopBoards': true,
 	'catalogLinks': true,
 	'revealImageSpoilers': false,
 	'imageHover': true,
@@ -533,9 +532,9 @@ function openGallery() { //Pashe, WTFPL
 		metadataSpan.appendTo(thumbHolder);
 		thumbHolder.appendTo(galleryHolder);
 		
-		thumbLink.click(function(e) {
+		thumbLink.click(i, function(e) {
 			e.preventDefault();
-			expandGalleryImage(this.href);
+			expandGalleryImage(parseInt(e.data));
 		});
 	}
 }
@@ -556,7 +555,9 @@ function toggleGallery() { //Pashe, WTFPL
 	}
 }
 
-function expandGalleryImage(image) { //Pashe, WTFPL
+function expandGalleryImage(index) { //Pashe, WTFPL
+	galleryImageIndex = index;
+	var image = galleryImages[index]["full"];
 	var imageHolder = $('<div id="chx_galleryExpandedImageHolder"></div>');
 	var fileExtension = image.match(/\.([a-z0-9]+)(&loop.*)?$/i)!=null?image.match(/\.([a-z0-9]+)(&loop.*)?$/i)[1]:"unknown";
 	
@@ -606,6 +607,14 @@ function expandGalleryImage(image) { //Pashe, WTFPL
 		if(e.target == this) $(this).remove();
 	});
 }
+
+function jogExpandedGalleryImage(steps) {
+	if ($("#chx_galleryExpandedImageHolder").length && galleryImages.hasOwnProperty(galleryImageIndex+steps)) {
+		$("#chx_galleryExpandedImageHolder").remove();
+		expandGalleryImage(galleryImageIndex+steps);
+	}
+}
+
 ////////////////
 //FILTERS
 ////////////////
@@ -647,14 +656,6 @@ function initMenu() { //Pashe, WTFPL
 	var $menu = $(menu);
 	
 	$("[data-description='1'], [data-description='2']").hide();
-	if (getSetting("hideTopBoards")) {
-		var checkTopBoardsExist = setInterval(function() {
-			if ($("[data-description='3']")[0]) {
-				$("[data-description='3']").hide();
-				clearInterval(checkTopBoardsExist);
-			}
-		}, 100);
-	}
 	
 	if (getSetting('catalogLinks') && !isOnCatalog()) {
 		$('.favorite-boards a').each( function (index, data) {
@@ -745,7 +746,6 @@ function initKeyboardShortcuts() { //Pashe, heavily influenced by Tux et al, WTF
 	if (!getSetting("keyboardShortcutsEnabled")) {return;}
 	
 	$(document).keydown(function(e) {
-		
 		if (e.keyCode == 27) {
 			$('#quick-reply').remove();
 			closeGallery();
@@ -769,6 +769,12 @@ function initKeyboardShortcuts() { //Pashe, heavily influenced by Tux et al, WTF
 					break;
 				case 67:
 					goToCatalog();
+					break;
+				case 39:
+					jogExpandedGalleryImage(+1);
+					break;
+				case 37:
+					jogExpandedGalleryImage(-1);
 					break;
 			}
 		}
@@ -1029,13 +1035,11 @@ initSettings();
 $(window.document).ready(function() {
 	initRelativeTime();
 	initMenu();
-	//initImprovedPageTitles();
 	initRevealImageSpoilers();
 	initImageHover();
 	initKeyboardShortcuts();
 	initCatalog();
 	initRISLinks();
-	//initQrDrag();
 	initParseTimestampImage();
 	initNotifications();
 	initMascot();
@@ -1105,7 +1109,6 @@ window.$(document).on('new_post', function (e, post) {
 	onNewPostRISLinks(post);
 	onNewPostNotifications(post);
 	onNewPostFormattedTime();
-	//onNewPostMenu();
 });
 
 if (isOnThread()) {
