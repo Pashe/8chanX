@@ -1,41 +1,35 @@
-#8chanX 2.0
-##<a href="https://github.com/Pashe/8chan-X/raw/2-0/8chan-x.user.js">Install</a>
+#![8](https://cdn.rawgit.com/Pashe/8chanX/2-0/images/logo.svg)chanX 2.0
+#[Click here to install](https://github.com/Pashe/8chanX/raw/2-0/8chan-x.user.js)
 
-This version of the script does not work on versions of Firefox past 30. <a href="https://github.com/Pashe/8chan-X/tree/2-0_pure">The 'pure' branch</a> should work, though.
+This branch may not work on versions of Firefox past 30. If you experience any issues, try [the "pure" branch.](https://github.com/Pashe/8chanX/tree/2-0_pure)
 ***
 
-This is a small 8chan userscript, it adds various features and options like:
- * Post and image counts in the menu
+This userscript adds various features and options like:
  * Image hover
- * Relative post dates (n minutes/hours/days ago)
-
-Additionally, this fork adds:
- * Thread page and visible autosage on the catalog and in the menu
- * Reverse image search links
+ * Gallery
+ * Tripfag filter (more filters to come)
+ * Reverse image search
+ * Flag preview
  * Mascots
  * Notifications
+ * Relative post dates
+ * Post and image counts in the menu
  * Many other poorly written hacks
- * Slightly less dead than tux's version
- 
-This version adds:
- * Uses GM_{get,set}Value instead of localStorage to save settings
- * Fixes that thing where frequently updating threads would fuck everything up
- * Way more jQuery (maybe a bad thing)
- * Flag preview
- * Probably some other stuff I'm forgetting
+ * Not as dead as tux's version
 
-This is a userscript, you will need <a href="https://addons.mozilla.org/en-US/firefox/addon/greasemonkey/">Greasemonkey</a> (Firefox), <a href="https://chrome.google.com/webstore/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo">Tampermonkey</a> (Chrome), <a href="https://addons.opera.com/en/extensions/details/violent-monkey/">Violentmonkey</a> (Opera) or an equivalent extension to run it.
+This is a userscript, you will need an addon to run it properly
 
-Key bindings
------
+Browser|Addon
+----   |----
+Firefox|[Greasemonkey](https://addons.mozilla.org/en-US/firefox/addon/greasemonkey/)
+Chrome |[Tampermonkey](https://chrome.google.com/webstore/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo)
 
-####General
-
-Key(s)  | Function
-------- | --------
-R       | Reloads the page
-E       | Expands/shrinks all images
+####Key bindings
+Key     | Function
+----    | ----
 C       | Navigates to the catalog
-Q       | Opens the quick reply
+E       | Expands/shrinks all images
 G       | Toggles the gallery
+Q       | Opens the quick reply
+R       | Update thread/reload page
 Esc     | Closes the quick reply, gallery, or expanded gallery image
