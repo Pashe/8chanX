@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Pashe's 8chanX v2 [pure]
-// @version     2.0.0.1421813930
+// @version     2.0.0.1421909950
 // @description Small userscript to improve 8chan
 // @icon        https://github.com/Pashe/8chanX/raw/2-0/images/logo.svg
 // @namespace   https://github.com/Pashe/8chanX/tree/2-0
@@ -457,12 +457,11 @@ var fileExtensionStyles = {
 	"gif": {"background-color": "#ff0", "color": "#000"},
 };
 
-function refreshGalleryImages() { //Pashe, WTFPL
+function refreshGalleryImages() { //Pashe, 7185, WTFPL
 	galleryImages = [];
 	
-	$(".post-image").each(function() {
-		var $this = $(this);
-		var metadata = $this.parent("a").siblings(".fileinfo").children(".unimportant").text().replace(/[()]/g, '').split(", ");
+	$("img.post-image").each(function() {
+		var metadata = $(this).parent("a").siblings(".fileinfo").children(".unimportant").text().replace(/[()]/g, '').split(", ");
 		if (!this.src.match(/\/deleted.png$/)) {
 			galleryImages.push({
 				"thumbnail":  this.src,
