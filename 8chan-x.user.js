@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Pashe's 8chanX v2
-// @version     2.0.0.1422033880
+// @version     2.0.0.1422034050
 // @description Small userscript to improve 8chan
 // @icon        https://github.com/Pashe/8chanX/raw/2-0/images/logo.svg
 // @namespace   https://github.com/Pashe/8chanX/tree/2-0
@@ -1094,28 +1094,28 @@ function initClearChxSettings() { //Pashe, WTFPL
 ////////////////
 //INIT CALLS
 ////////////////
-initSettings();
 
 $(unsafeWindow.document).ready(function() {
+	initSettings();
 	initBRLocalStorage();
-	initRelativeTime();
+	initDefaultSettings();
 	initMenu();
-	initRevealImageSpoilers();
-	initImageHover();
-	initKeyboardShortcuts();
 	initCatalog();
+	initFilter();
+	initFormattedTime();
+	initRelativeTime();
+	initMascot();
+	initImageHover();
+	initRevealImageSpoilers();
 	initRISLinks();
 	initParseTimestampImage();
 	initNotifications();
-	initMascot();
-	initpurgeDeadFavorites();
-	initDefaultSettings();
-	initFavicon();
 	initFlagIcons();
-	initFormattedTime();
-	initFilter();
+	initKeyboardShortcuts();
+	initpurgeDeadFavorites();
 	initClearLocalStorage();
 	initClearChxSettings();
+	initFavicon();
 });
 
 ////////////////
