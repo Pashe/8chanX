@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Pashe's 8chanX v2
-// @version     2.0.0.1422034050
+// @version     2.0.0.1422036920
 // @description Small userscript to improve 8chan
 // @icon        https://github.com/Pashe/8chanX/raw/2-0/images/logo.svg
 // @namespace   https://github.com/Pashe/8chanX/tree/2-0
@@ -147,6 +147,7 @@ function setSetting(key, value) {
 function refreshSettings() {
 	var settingsItems = settingsMenu.getElementsByTagName("input");
 	for (var i in settingsItems) {
+		if (!settingsItems.hasOwnProperty(i)) {continue;}
 		var control = settingsItems[i];
 		
 		switch (control.type) {
@@ -154,7 +155,7 @@ function refreshSettings() {
 				control.checked = getSetting(control.name);
 				break;
 			default:
-				control.value = getSetting(control.name);
+				if (control.hasOwnProperty("value")) {control.value = getSetting(control.name);}
 				break;
 		}
 	}
@@ -213,10 +214,12 @@ function calcThreadPage(pages, threadId) { //Pashe, WTFPL
 	var precisePages = getSetting("precisePages");
 	
 	for (var pageIdx in pages) {
+		if (!pages.hasOwnProperty(pageIdx)) {continue;}
 		if (threadPage != -1) {break;}
 		var threads = pages[pageIdx].threads;
 		
 		for (var threadIdx in threads) {
+			if (!threads.hasOwnProperty(threadIdx)) {continue;}
 			if (threadPage != -1) {break;}
 			
 			if (threads[threadIdx].no == threadId) {
@@ -416,6 +419,7 @@ var RISProviders = [
 
 function addRISLinks(image) { //Pashe, 7185, WTFPL
 	for (var providerIdx in RISProviders) {
+		if (!RISProviders.hasOwnProperty(providerIdx)) {continue;}
 		var provider = RISProviders[providerIdx];
 		
 		try {
@@ -525,6 +529,7 @@ function openGallery() { //Pashe, WTFPL
 	});
 	
 	for (var i in galleryImages) {
+		if (!galleryImages.hasOwnProperty(i)) {continue;}
 		var image = galleryImages[i];
 		var fileExtension = image.full.match(/\.([a-z0-9]+)(&loop.*)?$/i)!==null?image.full.match(/\.([a-z0-9]+)(&loop.*)?$/i)[1]:"???";
 		
@@ -653,6 +658,7 @@ function hidePost(post, recursive) { //Pashe, WTFPL
 	
 	if (recursive && post.ment.length) {
 		for (var i in post.ment) {
+			if (!post.ment.hasOwnProperty(i)) {continue;}
 			$("#reply_"+post.ment[i]).hide();
 			$("#reply_"+post.ment[i]).next("br").remove();
 		}
@@ -697,6 +703,7 @@ function runFilter() { //Pashe, WTFPL
 	};
 	
 	for (var i in filterTypes) {
+		if (!filterTypes.hasOwnProperty(i)) {continue;}
 		var filterType = filterTypes[i];
 		
 		if (getSetting(sprintf("filter%s", filterType)) && (thisPost[i].length)) {
@@ -717,8 +724,9 @@ function runFilter() { //Pashe, WTFPL
 function initSettings() {
 	refreshSettings();
 	var settingsItems = settingsMenu.getElementsByTagName("input");
-	for (var i = 0; i < settingsItems.length; i++) {
-	  setupControl(settingsItems[i]);
+	for (var i in settingsItems) {
+		if (!settingsItems.hasOwnProperty(i)) {continue;}
+		setupControl(settingsItems[i]);
 	}
 }
 
@@ -981,6 +989,7 @@ function initpurgeDeadFavorites() { //Pashe, WTFPL
 		var favorites = JSON.parse(localStorage.favorites);
 
 		for (var x in boards) {
+			if (!boards.hasOwnProperty(x)) {continue;}
 			boardsURIs.push(boards[x].uri);
 		}
 		
@@ -1064,6 +1073,7 @@ function initBRLocalStorage() { //Pashe, WTFPL
 		var savedLocalStorage = getSetting("localStorage");
 		unsafeWindow.localStorage.clear();
 		for (var key in savedLocalStorage) {
+			if (!savedLocalStorage.hasOwnProperty(key)) {continue;}
 			unsafeWindow.localStorage[key] = savedLocalStorage[key];
 		}
 	} else {
@@ -1085,6 +1095,7 @@ function initClearChxSettings() { //Pashe, WTFPL
 		if (confirm("Are you sure you want to clear 8chanX's settings? This will reset all 8chanX settings to their defaults. This inludes your filters, mascots, date format, and more.")) {
 			var settingsList = GM_listValues();
 			for (var i in settingsList) {
+				if (!settingsList.hasOwnProperty(i)) {continue;}
 				GM_deleteValue(settingsList[i]);
 			}
 		}
