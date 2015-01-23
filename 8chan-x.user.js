@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Pashe's 8chanX v2
-// @version     2.0.0.1422011260
+// @version     2.0.0.1422012580
 // @description Small userscript to improve 8chan
 // @icon        https://github.com/Pashe/8chanX/raw/2-0/images/logo.svg
 // @namespace   https://github.com/Pashe/8chanX/tree/2-0
@@ -9,6 +9,8 @@
 
 // @grant       GM_getValue
 // @grant       GM_setValue
+// @grant       GM_listValues
+// @grant       GM_deleteValue 
 // @grant       GM_getResourceURL
 // @grant       unsafeWindow
 
@@ -95,7 +97,9 @@ settingsMenu.innerHTML = sprintf('<span style="font-size:8pt;">8chanX %s</span>'
 
 + '</table>'
 + '<hr>' //Other shit
-+ '<button id="purgeDeadFavorites">' + 'Clean favorites' + '</button>'
++ '<button id="chx_purgeDeadFavorites">' + 'Clean favorites' + '</button>'
++ '<button id="chx_clearLocalStorage">' + 'Clear localStorage' + '</button>'
++ '<button id="chx_clearChxSettings">' + 'Clear 8chanX settings' + '</button>'
 + '</div>';
 
 $(settingsMenu).find(".chx_FilterField").css("text-align", "right");
@@ -989,11 +993,11 @@ function initMascot() { //Pashe, based on an anonymous contribution, WTFPL
 }
 
 function initpurgeDeadFavorites() { //Pashe, WTFPL
-	$("#purgeDeadFavorites").click(function() {
+	$("#chx_purgeDeadFavorites").click(function() {
 		console.log("Working...");
-		var originalText = $("#purgeDeadFavorites").text();
-		$("#purgeDeadFavorites").text("Working...");
-		$("#purgeDeadFavorites").prop("disabled", true);
+		var originalText = $("#chx_purgeDeadFavorites").text();
+		$("#chx_purgeDeadFavorites").text("Working...");
+		$("#chx_purgeDeadFavorites").prop("disabled", true);
 		var boards;
 		$.ajax({
 				url: "/boards.json",
@@ -1028,8 +1032,8 @@ function initpurgeDeadFavorites() { //Pashe, WTFPL
 			}
 		}
 		console.log("Done");
-		$("#purgeDeadFavorites").text(originalText + " - done")
-		$("#purgeDeadFavorites").prop("disabled", false);
+		$("#chx_purgeDeadFavorites").text(originalText + " - done")
+		$("#chx_purgeDeadFavorites").prop("disabled", false);
 	});
 }
 
@@ -1095,6 +1099,26 @@ function initBRLocalStorage() { //Pashe, WTFPL
 	}
 }
 
+function initClearLocalStorage() { //Pashe, WTFPL
+	$("#chx_clearLocalStorage").click(function() {
+		if (confirm("Are you sure you want to clear localStorage? This will delete ALL saved values in localStorage. This inludes your favorited boards, watched threads, and more.")) {
+			unsafeWindow.localStorage.clear();
+			GM_deleteValue("localStorage");
+		}
+	});
+}
+
+function initClearChxSettings() { //Pashe, WTFPL
+	$("#chx_clearChxSettings").click(function() {
+		if (confirm("Are you sure you want to clear 8chanX's settings? This will reset all 8chanX settings to their defaults. This inludes your filters, mascots, date format, and more.")) {
+			var settingsList = GM_listValues();
+			for (var i in settingsList) {
+				GM_deleteValue(settingsList[i]);
+			}
+		}
+	});
+}
+
 ////////////////
 //INIT CALLS
 ////////////////
@@ -1118,6 +1142,8 @@ $(unsafeWindow.document).ready(function() {
 	initFlagIcons();
 	initFormattedTime();
 	initFilter();
+	initClearLocalStorage();
+	initClearChxSettings();
 });
 
 ////////////////
