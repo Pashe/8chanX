@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Pashe's 8chanX v2
-// @version     2.0.0.1422039590
+// @version     2.0.0.1422039910
 // @description Small userscript to improve 8chan
 // @icon        https://github.com/Pashe/8chanX/raw/2-0/images/logo.svg
 // @namespace   https://github.com/Pashe/8chanX/tree/2-0
@@ -709,12 +709,12 @@ function runFilter() { //Pashe, WTFPL
 		var filterType = filterTypes[i];
 		
 		if (getSetting(sprintf("filter%s", filterType)) && (thisPost[i].length)) {
-			hidePost(thisPost);
+			hidePost(thisPost, getSetting(sprintf("filter%sRecursive", filterType)));
 		} else if (getSetting(sprintf("filter%sRegex", filterType))) {
 			var filterRegii = getSetting(sprintf("filter%sRegex", filterType)).split('````');
 			for (var rei in filterRegii) {
 				var filterRegex = new RegExp(filterRegii[rei]);
-				if (thisPost[i].match(filterRegex)) {hidePost(thisPost);}
+				if (thisPost[i].match(filterRegex)) {hidePost(thisPost, getSetting(sprintf("filter%sRecursive", filterType)));}
 			}
 		}
 	}
