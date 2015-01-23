@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Pashe's 8chanX v2
-// @version     2.0.0.1422012580
+// @version     2.0.0.1422033880
 // @description Small userscript to improve 8chan
 // @icon        https://github.com/Pashe/8chanX/raw/2-0/images/logo.svg
 // @namespace   https://github.com/Pashe/8chanX/tree/2-0
@@ -45,6 +45,7 @@
 var bumpLimit = 300;
 
 //Initializations
+var thisThread;
 var cachedPages = null;
 var galleryImages;
 var galleryImageIndex;
@@ -53,7 +54,7 @@ var galleryImageIndex;
 var isMod = (unsafeWindow.location.pathname.split("/")[1]=="mod.php");
 var originalPageTitle = unsafeWindow.document.title;
 var thisBoard = isMod?unsafeWindow.location.href.split("/")[4]:unsafeWindow.location.pathname.split("/")[1];
-try {var thisThread = parseInt(unsafeWindow.location.href.match(/([0-9]+)\.html/)[1]);} catch (e) {var thisThread = -1};
+try {thisThread = parseInt(unsafeWindow.location.href.match(/([0-9]+)\.html/)[1]);} catch (e) {thisThread = -1;}
 
 ////////////////
 //SETTINGS
@@ -139,18 +140,13 @@ function getSetting(key) {
 	}
 }
 
-function setting(key) {
-	console.log(sprintf("setting('%s') is deprecated. Please report this.", key));
-	return getSetting(key);
-}
-
 function setSetting(key, value) {
 	GM_setValue(key, JSON.stringify(value));
 }
 
 function refreshSettings() {
 	var settingsItems = settingsMenu.getElementsByTagName("input");
-	for (i in settingsItems) {
+	for (var i in settingsItems) {
 		var control = settingsItems[i];
 		
 		switch (control.type) {
@@ -182,16 +178,9 @@ function setupControl(control) {
 ////////////////
 //GENERAL FUNCTIONS
 ////////////////
-function strEndsWith(str, s) {
-	return str.length >= s.length && str.substr(str.length - s.length) == s;
-}
 
 function isOnCatalog() {
 	return unsafeWindow.active_page === "catalog";
-}
-
-function isOnBoardIndex() {
-	return unsafeWindow.active_page === "index";
 }
 
 function isOnThread() {
@@ -199,15 +188,15 @@ function isOnThread() {
 }
 
 function printf() { //alexei et al, 3BSD
-	var key = arguments[0], cache = sprintf.cache
+	var key = arguments[0], cache = sprintf.cache;
 	if (!(cache[key] && cache.hasOwnProperty(key))) {
-		cache[key] = sprintf.parse(key)
+		cache[key] = sprintf.parse(key);
 	}
-	console.log(sprintf.format.call(null, cache[key], arguments))
+	console.log(sprintf.format.call(null, cache[key], arguments));
 }
 
 function getThreadPage(threadId, boardId, cached) { //Pashe, WTFPL
-	if ((!cached) || (cachedPages == null)) {
+	if ((!cached) || (cachedPages === null)) {
 		$.ajax({
 			url: "/" + boardId + "/threads.json",
 			async: false,
@@ -220,21 +209,21 @@ function getThreadPage(threadId, boardId, cached) { //Pashe, WTFPL
 }
 
 function calcThreadPage(pages, threadId) { //Pashe, WTFPL
-	threadPage = -1;
+	var threadPage = -1;
 	var precisePages = getSetting("precisePages");
 	
 	for (var pageIdx in pages) {
-		if (threadPage != -1) {break}
-		var threads = pages[pageIdx]['threads'];
+		if (threadPage != -1) {break;}
+		var threads = pages[pageIdx].threads;
 		
-		for (threadIdx in threads) {
-			if (threadPage != -1) {break}
+		for (var threadIdx in threads) {
+			if (threadPage != -1) {break;}
 			
-			if (threads[threadIdx]['no'] == threadId) {
+			if (threads[threadIdx].no == threadId) {
 				if (!precisePages) {
-					threadPage = pages[pageIdx]['page']+1;
+					threadPage = pages[pageIdx].page+1;
 				} else {
-					threadPage = ((pages[pageIdx]['page']+1)+(threadIdx/threads.length)).toFixed(2)
+					threadPage = ((pages[pageIdx].page+1)+(threadIdx/threads.length)).toFixed(2);
 				}
 				break;
 			}
@@ -243,11 +232,11 @@ function calcThreadPage(pages, threadId) { //Pashe, WTFPL
 	return threadPage;
 }
 
-function getThreadPosts(threadId, boardId, cached) { //Pashe, WTFPL
+function getThreadPosts() { //Pashe, WTFPL
 	return $(".post").length;
 }
 
-function getThreadImages(threadId, boardId, cached) { //Pashe, WTFPL
+function getThreadImages() { //Pashe, WTFPL
 	return $(".post-image").length;
 }
 
@@ -269,7 +258,7 @@ function updateMenuStats() { //Pashe, WTFPL
 			cachedPages = response;
 			
 			var nPage = calcThreadPage(response, thisThread);
-			if (nPage < 1 ) {nPage = "<span style='opacity:0.5'>???</span>"}
+			if (nPage < 1 ) {nPage = "<span style='opacity:0.5'>???</span>";}
 			
 			$("#chx_menuPage").html(nPage);
 		}
@@ -300,8 +289,9 @@ var imghoverMMove = function(e) { //Tux et al, MIT //TODO: Cleanup
 		return;
 	}
 	
-	var picTimestamp = picUrl.substr(picUrl.indexOf("/thumb/")+7);
-	var picTimestamp = picTimestamp.substr(0, picTimestamp.lastIndexOf("."));
+	var picTimestamp;
+	picTimestamp = picUrl.substr(picUrl.indexOf("/thumb/")+7);
+	picTimestamp = picTimestamp.substr(0, picTimestamp.lastIndexOf("."));
 	
 	var picId = "post-image-"+picTimestamp;
 	var hoverPic = $("#"+picId);
@@ -342,7 +332,7 @@ var imghoverMMove = function(e) { //Tux et al, MIT //TODO: Cleanup
 			hoverPic.css('left', e.pageX).css('top', top);
 		}
 	}
-}
+};
 
 var imghoverMOut = function(e) { //Tux et al, MIT
 	var pic;
@@ -353,8 +343,9 @@ var imghoverMOut = function(e) { //Tux et al, MIT
 	if (picUrl.indexOf('spoiler.png') >= 0) {picUrl = $(this).parent().attr("href");}
 	picUrl = picUrl.replace("/src/","/thumb/");
 	
-	var picTimestamp = picUrl.substr(picUrl.indexOf("/thumb/")+7);
-	var picTimestamp = picTimestamp.substr(0, picTimestamp.lastIndexOf("."));
+	var picTimestamp;
+	picTimestamp = picUrl.substr(picUrl.indexOf("/thumb/")+7);
+	picTimestamp = picTimestamp.substr(0, picTimestamp.lastIndexOf("."));
 	var picId = "post-image-"+picTimestamp;
 	
 	var hoverPic = $("#"+picId);
@@ -369,7 +360,7 @@ var imghoverMOut = function(e) { //Tux et al, MIT
 			}
 		});
 	}
-}
+};
 
 ////////////////
 //KEYBOARD SHORTCUTS
@@ -428,21 +419,20 @@ function addRISLinks(image) { //Pashe, 7185, WTFPL
 		var provider = RISProviders[providerIdx];
 		
 		try {
+			var RISUrl;
 			if (!image.src.match(/\/spoiler.png$/)) {
-				var RISUrl = sprintf(provider["urlFormat"], image.src);
+				RISUrl = sprintf(provider.urlFormat, image.src);
 			} else {
-				var RISUrl = sprintf(provider["urlFormat"], image.parentNode.href);
+				RISUrl = sprintf(provider.urlFormat, image.parentNode.href);
 			}
-			
-			var providerText = ("[" + provider["name"][0].toUpperCase() + "]");
 			
 			var RISLink = $('<a class="chx_RISLink"></a>');
 			RISLink.attr("href", RISUrl);
-			RISLink.attr("title", provider["name"]);
+			RISLink.attr("title", provider.name);
 			RISLink.attr("target", "_blank");
 			RISLink.css("font-size", "8pt");
 			RISLink.css("margin-left", "2pt");
-			RISLink.text("[" + provider["name"][0].toUpperCase() + "]");
+			RISLink.text("[" + provider.name[0].toUpperCase() + "]");
 			
 			RISLink.appendTo(image.parentNode.parentNode.getElementsByClassName("fileinfo")[0]);
 		} catch (e) {}
@@ -466,9 +456,9 @@ function notifyReplies() {
 	var ownPosts = JSON.parse(unsafeWindow.localStorage.own_posts || '{}');
 	
 	$(this).find('div.body:first a:not([rel="nofollow"])').each(function() {
-		var postID;
+		var postID = $(this).text().match(/^>>(\d+)$/);
 		
-		if(postID = $(this).text().match(/^>>(\d+)$/)) {
+		if (postID.hasOwnProperty(1)) {
 			postID = postID[1];
 		} else {
 			return;
@@ -508,9 +498,9 @@ function refreshGalleryImages() { //Pashe, 7185, WTFPL
 				"resolution": metadata[1],
 				"aspect":     metadata[2],
 				"origName":   metadata[3],
-			})
+			});
 		}
-	})
+	});
 }
 
 function openGallery() { //Pashe, WTFPL
@@ -534,13 +524,13 @@ function openGallery() { //Pashe, WTFPL
 		if(e.target == this) $(this).remove();
 	});
 	
-	for (i in galleryImages) {
+	for (var i in galleryImages) {
 		var image = galleryImages[i];
-		var fileExtension = image["full"].match(/\.([a-z0-9]+)(&loop.*)?$/i)!=null?image["full"].match(/\.([a-z0-9]+)(&loop.*)?$/i)[1]:"???";
+		var fileExtension = image.full.match(/\.([a-z0-9]+)(&loop.*)?$/i)!==null?image.full.match(/\.([a-z0-9]+)(&loop.*)?$/i)[1]:"???";
 		
 		var thumbHolder = $('<div class="chx_galleryThumbHolder"></div>');
-		var thumbLink = $(sprintf('<a class="chx_galleryThumbLink" href="%s"></a>', image["full"]));
-		var thumbImage = $(sprintf('<img class="chx_galleryThumbImage" src="%s" />', image["thumbnail"]));
+		var thumbLink = $(sprintf('<a class="chx_galleryThumbLink" href="%s"></a>', image.full));
+		var thumbImage = $(sprintf('<img class="chx_galleryThumbImage" src="%s" />', image.thumbnail));
 		var metadataSpan = $(sprintf('<span class="chx_galleryThumbMetadata">%s</span>', fileExtension));
 		
 		thumbImage.css({
@@ -594,12 +584,13 @@ function toggleGallery() { //Pashe, WTFPL
 
 function expandGalleryImage(index) { //Pashe, WTFPL
 	galleryImageIndex = index;
-	var image = galleryImages[index]["full"];
+	var expandedImage;
+	var image = galleryImages[index].full;
 	var imageHolder = $('<div id="chx_galleryExpandedImageHolder"></div>');
-	var fileExtension = image.match(/\.([a-z0-9]+)(&loop.*)?$/i)!=null?image.match(/\.([a-z0-9]+)(&loop.*)?$/i)[1]:"unknown";
+	var fileExtension = image.match(/\.([a-z0-9]+)(&loop.*)?$/i)!==null?image.match(/\.([a-z0-9]+)(&loop.*)?$/i)[1]:"unknown";
 	
 	if ($.inArray(fileExtension, ["jpg", "jpeg", "gif", "png"]) != -1) {
-		var expandedImage = $(sprintf('<img class="chx_galleryExpandedImage" src="%s" />', image));
+		expandedImage = $(sprintf('<img class="chx_galleryExpandedImage" src="%s" />', image));
 		expandedImage.css({
 			"max-height": "98%",
 			"max-width":  "100%",
@@ -608,7 +599,7 @@ function expandGalleryImage(index) { //Pashe, WTFPL
 		});
 	} else if ($.inArray(fileExtension, ["webm", "mp4"]) != -1) {
 		image = image.match(/player\.php\?v=([^&]*[0-9]+\.[a-z0-9]+).*/i)[1];
-		var expandedImage = $(sprintf('<video class="chx_galleryExpandedImage" src="%s" autoplay controls>Your browser is shit</video>', image));
+		expandedImage = $(sprintf('<video class="chx_galleryExpandedImage" src="%s" autoplay controls>Your browser is shit</video>', image));
 		expandedImage.css({
 			"max-height": "98%",
 			"max-width":  "100%",
@@ -616,7 +607,7 @@ function expandGalleryImage(index) { //Pashe, WTFPL
 			"display":    "block"
 		});
 	} else {
-		var expandedImage = $(sprintf('<iframe class="chx_galleryExpandedImage" src="%s"></iframe>', image));
+		expandedImage = $(sprintf('<iframe class="chx_galleryExpandedImage" src="%s"></iframe>', image));
 		expandedImage.css({
 			"max-height": "98%",
 			"max-width":  "100%",
@@ -712,7 +703,7 @@ function runFilter() { //Pashe, WTFPL
 			hidePost(thisPost);
 		} else if (getSetting(sprintf("filter%sRegex", filterType))) {
 			var filterRegii = getSetting(sprintf("filter%sRegex", filterType)).split('````');
-			for (rei in filterRegii) {
+			for (var rei in filterRegii) {
 				var filterRegex = new RegExp(filterRegii[rei]);
 				if (thisPost[i].match(filterRegex)) {hidePost(thisPost);}
 			}
@@ -733,7 +724,7 @@ function initSettings() {
 
 function initRelativeTime() {
 	if (!getSetting("dateFormat")) {$("time").timeago();}
-};
+}
 
 function initMenu() { //Pashe, WTFPL
 	var menu = unsafeWindow.document.getElementsByClassName("boardlist")[0];
@@ -772,21 +763,6 @@ function initMenu() { //Pashe, WTFPL
 	}
 }
 
-function initImprovedPageTitles() {
-	if (isOnThread()) {
-		try {
-			unsafeWindow.document.title = unsafeWindow.document.location.pathname.match(/\/(.*?)\//)[0] + " - " + (function(){
-				var op = $(".op").text();
-				var subject = op ? $(".subject").text() : null;
-				var body = op ? $(".body").text() : null;
-				return subject ? subject : body ? body.length > 128 ? body.substr(0, 128) + "..." : body : "8chan";
-			})();
-		} catch (e) {
-			unsafeWindow.document.title = originalPageTitle;
-		}
-	}
-}
-
 function initRevealImageSpoilers() { //Tux et al, MIT
 	if (!getSetting('revealImageSpoilers')) {return;}
 	
@@ -810,7 +786,7 @@ function initImageHover() { //Tux et al, MIT //TODO: Cleanup
 	if (getSetting("imageHover")) selector += "img.post-image, canvas.post-image";
 	
 	if (getSetting('catalogImageHover') && isOnCatalog()) {
-		if (selector != '') {selector += ', ';}
+		if (selector !== '') {selector += ', ';}
 		selector += '.thread-image';
 		$('.theme-catalog div.thread').each(function() {
 			$(this).css('position','inherit');
@@ -878,25 +854,25 @@ function initCatalog() { //Pashe, WTFPL
 	
 	//highlightCatalogAutosage
 	$(".replies").each(function (e, ele) {
-		eReplies = $(ele).html().match(/R: ([0-9]+)/)[1];
+		var eReplies = $(ele).html().match(/R: ([0-9]+)/)[1];
 		if (eReplies>bumpLimit) {
 			$(ele).html(function(e, html) {
-				return html.replace(/R: ([0-9]+)/, "<span style='color:#f00;'>R: $1</span>")
+				return html.replace(/R: ([0-9]+)/, "<span style='color:#f00;'>R: $1</span>");
 			});
-		};
+		}
 	});
 	
 	//setCatalogImageSize
-	var catalogStorage = JSON.parse(localStorage["catalog"]);
-	if (!catalogStorage["image_size"]) {
-		catalogStorage["image_size"] = "large";
-		localStorage["catalog"] = JSON.stringify(catalogStorage);
+	var catalogStorage = JSON.parse(localStorage.catalog);
+	if (!catalogStorage.image_size) {
+		catalogStorage.image_size = "large";
+		localStorage.catalog = JSON.stringify(catalogStorage);
 		
 		$(".grid-li").removeClass("grid-size-vsmall");
 		$(".grid-li").removeClass("grid-size-small");
 		$(".grid-li").removeClass("grid-size-large");
-		$(".grid-li").addClass("grid-size-" + catalogStorage["image_size"]);
-		$("#image_size").val(catalogStorage["image_size"]);
+		$(".grid-li").addClass("grid-size-" + catalogStorage.image_size);
+		$("#image_size").val(catalogStorage.image_size);
 	}
 	
 	//addCatalogNullImagePlaceholders
@@ -906,10 +882,6 @@ function initCatalog() { //Pashe, WTFPL
 function initRISLinks() { //Pashe, 7185, WTFPL
 	if (!getSetting("reverseImageSearch")) {return;}
 	var posts = $("img.post-image").each(function() {addRISLinks(this);});
-}
-
-function initQrDrag() {
-	$("#quick-reply").draggable();
 }
 
 function initParseTimestampImage() { //Pashe, WTFPL
@@ -938,7 +910,7 @@ function initParseTimestampImage() { //Pashe, WTFPL
 			fileTimeElement.appendTo($this.parent());
 			
 			$this.parent().html(function(e, html) {
-				return html.replace(")", "")
+				return html.replace(")", "");
 			});
 		});
 	} catch (e) {}
@@ -1009,7 +981,7 @@ function initpurgeDeadFavorites() { //Pashe, WTFPL
 		var favorites = JSON.parse(localStorage.favorites);
 
 		for (var x in boards) {
-			boardsURIs.push(boards[x]['uri']);
+			boardsURIs.push(boards[x].uri);
 		}
 		
 		if (boardsURIs.length > 0) {
@@ -1032,15 +1004,15 @@ function initpurgeDeadFavorites() { //Pashe, WTFPL
 			}
 		}
 		console.log("Done");
-		$("#chx_purgeDeadFavorites").text(originalText + " - done")
+		$("#chx_purgeDeadFavorites").text(originalText + " - done");
 		$("#chx_purgeDeadFavorites").prop("disabled", false);
 	});
 }
 
 function initDefaultSettings() { //Pashe, WTFPL
-	if (unsafeWindow.localStorage.color_ids == undefined) unsafeWindow.localStorage.color_ids = true;
-	if ((unsafeWindow.localStorage.videohover == undefined) && getSetting('imageHover')) unsafeWindow.localStorage.videohover = true;
-	if (unsafeWindow.localStorage.useInlining == undefined) unsafeWindow.localStorage.useInlining = true;
+	if (unsafeWindow.localStorage.color_ids === undefined) unsafeWindow.localStorage.color_ids = true;
+	if ((unsafeWindow.localStorage.videohover === undefined) && getSetting('imageHover')) unsafeWindow.localStorage.videohover = true;
+	if (unsafeWindow.localStorage.useInlining === undefined) unsafeWindow.localStorage.useInlining = true;
 }
 
 function initFavicon() { //Pashe, WTFPL
@@ -1091,7 +1063,7 @@ function initBRLocalStorage() { //Pashe, WTFPL
 	if (!unsafeWindow.localStorage.hasOwnProperty("color_ids")) {
 		var savedLocalStorage = getSetting("localStorage");
 		unsafeWindow.localStorage.clear();
-		for (key in savedLocalStorage) {
+		for (var key in savedLocalStorage) {
 			unsafeWindow.localStorage[key] = savedLocalStorage[key];
 		}
 	} else {
@@ -1175,10 +1147,6 @@ function onNewPostNotifications(post) {
 	} else {
 		$post.find('div.post.reply').each(notifyReplies);
 	}
-}
-
-function onNewPostMenu() {
-	updateMenuStats();
 }
 
 function onNewPostFormattedTime() {
