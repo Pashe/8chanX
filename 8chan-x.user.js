@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Pashe's 8chanX v2
-// @version     2.0.0.1422036920
+// @version     2.0.0.1422039590
 // @description Small userscript to improve 8chan
 // @icon        https://github.com/Pashe/8chanX/raw/2-0/images/logo.svg
 // @namespace   https://github.com/Pashe/8chanX/tree/2-0
@@ -37,6 +37,8 @@
 ** 7185
 ** Pashe
 */
+
+try {
 
 ////////////////
 //GLOBAL VARIABLES
@@ -136,7 +138,7 @@ function getSetting(key) {
 			} else {
 				return defaultSettings["filterDefault"+(keyMatch.hasOwnProperty(2)?keyMatch[2]:"")];
 			}
-		} catch(e) {console.err(e);}
+		} catch(e) {console.error(e);}
 	}
 }
 
@@ -1186,4 +1188,14 @@ unsafeWindow.$(document).on('new_post', function (e, post) {
 
 if (isOnThread()) {
 	setInterval(intervalMenu, (1.5*60*1000));
+}
+} catch(globalError) {
+	console.error("8chanX experienced an uncaught error. Please include the following information with your report:");
+	console.error(sprintf(
+		"%s in %s @ L%d C%d: %s\n\nVersion: %s (2-0@%s)\nUser agent: %s\nLocation: %s",
+		globalError.name, globalError.fileName.split("/").slice(-1).join(""), globalError.lineNumber, globalError.columnNumber, globalError.message,
+		GM_info.script.name, GM_info.script.version,
+		unsafeWindow.navigator.userAgent,
+		unsafeWindow.location.href
+	));
 }
