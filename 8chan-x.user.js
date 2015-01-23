@@ -1,12 +1,11 @@
 // ==UserScript==
 // @name        Pashe's 8chanX v2 [pure]
-// @version     2.0.0.1421909950
+// @version     2.0.0.1422012910
 // @description Small userscript to improve 8chan
 // @icon        https://github.com/Pashe/8chanX/raw/2-0/images/logo.svg
 // @namespace   https://github.com/Pashe/8chanX/tree/2-0
 // @updateURL   https://github.com/Pashe/8chanX/raw/2-0_pure/8chan-x.meta.js
 // @downloadURL https://github.com/Pashe/8chanX/raw/2-0_pure/8chan-x.user.js
-
 // @grant       none
 
 // @require     https://8chan.co/js/jquery-ui.custom.min.js
@@ -60,22 +59,44 @@ if (window.Options) {
 }
 
 settingsMenu.innerHTML = sprintf('<span style="font-size:8pt;">8chanX %s pure</span>', GM_info.script.version)
-+ '<div style="overflow:auto;height:240px;">'
-+ '<label><input type="checkbox" name="precisePages">' + 'Increase page indicator precision' + '</label><br>'
-+ '<label><input type="checkbox" name="catalogLinks">' + 'Force catalog links' + '</label><br>'
-+ '<label><input type="checkbox" name="revealImageSpoilers">' + 'Reveal image spoilers' + '</label><br>'
++ '<div style="overflow:auto;height:100%;">' //General
 + '<label><input type="checkbox" name="imageHover">' + 'Image hover' + '</label><br>'
 + '<label><input type="checkbox" name="catalogImageHover">' + 'Image hover on catalog' + '</label><br>'
-+ '<label><input type="checkbox" name="reverseImageSearch">' + 'Add reverse image search links' + '</label><br>'
++ '<label><input type="checkbox" name="catalogLinks">' + 'Force catalog links' + '</label><br>'
++ '<label><input type="checkbox" name="revealImageSpoilers">' + 'Reveal image spoilers' + '</label><br>'
 + '<label><input type="checkbox" name="keyboardShortcutsEnabled">' + 'Enable keyboard shortcuts' + '</label><br>'
++ '<hr>' //How information is displayed
++ '<label><input type="checkbox" name="reverseImageSearch">' + 'Add reverse image search links' + '</label><br>'
 + '<label><input type="checkbox" name="parseTimestampImage">' + 'Guess original download date of imageboard-style filenames' + '</label><br>'
-+ '<span>Filter:</span><br>'
-+ '  <label><input type="checkbox" name="filterTrips">' + 'Tripfags' + '</label><label><input type="checkbox" name="filterTripsRecursive">' + 'recursively' + '</label><br>'
++ '<label><input type="checkbox" name="precisePages">' + 'Increase page indicator precision' + '</label><br>'
++ '<label>' + 'Mascot URL(s) (pipe separated):<br />' + '<input type="text" name="mascotUrl" style="width: 30em"></label><br>'
++ '<label>' + '<a href="http://strftime.net/">Date format</a> (relative dates when empty):<br />' + '<input type="text" name="dateFormat" style="width:30em"></label><br>'
 + '<label><input type="checkbox" name="localTime">' + 'Use local time' + '</label><br>'
-+ '<label>' + '<a href="http://strftime.net/">Date format</a> (relative dates when empty):<br />' + '<input type="text" name="dateFormat" style="width: 1000pt"></label><br>'
-+ '<label>' + 'Mascot URL(s) (pipe separated):<br />' + '<input type="text" name="mascotUrl" style="width: 1000pt"></label><br>'
-+ '<button id="purgeDeadFavorites">' + 'Clean favorites' + '</button>'
++ '<hr>' //Filters
++ '<h3>Filters</h3>'
++ '<table style="text-align:center;">'
++ '<tr><th>Field</th><th title="Regular expressions seperated with &quot;````&quot;">Regex</th><th title="Recursive: If this is checked, replies to filtered posts will also be removed">R</th><th title="Stubs: If this is not checked, filtered posts will be removed completely">S</th><th title="All: If this is checked, all posts of this type will be removed, ignoring regex">A</th></tr>'
+
++ '<tr><td class="chx_FilterField">Tripcode</td><td><input type="text" name="filterTripsRegex" style="width:25em"></td><td><input type="checkbox" name="filterTripsRecursive"></td><td><input type="checkbox" name="filterTripsStubs"></td><td><input type="checkbox" name="filterTrips"></td></tr>'
+
++ '<tr><td class="chx_FilterField">Name</td><td><input type="text" name="filterNamesRegex" style="width:25em"></td><td><input type="checkbox" name="filterNamesRecursive"></td><td><input type="checkbox" name="filterNamesStubs"></td><td><input type="checkbox" name="filterNames"></td></tr>'
+
++ '<tr><td class="chx_FilterField">Body</td><td><input type="text" name="filterBodyRegex" style="width:25em"></td><td><input type="checkbox" name="filterBodyRecursive"></td><td><input type="checkbox" name="filterBodyStubs"></td><td><input type="checkbox" name="filterBody"></td></tr>'
+
++ '<tr><td class="chx_FilterField">Email</td><td><input type="text" name="filterEmailRegex" style="width:25em"></td><td><input type="checkbox" name="filterEmailRecursive"></td><td><input type="checkbox" name="filterEmailStubs"></td><td><input type="checkbox" name="filterEmail"></td></tr>'
+
++ '<tr><td class="chx_FilterField">Subject</td><td><input type="text" name="filterSubjectRegex" style="width:25em"></td><td><input type="checkbox" name="filterSubjectRecursive"></td><td><input type="checkbox" name="filterSubjectStubs"></td><td><input type="checkbox" name="filterSubject"></td></tr>'
+
++ '<tr><td class="chx_FilterField">Flag</td><td><input type="text" name="filterFlagRegex" style="width:25em"></td><td><input type="checkbox" name="filterFlagRecursive"></td><td><input type="checkbox" name="filterFlagStubs"></td><td><input type="checkbox" name="filterFlag"></td></tr>'
+
++ '</table>'
++ '<hr>' //Other shit
++ '<button id="chx_purgeDeadFavorites">' + 'Clean favorites' + '</button>'
 + '</div>';
+
+$(settingsMenu).find(".chx_FilterField").css("text-align", "right");
+$(settingsMenu).find('input').css("max-width", "100%");
+
 
 var defaultSettings = {
 	'precisePages': true,
@@ -89,15 +110,24 @@ var defaultSettings = {
 	'dateFormat':"",
 	'mascotUrl':"",
 	'keyboardShortcutsEnabled': true,
-	'filterTrips': false,
-	'filterTripsRecursive': true
+	'filterDefaultRegex': '',
+	'filterDefaultRecursive': true,
+	'filterDefaultStubs': true,
+	'filterDefault': false,
 };
 
 function getSetting(key) {
 	if (localStorage.getItem("chx_"+key)) {
 		return JSON.parse(localStorage.getItem("chx_"+key));
 	} else {
-		return defaultSettings[key];
+		try {
+			var keyMatch = key.match(/filter([A-Z][a-z]*)([A-Z][a-z]*)?/);
+			if (!keyMatch) {
+				return defaultSettings[key];
+			} else {
+				return defaultSettings["filterDefault"+(keyMatch.hasOwnProperty(2)?keyMatch[2]:"")];
+			}
+		} catch(e) {console.err(e);}
 	}
 }
 
@@ -617,11 +647,6 @@ function jogExpandedGalleryImage(steps) {
 ////////////////
 //FILTERS
 ////////////////
-function tripFilter(post) { //Pashe, WTFPL
-	if (post.trip && (post.trip != "!!tKlE5XtNKE")) { //You still have to tolerate me
-		hidePost(post, getSetting("filterTripsRecursive"));
-	}
-}
 
 function hidePost(post, recursive) { //Pashe, WTFPL
 	post.jqObj.hide();
@@ -639,23 +664,52 @@ function runFilter() { //Pashe, WTFPL
 	var $this = $(this);
 	
 	var thisPost = {
-		//name:  $this.find("span.name").text(),
 		trip:  $this.find("span.trip").text(),
-		// cap:   $this.find("span.capcode").text(),
-		// email: $this.find("a.email").attr("href"),
-		// flag:  $this.find("img.flag").attr("title"),
+		name:  $this.find("span.name").text(),
+		body:  $this.find("div.body").text(),
+		email: $this.find("a.email").attr("href"),
+		sub:   $this.find("span.subject").text(),
+		flag:  $this.find("img.flag").attr("title"),
+
+		cap:   $this.find("span.capcode").text(),
+		ment:  $this.find(".mentioned").text().length?$this.find(".mentioned").text().replace(/>>/g, "").replace(/ $/, "").split(" "):[],
+		
 		// date:  $this.find("time").attr("datetime"),
 		// no:    $this.find("a.post_no").first().next().text(),
-		ment:  $this.find(".mentioned").text().length?$this.find(".mentioned").text().replace(/>>/g, "").replace(/ $/, "").split(" "):[],
-		// sub:   $this.find("span.subject").text(),
-		// body:  $this.find("div.body").text(),
+		
 		jqObj: $this,
-		//stdObj: this,
+		// stdObj: this,
 	};
 	
-	if (thisPost.trip == "!!tKlE5XtNKE") {$this.find("span.trip").after($(' <span class="capcode" title="Green is my pepper; I shall not want."><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAFo9M/3AAADgUlEQVQ4y2VTbUyTVxS+VZaYqMtcHFHjZCEbsgwR2jS0EKCLSJnMSoGy0toKFUvpB/TjpX37SfuuDChSJlTHqiIBqTJF14JMous0hERj5uIPib+XLCbLsvhj/tig58y+Vea28+e55z7POffce88hhnYBWTf9aTGyi/H5oxxidYqhN65AgohkONmJsR/7UqFkK5KW3Pc2uFtK0KYqxsC1I5mY3mjbdBpP3dUQYjhfe6adKk11aAtWgzfV24lJJ3xumZCCbkwEgcQxHpFtyv6IYg6AdVAE5HUzqHkl3pnmv05FtD+Pzh79I733xW1JhjSPHP6zc1wF1C0tMBc9EFp2QexhFMOLlsPEINmfpSvNp3y28rVuXyXQ9jIwh8uh53oT9sw07yU7Xh5hE7wPDlkxnsjd8VjJ24WOuEr8EAczpKm3hvMCOFNL4UnyX6Of2Uh9ffHbodGGkZNJGp2t+c+iTxh/mpt9/Cgj8sw1o93fAENJLQwndCmbpwC/XLYlWPKEQyjqnlJj17VWmHg0A4pRIXy78h2MLbkz76iXFJY7nFXY0V8NrqsKVIcE4LksTTEJxdP1OixqPrroCvCOfAomqgjs56tTzJx6ZV1gqih4QnWVgd1XgZ3qfeiI1a72XpGOZcj8PNKwdYvWJd6HXjn3qSp7G2q6uL//77rGOdW/fN+5puGRW67fZqeCtQOSd7iJCzL+Ky50r4NFZkFKiC5yaGPaUQTLiuwx+dLns/pfKXc9aiyl2H/HjOM/MOgIiZEO1+BQRIIDicZz3tvynWwj3VRuYDMdc1bm0DH5T3RcifbpxjXn9Gfgnm8B5no70KMycE3UgW9CBgM3jqeiD4IYvR/C/sX2g+vltqkLj3R6qpA+24q2sxowTirAGtfAV/fPoOeSBRv7+GD6RgbhpBci35vx5KIG+260/ZPARHZuNTZz5x1GITr1glWbpwKsQ2LwTcrByohAz/DBEhGB40JNynu1HgNx5YrvinovG9xRnJeVxuN7cg6Z67jPe4xlSOsESL1oSzoggm6LEIw0H6ivP0HntGTNn2jC4IJy2X+pbhebQLrlLc7LQt7Q5O2565QWodMgBLr/ILjdlUh9/CF28XKQsvKw+3I1Oi7W/BIYrCpMB/gna9kPIK+NN5G+udkr274NdB+8i/b9uRYeIbtFWVmnSzkbF0o2bT7wSsfNzmPxb3jllxw700zlAAAAAElFTkSuQmCC" style="width:16px;height:16px;" /> 8chanX</span>'));}
+	if (thisPost.trip == "!!tKlE5XtNKE") {
+		$this.find("span.trip").after($(' <span class="capcode" title="Green is my pepper; I shall not want."><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAFo9M/3AAADgUlEQVQ4y2VTbUyTVxS+VZaYqMtcHFHjZCEbsgwR2jS0EKCLSJnMSoGy0toKFUvpB/TjpX37SfuuDChSJlTHqiIBqTJF14JMous0hERj5uIPib+XLCbLsvhj/tig58y+Vea28+e55z7POffce88hhnYBWTf9aTGyi/H5oxxidYqhN65AgohkONmJsR/7UqFkK5KW3Pc2uFtK0KYqxsC1I5mY3mjbdBpP3dUQYjhfe6adKk11aAtWgzfV24lJJ3xumZCCbkwEgcQxHpFtyv6IYg6AdVAE5HUzqHkl3pnmv05FtD+Pzh79I733xW1JhjSPHP6zc1wF1C0tMBc9EFp2QexhFMOLlsPEINmfpSvNp3y28rVuXyXQ9jIwh8uh53oT9sw07yU7Xh5hE7wPDlkxnsjd8VjJ24WOuEr8EAczpKm3hvMCOFNL4UnyX6Of2Uh9ffHbodGGkZNJGp2t+c+iTxh/mpt9/Cgj8sw1o93fAENJLQwndCmbpwC/XLYlWPKEQyjqnlJj17VWmHg0A4pRIXy78h2MLbkz76iXFJY7nFXY0V8NrqsKVIcE4LksTTEJxdP1OixqPrroCvCOfAomqgjs56tTzJx6ZV1gqih4QnWVgd1XgZ3qfeiI1a72XpGOZcj8PNKwdYvWJd6HXjn3qSp7G2q6uL//77rGOdW/fN+5puGRW67fZqeCtQOSd7iJCzL+Ky50r4NFZkFKiC5yaGPaUQTLiuwx+dLns/pfKXc9aiyl2H/HjOM/MOgIiZEO1+BQRIIDicZz3tvynWwj3VRuYDMdc1bm0DH5T3RcifbpxjXn9Gfgnm8B5no70KMycE3UgW9CBgM3jqeiD4IYvR/C/sX2g+vltqkLj3R6qpA+24q2sxowTirAGtfAV/fPoOeSBRv7+GD6RgbhpBci35vx5KIG+260/ZPARHZuNTZz5x1GITr1glWbpwKsQ2LwTcrByohAz/DBEhGB40JNynu1HgNx5YrvinovG9xRnJeVxuN7cg6Z67jPe4xlSOsESL1oSzoggm6LEIw0H6ivP0HntGTNn2jC4IJy2X+pbhebQLrlLc7LQt7Q5O2565QWodMgBLr/ILjdlUh9/CF28XKQsvKw+3I1Oi7W/BIYrCpMB/gna9kPIK+NN5G+udkr274NdB+8i/b9uRYeIbtFWVmnSzkbF0o2bT7wSsfNzmPxb3jllxw700zlAAAAAElFTkSuQmCC" style="width:16px;height:16px;" /> 8chanX</span>'));
+		return;
+	}
 	
-	if (getSetting("filterTrips")) {tripFilter(thisPost);}
+	if (isMod) {return;}
+	
+	var filterTypes = {
+		trip: "Trips",
+		name: "Names",
+		body: "Body",
+		email: "Email",
+		sub: "Subject",
+		flag: "Flag",
+	};
+	
+	for (var i in filterTypes) {
+		var filterType = filterTypes[i];
+		
+		if (getSetting(sprintf("filter%s", filterType)) && (thisPost[i].length)) {
+			hidePost(thisPost);
+		} else if (getSetting(sprintf("filter%sRegex", filterType))) {
+			var filterRegii = getSetting(sprintf("filter%sRegex", filterType)).split('````');
+			for (rei in filterRegii) {
+				var filterRegex = new RegExp(filterRegii[rei]);
+				if (thisPost[i].match(filterRegex)) {hidePost(thisPost);}
+			}
+		}
+	}
 }
 
 ////////////////
@@ -931,11 +985,11 @@ function initMascot() { //Pashe, based on an anonymous contribution, WTFPL
 }
 
 function initpurgeDeadFavorites() { //Pashe, WTFPL
-	$("#purgeDeadFavorites").click(function() {
+	$("#chx_purgeDeadFavorites").click(function() {
 		console.log("Working...");
-		var originalText = $("#purgeDeadFavorites").text();
-		$("#purgeDeadFavorites").text("Working...");
-		$("#purgeDeadFavorites").prop("disabled", true);
+		var originalText = $("#chx_purgeDeadFavorites").text();
+		$("#chx_purgeDeadFavorites").text("Working...");
+		$("#chx_purgeDeadFavorites").prop("disabled", true);
 		var boards;
 		$.ajax({
 				url: "/boards.json",
@@ -970,8 +1024,8 @@ function initpurgeDeadFavorites() { //Pashe, WTFPL
 			}
 		}
 		console.log("Done");
-		$("#purgeDeadFavorites").text(originalText + " - done")
-		$("#purgeDeadFavorites").prop("disabled", false);
+		$("#chx_purgeDeadFavorites").text(originalText + " - done")
+		$("#chx_purgeDeadFavorites").prop("disabled", false);
 	});
 }
 
@@ -1021,10 +1075,7 @@ function initFormattedTime() { //Pashe, WTFPL
 	});
 }
 
-function initFilter() { //Pashe, WTFPL
-	if (isMod) {return;}
-	var filterTrips = (getSetting("filterTrips"));
-	
+function initFilter() { //Pashe, WTFPL	
 	$(".reply").each(runFilter);
 }
 
@@ -1050,6 +1101,8 @@ $(window.document).ready(function() {
 	initFlagIcons();
 	initFormattedTime();
 	initFilter();
+	initClearLocalStorage();
+	initClearChxSettings();
 });
 
 ////////////////
@@ -1092,9 +1145,6 @@ function onNewPostFormattedTime() {
 }
 
 function onNewPostFilter(post) { //Pashe, WTFPL
-	if (isMod) {return;}
-	if (!getSetting("filterTrips")) {return;}
-	
 	$(post).each(runFilter);
 }
 
@@ -1111,6 +1161,7 @@ window.$(document).on('new_post', function (e, post) {
 	onNewPostRISLinks(post);
 	onNewPostNotifications(post);
 	onNewPostFormattedTime();
+	onNewPostFilter(post);
 });
 
 if (isOnThread()) {
