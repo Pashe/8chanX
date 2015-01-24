@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Pashe's 8chanX v2
-// @version     2.0.0.1422140750
+// @version     2.0.0.1422141360
 // @description Small userscript to improve 8chan
 // @icon        https://github.com/Pashe/8chanX/raw/2-0/images/logo.svg
 // @namespace   https://github.com/Pashe/8chanX/tree/2-0
@@ -654,7 +654,6 @@ function jogExpandedGalleryImage(steps) {
 ////////////////
 //FILTERS
 ////////////////
-
 function hidePost(post, recursive) { //Pashe, WTFPL
 	post.jqObj.hide();
 	post.jqObj.next("br").remove();
@@ -706,7 +705,7 @@ function runFilter() { //Pashe, WTFPL
 	};
 	
 	for (var i in filterTypes) {
-		if (!filterTypes.hasOwnProperty(i)) {continue;}
+		if (!filterTypes.hasOwnProperty(i) || !thisPost[i]) {continue;}
 		var filterType = filterTypes[i];
 		
 		if (getSetting(sprintf("filter%s", filterType)) && (thisPost[i].length)) {
