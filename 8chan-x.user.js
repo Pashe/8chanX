@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name        Pashe's 8chanX v2
-// @version     2.0.0.1422141360
+// @version     2.0.0.1422143930
 // @description Small userscript to improve 8chan
-// @icon        https://github.com/Pashe/8chanX/raw/2-0/images/logo.svg
+// @icon        https://cdn.rawgit.com/Pashe/8chanX/2-0/images/logo.svg
 // @namespace   https://github.com/Pashe/8chanX/tree/2-0
 // @updateURL   https://github.com/Pashe/8chanX/raw/2-0/8chan-x.meta.js
 // @downloadURL https://github.com/Pashe/8chanX/raw/2-0/8chan-x.user.js
@@ -10,24 +10,22 @@
 // @grant       GM_getValue
 // @grant       GM_setValue
 // @grant       GM_listValues
-// @grant       GM_deleteValue 
-// @grant       GM_getResourceURL
+// @grant       GM_deleteValue
 // @grant       unsafeWindow
 
-// @require     https://8chan.co/js/jquery.min.js
-// @require     https://8chan.co/js/jquery-ui.custom.min.js
+// @require     https://code.jquery.com/jquery-2.1.3.min.js
+// @require     https://code.jquery.com/ui/1.11.2/jquery-ui.min.js
 // @require     https://github.com/alexei/sprintf.js/raw/master/src/sprintf.js
 // @require     https://raw.githubusercontent.com/rmm5t/jquery-timeago/master/jquery.timeago.js
 // @require     https://raw.githubusercontent.com/samsonjs/strftime/master/strftime.js
 
-// @resource    normalFavicon https://github.com/Pashe/8chanX/raw/2-0/images/favicon.png
-
-// @match       *://8chan.co/*
 // @match       *://hatechan.co/*
-// @match       *://jp.8chan.co/*
-// @match       *://8ch.net/*
+// @match       *://8chan.co/*
 // @match       *://h.8chan.co/*
 // @match       *://h.8ch.net/*
+// @match       *://jp.8chan.co/*
+// @match       *://jp.8ch.net/*
+// @match       *://8ch.net/*
 // ==/UserScript==
 
 /*Contributors
