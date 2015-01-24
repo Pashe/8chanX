@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Pashe's 8chanX v2
-// @version     2.0.0.1422039910
+// @version     2.0.0.1422140750
 // @description Small userscript to improve 8chan
 // @icon        https://github.com/Pashe/8chanX/raw/2-0/images/logo.svg
 // @namespace   https://github.com/Pashe/8chanX/tree/2-0
@@ -151,13 +151,14 @@ function refreshSettings() {
 	for (var i in settingsItems) {
 		if (!settingsItems.hasOwnProperty(i)) {continue;}
 		var control = settingsItems[i];
+		if (!control.name) {continue;}
 		
 		switch (control.type) {
 			case "checkbox":
 				control.checked = getSetting(control.name);
 				break;
 			default:
-				if (control.hasOwnProperty("value")) {control.value = getSetting(control.name);}
+				control.value = getSetting(control.name);
 				break;
 		}
 	}
