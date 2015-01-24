@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Pashe's 8chanX v2 [pure]
-// @version     2.0.0.1422064330
+// @version     2.0.0.1422064480
 // @description Small userscript to improve 8chan
 // @icon        https://github.com/Pashe/8chanX/raw/2-0/images/logo.svg
 // @namespace   https://github.com/Pashe/8chanX/tree/2-0
@@ -47,9 +47,8 @@ var galleryImageIndex;
 
 //Dynamic
 var isMod = (window.location.pathname.split("/")[1]=="mod.php");
-var originalPageTitle = window.document.title;
 var thisBoard = isMod?window.location.href.split("/")[4]:window.location.pathname.split("/")[1];
-try {thisThread = parseInt(window.location.href.match(/([0-9]+)\.html/)[1]);} catch (e) {thisThread = -1};
+try {thisThread = parseInt(window.location.href.match(/([0-9]+)\.html/)[1]);} catch (e) {thisThread = -1;}
 
 ////////////////
 //SETTINGS
@@ -1083,8 +1082,6 @@ $(window.document).ready(function() {
 	initFlagIcons();
 	initKeyboardShortcuts();
 	initpurgeDeadFavorites();
-	initClearLocalStorage();
-	initClearChxSettings();
 	initFavicon();
 });
 
