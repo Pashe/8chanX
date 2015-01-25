@@ -82,7 +82,7 @@ settingsMenu.innerHTML = sprintf('<span style="font-size:8pt;">8chanX %s</span>'
 + '<hr>' //Filters
 + '<h3>Filters</h3>'
 + '<table style="text-align:center;">'
-+ '<tr><th>Field</th><th title="Regular expressions seperated with &quot;````&quot;">Regex</th><th title="Recursive: If this is checked, replies to filtered posts will also be removed">R</th><th title="Stubs: If this is not checked, filtered posts will be removed completely">S</th><th title="All: If this is checked, all posts of this type will be removed, ignoring regex">A</th></tr>'
++ '<tr><th>Field</th><th title="Regular expressions seperated with &quot;````&quot;. Boards may be specified like this: &quot;fag```a,b,c&quot;, which will filter &quot;fag&quot; on /a/, /b/, and /c/">Regex</th><th title="Recursive: If this is checked, replies to filtered posts will also be removed">R</th><th title="Stubs: If this is not checked, filtered posts will be removed completely">S</th><th title="All: If this is checked, all posts of this type will be removed, ignoring regex">A</th></tr>'
 
 + '<tr><td class="chx_FilterField">Tripcode</td><td><input type="text" name="filterTripsRegex" style="width:25em"></td><td><input type="checkbox" name="filterTripsRecursive"></td><td><input type="checkbox" name="filterTripsStubs"></td><td><input type="checkbox" name="filterTrips"></td></tr>'
 
@@ -727,8 +727,21 @@ function runFilter() { //Pashe, WTFPL
 		} else if (filterRegex) {
 			var filterRegex = filterRegex.split('````');
 			for (var i in filterRegex) {
-				var thisRegex = new RegExp(filterRegex[i]);
-				if (filterField.match(thisRegex)) {hidePost(thisPost, filterRecursive, filterStubs);}
+				var thisRegex;
+				var thisRegexStr = filterRegex[i].split("```")[0];
+				
+				if (filterRegex[i].split("```").length > 1) {
+					var thisRegexBoards = filterRegex[i].split("```")[1].split(",");
+					for (var i in thisRegexBoards) {
+						if (thisBoard.match(RegExp(thisRegexBoards[i])) !== null) {
+							thisRegex = new RegExp(thisRegexStr);
+							if (filterField.match(thisRegex)) {hidePost(thisPost, filterRecursive, filterStubs);}
+						}
+					}
+				} else {
+					thisRegex = new RegExp(thisRegexStr);
+					if (filterField.match(thisRegex)) {hidePost(thisPost, filterRecursive, filterStubs);}
+				}
 			}
 		}
 	}
@@ -1121,7 +1134,6 @@ function initClearChxSettings() { //Pashe, WTFPL
 ////////////////
 //INIT CALLS
 ////////////////
-
 $(unsafeWindow.document).ready(function() {
 	initSettings();
 	initBRLocalStorage();
