@@ -1,26 +1,26 @@
 // ==UserScript==
 // @name        Pashe's 8chanX v2 [pure]
-// @version     2.0.0.1422064480
+// @version     2.0.0.1422144740
 // @description Small userscript to improve 8chan
-// @icon        https://github.com/Pashe/8chanX/raw/2-0/images/logo.svg
+// @icon        https://cdn.rawgit.com/Pashe/8chanX/2-0_pure/images/logo.svg
 // @namespace   https://github.com/Pashe/8chanX/tree/2-0
 // @updateURL   https://github.com/Pashe/8chanX/raw/2-0_pure/8chan-x.meta.js
 // @downloadURL https://github.com/Pashe/8chanX/raw/2-0_pure/8chan-x.user.js
 // @grant       none
 
-// @require     https://8chan.co/js/jquery-ui.custom.min.js
+// @require     https://code.jquery.com/jquery-2.1.3.min.js
+// @require     https://code.jquery.com/ui/1.11.2/jquery-ui.min.js
 // @require     https://github.com/alexei/sprintf.js/raw/master/src/sprintf.js
 // @require     https://raw.githubusercontent.com/rmm5t/jquery-timeago/master/jquery.timeago.js
 // @require     https://raw.githubusercontent.com/samsonjs/strftime/master/strftime.js
 
-// @resource    normalFavicon https://github.com/Pashe/8chanX/raw/2-0/images/favicon.png
-
-// @match       *://8chan.co/*
 // @match       *://hatechan.co/*
-// @match       *://jp.8chan.co/*
-// @match       *://8ch.net/*
+// @match       *://8chan.co/*
 // @match       *://h.8chan.co/*
 // @match       *://h.8ch.net/*
+// @match       *://jp.8chan.co/*
+// @match       *://jp.8ch.net/*
+// @match       *://8ch.net/*
 // ==/UserScript==
 
 /*Contributors
@@ -142,13 +142,14 @@ function refreshSettings() {
 	for (var i in settingsItems) {
 		if (!settingsItems.hasOwnProperty(i)) {continue;}
 		var control = settingsItems[i];
+		if (!control.name) {continue;}
 		
 		switch (control.type) {
 			case "checkbox":
 				control.checked = getSetting(control.name);
 				break;
 			default:
-				if (control.hasOwnProperty("value")) {control.value = getSetting(control.name);}
+				control.value = getSetting(control.name);
 				break;
 		}
 	}
@@ -644,7 +645,6 @@ function jogExpandedGalleryImage(steps) {
 ////////////////
 //FILTERS
 ////////////////
-
 function hidePost(post, recursive) { //Pashe, WTFPL
 	post.jqObj.hide();
 	post.jqObj.next("br").remove();
@@ -696,7 +696,7 @@ function runFilter() { //Pashe, WTFPL
 	};
 	
 	for (var i in filterTypes) {
-		if (!filterTypes.hasOwnProperty(i)) {continue;}
+		if (!filterTypes.hasOwnProperty(i) || !thisPost[i]) {continue;}
 		var filterType = filterTypes[i];
 		
 		if (getSetting(sprintf("filter%s", filterType)) && (thisPost[i].length)) {

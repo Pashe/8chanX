@@ -7,7 +7,7 @@ This branch removes a few features in order to improve compatibility. You should
 This userscript adds various features and options like:
  * Image hover
  * Gallery
- * Tripfag filter (more filters to come)
+ * Filters
  * Reverse image search
  * Flag preview
  * Mascots
