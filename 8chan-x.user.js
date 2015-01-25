@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Pashe's 8chanX v2
-// @version     2.0.0.1422147960
+// @version     2.0.0.1422183060
 // @description Small userscript to improve 8chan
 // @icon        https://cdn.rawgit.com/Pashe/8chanX/2-0/images/logo.svg
 // @namespace   https://github.com/Pashe/8chanX/tree/2-0
@@ -1148,8 +1148,8 @@ $(unsafeWindow.document).ready(function() {
 ////////////////
 //EVENT HANDLER FUNCTIONS
 ////////////////
-function onNewPostRelativeTime() {
-	if (!getSetting("dateFormat")) {$("time").timeago();}
+function onNewPostRelativeTime(post) {
+	if (!getSetting("dateFormat")) {$(post).find("time").timeago();}
 }
 
 function onNewPostImageHover(post) { //Tux et al, MIT
@@ -1192,7 +1192,7 @@ function intervalMenu() {
 //EVENT HANDLERS
 ////////////////
 unsafeWindow.$(document).on('new_post', function (e, post) {
-	onNewPostRelativeTime();
+	onNewPostRelativeTime(post);
 	onNewPostImageHover(post);
 	onNewPostRISLinks(post);
 	onNewPostNotifications(post);
