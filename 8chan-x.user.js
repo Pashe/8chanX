@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Pashe's 8chanX v2
-// @version     2.0.0.1422143930
+// @version     2.0.0.1422147960
 // @description Small userscript to improve 8chan
 // @icon        https://cdn.rawgit.com/Pashe/8chanX/2-0/images/logo.svg
 // @namespace   https://github.com/Pashe/8chanX/tree/2-0
@@ -121,7 +121,7 @@ var defaultSettings = {
 	'keyboardShortcutsEnabled': true,
 	'filterDefaultRegex': '',
 	'filterDefaultRecursive': true,
-	'filterDefaultStubs': true,
+	'filterDefaultStubs': false,
 	'filterDefault': false,
 };
 
@@ -652,15 +652,24 @@ function jogExpandedGalleryImage(steps) {
 ////////////////
 //FILTERS
 ////////////////
-function hidePost(post, recursive) { //Pashe, WTFPL
+function hidePost(post, recursive, stubs) { //Pashe, WTFPL
 	post.jqObj.hide();
-	post.jqObj.next("br").remove();
+	if (!stubs) {
+		post.jqObj.next("br").remove();
+	} else {
+		post.jqObj.next("br").replaceWith($("<p>Primary filtered post</p>"))
+	};
 	
 	if (recursive && post.ment.length) {
 		for (var i in post.ment) {
 			if (!post.ment.hasOwnProperty(i)) {continue;}
+			
 			$("#reply_"+post.ment[i]).hide();
-			$("#reply_"+post.ment[i]).next("br").remove();
+			if (!stubs) {
+				$("#reply_"+post.ment[i]).next("br").remove()
+			} else {
+				$("#reply_"+post.ment[i]).next("br").replaceWith($("<p>Recursively filtered post</p>"))
+			};
 		}
 	}
 }
@@ -704,15 +713,22 @@ function runFilter() { //Pashe, WTFPL
 	
 	for (var i in filterTypes) {
 		if (!filterTypes.hasOwnProperty(i) || !thisPost[i]) {continue;}
-		var filterType = filterTypes[i];
 		
-		if (getSetting(sprintf("filter%s", filterType)) && (thisPost[i].length)) {
-			hidePost(thisPost, getSetting(sprintf("filter%sRecursive", filterType)));
-		} else if (getSetting(sprintf("filter%sRegex", filterType))) {
-			var filterRegii = getSetting(sprintf("filter%sRegex", filterType)).split('````');
-			for (var rei in filterRegii) {
-				var filterRegex = new RegExp(filterRegii[rei]);
-				if (thisPost[i].match(filterRegex)) {hidePost(thisPost, getSetting(sprintf("filter%sRecursive", filterType)));}
+		var filterType = filterTypes[i];
+		var filterField = thisPost[i];
+		
+		var filterHideAll = getSetting(sprintf("filter%s", filterType));
+		var filterRecursive = getSetting(sprintf("filter%sRecursive", filterType));
+		var filterStubs = getSetting(sprintf("filter%sStubs", filterType));
+		var filterRegex = getSetting(sprintf("filter%sRegex", filterType));
+		
+		if (filterHideAll && (filterField.length)) {
+			hidePost(thisPost, filterRecursive, filterStubs);
+		} else if (filterRegex) {
+			var filterRegex = filterRegex.split('````');
+			for (var i in filterRegex) {
+				var thisRegex = new RegExp(filterRegex[i]);
+				if (filterField.match(thisRegex)) {hidePost(thisPost, filterRecursive, filterStubs);}
 			}
 		}
 	}
