@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Pashe's 8chanX v2
-// @version     2.0.0.1422233430
+// @version     2.0.0.1422238630
 // @description Small userscript to improve 8chan
 // @icon        https://cdn.rawgit.com/Pashe/8chanX/2-0/images/logo.svg
 // @namespace   https://github.com/Pashe/8chanX/tree/2-0
@@ -652,22 +652,22 @@ function jogExpandedGalleryImage(steps) {
 //FILTERS
 ////////////////
 function hidePost(post, recursive, stubs) { //Pashe, WTFPL
-	post.jqObj.hide();
 	if (!stubs) {
+		post.jqObj.hide();
 		post.jqObj.next("br").remove();
 	} else {
-		post.jqObj.next("br").replaceWith($("<p>Primary filtered post</p>"))
+		unsafeWindow.$("#reply_"+post.no).find(".post-hide-link").trigger("click");
 	};
 	
 	if (recursive && post.ment.length) {
 		for (var i in post.ment) {
 			if (!post.ment.hasOwnProperty(i)) {continue;}
 			
-			$("#reply_"+post.ment[i]).hide();
 			if (!stubs) {
-				$("#reply_"+post.ment[i]).next("br").remove()
+				$("#reply_"+post.ment[i]).hide();
+				$("#reply_"+post.ment[i]).next("br").remove();
 			} else {
-				$("#reply_"+post.ment[i]).next("br").replaceWith($("<p>Recursively filtered post</p>"))
+				unsafeWindow.$("#reply_"+post.ment[i]).find(".post-hide-link").trigger("click");
 			};
 		}
 	}
@@ -688,7 +688,7 @@ function runFilter() { //Pashe, WTFPL
 		ment:  $this.find(".mentioned").text().length?$this.find(".mentioned").text().replace(/>>/g, "").replace(/ $/, "").split(" "):[],
 		
 		// date:  $this.find("time").attr("datetime"),
-		// no:    $this.find("a.post_no").first().next().text(),
+		no:    $this.find("a.post_no").first().next().text(),
 		
 		jqObj: $this,
 		// stdObj: this,
