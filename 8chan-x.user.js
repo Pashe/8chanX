@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Pashe's 8chanX v2 [pure]
-// @version     2.0.0.1422241170
+// @version     2.0.0.1422264330
 // @description Small userscript to improve 8chan
 // @icon        https://cdn.rawgit.com/Pashe/8chanX/2-0_pure/images/logo.svg
 // @namespace   https://github.com/Pashe/8chanX/tree/2-0
@@ -1182,16 +1182,16 @@ function intervalMenu() {
 ////////////////
 //EVENT HANDLERS
 ////////////////
-window.$(document).on('new_post', function (e, post) { try {
-	onNewPostRelativeTime(post);
-	onNewPostImageHover(post);
-	onNewPostRISLinks(post);
-	onNewPostNotifications(post);
-	onNewPostFormattedTime();
-	onNewPostFilter(post);
-} catch(e) {chxErrorHandler(e, "newpost");}});
-
 if (isOnThread()) {
+	window.$(document).on('new_post', function (e, post) { try {
+		onNewPostRelativeTime(post);
+		onNewPostImageHover(post);
+		onNewPostRISLinks(post);
+		onNewPostNotifications(post);
+		onNewPostFormattedTime();
+		onNewPostFilter(post);
+	} catch(e) {chxErrorHandler(e, "newpost");}});
+
 	setInterval(intervalMenu, (1.5*60*1000));
 }
 } catch(e) {chxErrorHandler(e, "global");}

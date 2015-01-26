@@ -1,6 +1,11 @@
 // ==UserScript==
+<<<<<<< HEAD
 // @name        Pashe's 8chanX v2 [pure]
 // @version     2.0.0.1422241170
+=======
+// @name        Pashe's 8chanX v2
+// @version     2.0.0.1422252860
+>>>>>>> 2-0
 // @description Small userscript to improve 8chan
 // @namespace   https://github.com/Pashe/8chanX/tree/2-0
 // @updateURL   https://github.com/Pashe/8chanX/raw/2-0/8chan-x.meta.js
