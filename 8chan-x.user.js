@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Pashe's 8chanX v2 [pure]
-// @version     2.0.0.1422183170
+// @version     2.0.0.1422233540
 // @description Small userscript to improve 8chan
 // @icon        https://cdn.rawgit.com/Pashe/8chanX/2-0_pure/images/logo.svg
 // @namespace   https://github.com/Pashe/8chanX/tree/2-0
@@ -77,7 +77,7 @@ settingsMenu.innerHTML = sprintf('<span style="font-size:8pt;">8chanX %s pure</s
 + '<hr>' //Filters
 + '<h3>Filters</h3>'
 + '<table style="text-align:center;">'
-+ '<tr><th>Field</th><th title="Regular expressions seperated with &quot;````&quot;">Regex</th><th title="Recursive: If this is checked, replies to filtered posts will also be removed">R</th><th title="Stubs: If this is not checked, filtered posts will be removed completely">S</th><th title="All: If this is checked, all posts of this type will be removed, ignoring regex">A</th></tr>'
++ '<tr><th>Field</th><th title="Regular expressions seperated with &quot;````&quot;. Boards may be specified like this: &quot;fag```a,b,c&quot;, which will filter &quot;fag&quot; on /a/, /b/, and /c/">Regex</th><th title="Recursive: If this is checked, replies to filtered posts will also be removed">R</th><th title="Stubs: If this is not checked, filtered posts will be removed completely">S</th><th title="All: If this is checked, all posts of this type will be removed, ignoring regex">A</th></tr>'
 
 + '<tr><td class="chx_FilterField">Tripcode</td><td><input type="text" name="filterTripsRegex" style="width:25em"></td><td><input type="checkbox" name="filterTripsRecursive"></td><td><input type="checkbox" name="filterTripsStubs"></td><td><input type="checkbox" name="filterTrips"></td></tr>'
 
@@ -173,7 +173,6 @@ function setupControl(control) {
 ////////////////
 //GENERAL FUNCTIONS
 ////////////////
-
 function isOnCatalog() {
 	return window.active_page === "catalog";
 }
@@ -720,8 +719,21 @@ function runFilter() { //Pashe, WTFPL
 		} else if (filterRegex) {
 			var filterRegex = filterRegex.split('````');
 			for (var i in filterRegex) {
-				var thisRegex = new RegExp(filterRegex[i]);
-				if (filterField.match(thisRegex)) {hidePost(thisPost, filterRecursive, filterStubs);}
+				var thisRegex;
+				var thisRegexStr = filterRegex[i].split("```")[0];
+				
+				if (filterRegex[i].split("```").length > 1) {
+					var thisRegexBoards = filterRegex[i].split("```")[1].split(",");
+					for (var i in thisRegexBoards) {
+						if (thisBoard.match(RegExp(thisRegexBoards[i])) !== null) {
+							thisRegex = new RegExp(thisRegexStr);
+							if (filterField.match(thisRegex)) {hidePost(thisPost, filterRecursive, filterStubs);}
+						}
+					}
+				} else {
+					thisRegex = new RegExp(thisRegexStr);
+					if (filterField.match(thisRegex)) {hidePost(thisPost, filterRecursive, filterStubs);}
+				}
 			}
 		}
 	}
@@ -777,6 +789,16 @@ function initMenu() { //Pashe, WTFPL
 		statsNode.appendTo($menu);
 		
 		updateMenuStats();
+		
+		var galleryButton = $('<a href="javascript:void(0)"><i class="fa fa-th-large chx_menuGalleryButton"></i></a>');
+		var menuButtonHolder = $('span.sub[data-description=0]').first();
+		
+		menuButtonHolder.html(function() {return this.innerHTML.replace("]", " / ");});
+		
+		galleryButton.appendTo(menuButtonHolder);
+		menuButtonHolder.html(function() {return this.innerHTML + " ]";});
+		
+		$(".chx_menuGalleryButton").on("click", toggleGallery); //galleryButton isn't the same as $(".chx_menuGalleryButton") after appending the ] to menuButtonHolder.
 	}
 }
 
@@ -1080,7 +1102,6 @@ function initFilter() { //Pashe, WTFPL
 ////////////////
 //INIT CALLS
 ////////////////
-
 $(window.document).ready(function() {
 	initSettings();
 	initDefaultSettings();
