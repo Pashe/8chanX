@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Pashe's 8chanX v2 [pure]
-// @version     2.0.0.1422233540
+// @version     2.0.0.1422241170
 // @description Small userscript to improve 8chan
 // @icon        https://cdn.rawgit.com/Pashe/8chanX/2-0_pure/images/logo.svg
 // @namespace   https://github.com/Pashe/8chanX/tree/2-0
@@ -31,8 +31,21 @@
 ** Pashe
 */
 
-try {
+function chxErrorHandler(e, section) {
+	console.trace();
+	console.error(sprintf(
+		"8chanX experienced an error. Please include the following information with your report:\n"+ 
+		"\n%s in %s/%s @ L%d C%d: %s\n\nVersion: %s (2-0_pure@%s)\nGreasemonkey: %s\nUser agent: %s\nLocation: %s\n",
+		e.name, e.fileName.split("/").slice(-1).join(""), section, e.lineNumber, e.columnNumber, e.message,
+		GM_info.script.name, GM_info.script.version,
+		GM_info.version,
+		window.navigator.userAgent,
+		window.location.href
+	));
+	alert("8chanX experienced an error. Check the console for details (typically F12).");
+}
 
+try {
 ////////////////
 //GLOBAL VARIABLES
 ////////////////
@@ -364,6 +377,7 @@ var imghoverMOut = function(e) { //Tux et al, MIT
 function reloadPage() { //Pashe, WTFPL
 	if (isOnThread()) {
 		window.$('#update_thread').click();
+		updateMenuStats();
 	} else {
 		document.location.reload();
 	}
@@ -645,22 +659,22 @@ function jogExpandedGalleryImage(steps) {
 //FILTERS
 ////////////////
 function hidePost(post, recursive, stubs) { //Pashe, WTFPL
-	post.jqObj.hide();
 	if (!stubs) {
+		post.jqObj.hide();
 		post.jqObj.next("br").remove();
 	} else {
-		post.jqObj.next("br").replaceWith($("<p>Primary filtered post</p>"))
+		window.$("#reply_"+post.no).find(".post-hide-link").trigger("click");
 	};
 	
 	if (recursive && post.ment.length) {
 		for (var i in post.ment) {
 			if (!post.ment.hasOwnProperty(i)) {continue;}
 			
-			$("#reply_"+post.ment[i]).hide();
 			if (!stubs) {
-				$("#reply_"+post.ment[i]).next("br").remove()
+				$("#reply_"+post.ment[i]).hide();
+				$("#reply_"+post.ment[i]).next("br").remove();
 			} else {
-				$("#reply_"+post.ment[i]).next("br").replaceWith($("<p>Recursively filtered post</p>"))
+				window.$("#reply_"+post.ment[i]).find(".post-hide-link").trigger("click");
 			};
 		}
 	}
@@ -681,7 +695,7 @@ function runFilter() { //Pashe, WTFPL
 		ment:  $this.find(".mentioned").text().length?$this.find(".mentioned").text().replace(/>>/g, "").replace(/ $/, "").split(" "):[],
 		
 		// date:  $this.find("time").attr("datetime"),
-		// no:    $this.find("a.post_no").first().next().text(),
+		no:    $this.find("a.post_no").first().next().text(),
 		
 		jqObj: $this,
 		// stdObj: this,
@@ -790,7 +804,7 @@ function initMenu() { //Pashe, WTFPL
 		
 		updateMenuStats();
 		
-		var galleryButton = $('<a href="javascript:void(0)"><i class="fa fa-th-large chx_menuGalleryButton"></i></a>');
+		var galleryButton = $('<a href="javascript:void(0)" title="Gallery"><i class="fa fa-th-large chx_menuGalleryButton"></i></a>');
 		var menuButtonHolder = $('span.sub[data-description=0]').first();
 		
 		menuButtonHolder.html(function() {return this.innerHTML.replace("]", " / ");});
@@ -1102,7 +1116,7 @@ function initFilter() { //Pashe, WTFPL
 ////////////////
 //INIT CALLS
 ////////////////
-$(window.document).ready(function() {
+$(window.document).ready(function() { try {
 	initSettings();
 	initDefaultSettings();
 	initMenu();
@@ -1120,7 +1134,7 @@ $(window.document).ready(function() {
 	initKeyboardShortcuts();
 	initpurgeDeadFavorites();
 	initFavicon();
-});
+} catch(e) {chxErrorHandler(e, "ready");}});
 
 ////////////////
 //EVENT HANDLER FUNCTIONS
@@ -1168,25 +1182,16 @@ function intervalMenu() {
 ////////////////
 //EVENT HANDLERS
 ////////////////
-window.$(document).on('new_post', function (e, post) {
+window.$(document).on('new_post', function (e, post) { try {
 	onNewPostRelativeTime(post);
 	onNewPostImageHover(post);
 	onNewPostRISLinks(post);
 	onNewPostNotifications(post);
 	onNewPostFormattedTime();
 	onNewPostFilter(post);
-});
+} catch(e) {chxErrorHandler(e, "newpost");}});
 
 if (isOnThread()) {
 	setInterval(intervalMenu, (1.5*60*1000));
 }
-} catch(globalError) {
-	console.error("8chanX experienced an uncaught error. Please include the following information with your report:");
-	console.error(sprintf(
-		"%s in %s @ L%d C%d: %s\n\nVersion: %s (2-0_pure@%s)\nUser agent: %s\nLocation: %s",
-		globalError.name, globalError.fileName.split("/").slice(-1).join(""), globalError.lineNumber, globalError.columnNumber, globalError.message,
-		GM_info.script.name, GM_info.script.version,
-		window.navigator.userAgent,
-		window.location.href
-	));
-}
+} catch(e) {chxErrorHandler(e, "global");}
