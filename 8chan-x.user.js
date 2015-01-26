@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Pashe's 8chanX v2
-// @version     2.0.0.1422238760
+// @version     2.0.0.1422239110
 // @description Small userscript to improve 8chan
 // @icon        https://cdn.rawgit.com/Pashe/8chanX/2-0/images/logo.svg
 // @namespace   https://github.com/Pashe/8chanX/tree/2-0
@@ -371,6 +371,7 @@ var imghoverMOut = function(e) { //Tux et al, MIT
 function reloadPage() { //Pashe, WTFPL
 	if (isOnThread()) {
 		unsafeWindow.$('#update_thread').click();
+		updateMenuStats();
 	} else {
 		document.location.reload();
 	}
