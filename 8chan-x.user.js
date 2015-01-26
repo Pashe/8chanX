@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Pashe's 8chanX v2 [pure]
-// @version     2.0.0.1422264330
+// @version     2.0.0.1422264390
 // @description Small userscript to improve 8chan
 // @icon        https://cdn.rawgit.com/Pashe/8chanX/2-0_pure/images/logo.svg
 // @namespace   https://github.com/Pashe/8chanX/tree/2-0
@@ -8,7 +8,6 @@
 // @downloadURL https://github.com/Pashe/8chanX/raw/2-0_pure/8chan-x.user.js
 // @grant       none
 
-// @require     https://code.jquery.com/jquery-2.1.3.min.js
 // @require     https://code.jquery.com/ui/1.11.2/jquery-ui.min.js
 // @require     https://github.com/alexei/sprintf.js/raw/master/src/sprintf.js
 // @require     https://raw.githubusercontent.com/rmm5t/jquery-timeago/master/jquery.timeago.js
