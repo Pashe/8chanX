@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Pashe's 8chanX v2
-// @version     2.0.0.1422183060
+// @version     2.0.0.1422233430
 // @description Small userscript to improve 8chan
 // @icon        https://cdn.rawgit.com/Pashe/8chanX/2-0/images/logo.svg
 // @namespace   https://github.com/Pashe/8chanX/tree/2-0
@@ -180,7 +180,6 @@ function setupControl(control) {
 ////////////////
 //GENERAL FUNCTIONS
 ////////////////
-
 function isOnCatalog() {
 	return unsafeWindow.active_page === "catalog";
 }
@@ -797,6 +796,16 @@ function initMenu() { //Pashe, WTFPL
 		statsNode.appendTo($menu);
 		
 		updateMenuStats();
+		
+		var galleryButton = $('<a href="javascript:void(0)"><i class="fa fa-th-large chx_menuGalleryButton"></i></a>');
+		var menuButtonHolder = $('span.sub[data-description=0]').first();
+		
+		menuButtonHolder.html(function() {return this.innerHTML.replace("]", " / ");});
+		
+		galleryButton.appendTo(menuButtonHolder);
+		menuButtonHolder.html(function() {return this.innerHTML + " ]";});
+		
+		$(".chx_menuGalleryButton").on("click", toggleGallery); //galleryButton isn't the same as $(".chx_menuGalleryButton") after appending the ] to menuButtonHolder.
 	}
 }
 
