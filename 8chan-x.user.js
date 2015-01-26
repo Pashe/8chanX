@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Pashe's 8chanX v2
-// @version     2.0.0.1422239110
+// @version     2.0.0.1422240930
 // @description Small userscript to improve 8chan
 // @icon        https://cdn.rawgit.com/Pashe/8chanX/2-0/images/logo.svg
 // @namespace   https://github.com/Pashe/8chanX/tree/2-0
@@ -36,8 +36,21 @@
 ** Pashe
 */
 
-try {
+function chxErrorHandler(e, section) {
+	console.trace();
+	console.error(sprintf(
+		"8chanX experienced an error. Please include the following information with your report:\n"+ 
+		"\n%s in %s/%s @ L%d C%d: %s\n\nVersion: %s (2-0@%s)\nGreasemonkey: %s\nUser agent: %s\nLocation: %s\n",
+		e.name, e.fileName.split("/").slice(-1).join(""), section, e.lineNumber, e.columnNumber, e.message,
+		GM_info.script.name, GM_info.script.version,
+		GM_info.version,
+		unsafeWindow.navigator.userAgent,
+		unsafeWindow.location.href
+	));
+	alert("8chanX experienced an error. Check the console for details (typically F12).");
+}
 
+try {
 ////////////////
 //GLOBAL VARIABLES
 ////////////////
@@ -1144,7 +1157,7 @@ function initClearChxSettings() { //Pashe, WTFPL
 ////////////////
 //INIT CALLS
 ////////////////
-$(unsafeWindow.document).ready(function() {
+$(unsafeWindow.document).ready(function() { try {
 	initSettings();
 	initBRLocalStorage();
 	initDefaultSettings();
@@ -1165,7 +1178,7 @@ $(unsafeWindow.document).ready(function() {
 	initClearLocalStorage();
 	initClearChxSettings();
 	initFavicon();
-});
+} catch(e) {chxErrorHandler(e, "ready");}});
 
 ////////////////
 //EVENT HANDLER FUNCTIONS
@@ -1213,25 +1226,16 @@ function intervalMenu() {
 ////////////////
 //EVENT HANDLERS
 ////////////////
-unsafeWindow.$(document).on('new_post', function (e, post) {
+unsafeWindow.$(document).on('new_post', function (e, post) { try {
 	onNewPostRelativeTime(post);
 	onNewPostImageHover(post);
 	onNewPostRISLinks(post);
 	onNewPostNotifications(post);
 	onNewPostFormattedTime();
 	onNewPostFilter(post);
-});
+} catch(e) {chxErrorHandler(e, "newpost");}});
 
 if (isOnThread()) {
 	setInterval(intervalMenu, (1.5*60*1000));
 }
-} catch(globalError) {
-	console.error("8chanX experienced an uncaught error. Please include the following information with your report:");
-	console.error(sprintf(
-		"%s in %s @ L%d C%d: %s\n\nVersion: %s (2-0@%s)\nUser agent: %s\nLocation: %s",
-		globalError.name, globalError.fileName.split("/").slice(-1).join(""), globalError.lineNumber, globalError.columnNumber, globalError.message,
-		GM_info.script.name, GM_info.script.version,
-		unsafeWindow.navigator.userAgent,
-		unsafeWindow.location.href
-	));
-}
+} catch(e) {chxErrorHandler(e, "global");}
