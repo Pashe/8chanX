@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Pashe's 8chanX v2
-// @version     2.0.0.1422252860
+// @version     2.0.0.1422344570
 // @description Small userscript to improve 8chan
 // @icon        https://cdn.rawgit.com/Pashe/8chanX/2-0/images/logo.svg
 // @namespace   https://github.com/Pashe/8chanX/tree/2-0
@@ -38,15 +38,38 @@
 
 function chxErrorHandler(e, section) {
 	console.trace();
+	
+	var rptObj = { //Chrome needs this
+		name:          e?(e.name||"unknown"):"VERY unknown",
+		msg:           e?(e.message||"unknown"):"VERY unknown",
+		file:          e?((e.fileName||"unknown").split("/").slice(-1).join("")):"VERY unknown",
+		line:          e?(e.lineNumber||"?"):"???",
+		col:           e?(e.columnNumber||"?"):"???",
+		section:       (section||"unknown"),
+		scriptName:    (GM_info&&GM_info.script)?(GM_info.script.name||"unknown"):"VERY unknown",
+		scriptVersion: (GM_info&&GM_info.script)?(GM_info.script.version||"unknown"):"VERY unknown",
+		gmVersion:     (GM_info&&GM_info.version)?(GM_info.version||"unknown"):"VERY unknown",
+		activePage:    unsafeWindow?(unsafeWindow.active_page||"unknown"):"VERY unknown",
+		browser:       (unsafeWindow&&unsafeWindow.navigator)?((unsafeWindow.navigator.userAgent||"unknown").match(/(Chrom\S*|\S*fox\/\S*|Ice\S*)/gi)||["unknown"]).join(", "):"VERY unknown",
+		userAgent:     (unsafeWindow&&unsafeWindow.navigator)?(unsafeWindow.navigator.userAgent||"unknown"):"VERY unknown",
+		location:      (unsafeWindow&&unsafeWindow.location)?(unsafeWindow.location.href||"unknown"):"VERY unknown",
+		stack:         e?((e.stack||"unknown").replace(/file:[^ \n]*\//g, "file:").replace(/^/gm, "  ")):"VERY unknown",
+	}
+	console.log(e);
+	
 	console.error(sprintf(
 		"8chanX experienced an error. Please include the following information with your report:\n"+ 
-		"\n%s in %s/%s @ L%d C%d: %s\n\nVersion: %s (2-0@%s)\nGreasemonkey: %s\nUser agent: %s\nLocation: %s\n",
-		e.name, e.fileName.split("/").slice(-1).join(""), section, e.lineNumber, e.columnNumber, e.message,
-		GM_info.script.name, GM_info.script.version,
-		GM_info.version,
-		unsafeWindow.navigator.userAgent,
-		unsafeWindow.location.href
+		"[code]%s in %s/%s @ L%s C%s: %s\n\nVersion: %s (2-0@%s)\nGreasemonkey: %s\nActive page: %s\nBrowser: %s\nUser agent: %s\nLocation: %s\nStack:\n%s[/code]",
+		rptObj.name, rptObj.file, rptObj.section, rptObj.line, rptObj.col, rptObj.msg,
+		rptObj.scriptName, rptObj.scriptVersion,
+		rptObj.gmVersion,
+		rptObj.activePage,
+		rptObj.browser,
+		rptObj.userAgent,
+		rptObj.location,
+		rptObj.stack
 	));
+	
 	alert("8chanX experienced an error. Check the console for details (typically F12).");
 }
 
