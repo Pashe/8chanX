@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Pashe's 8chanX v2 [pure]
-// @version     2.0.0.1422493310
+// @version     2.0.0.1422520190
 // @description Small userscript to improve 8chan
 // @icon        https://cdn.rawgit.com/Pashe/8chanX/2-0_pure/images/logo.svg
 // @namespace   https://github.com/Pashe/8chanX/tree/2-0
@@ -301,10 +301,17 @@ function updateMenuStats() { //Pashe, WTFPL
 //IMAGE HOVER
 ////////////////
 function imageHoverStart(e) { //Tux et al, MIT //TODO: Cleanup
-	if ($("#chx_hoverImage").length) {return;}
+	var posPercent = (e.screenX/screen.availWidth)*100;
+	var maxWidth = (posPercent<50)?(99-posPercent)+"%":(posPercent-1)+"%";
+	
+	if ($("#chx_hoverImage").length) {
+		$("#chx_hoverImage").css("max-width", maxWidth);
+		if (posPercent<50) {hoverImage.css("right", 0);} else {hoverImage.css("right", "100%");}
+		return;
+	}
 	
 	var $this = $(this);
-	var fullUrl = $this.parent().attr("href");
+	var fullUrl = $this.parent().attr("href").match("src")?$this.parent().attr("href"):$this.attr("src").replace("thumb", "src");
 	var fileExtension = fullUrl.match(/\.([a-z0-9]+)(&loop.*)?$/i)!==null?fullUrl.match(/\.([a-z0-9]+)(&loop.*)?$/i)[1]:"unknown";
 	
 	if ($.inArray(fileExtension, ["webm", "mp4"]) != -1) {return;}
@@ -313,11 +320,11 @@ function imageHoverStart(e) { //Tux et al, MIT //TODO: Cleanup
 	hoverImage.css({
 		"position"  : "fixed",
 		"top"       : 0,
-		"right"     : 0,
 		"z-index"   : 101,
-		"max-width" : "50%",
+		"max-width" : maxWidth,
 		"max-height": "100%",
 	});
+	if (posPercent<50) {hoverImage.css({"right": 0, "left": "initial"});} else {hoverImage.css({"right": "initial", "left": 0});}
 	
 	hoverImage.appendTo($("body"));
 }
@@ -799,13 +806,13 @@ function initImageHover() { //Pashe, influenced by tux, et al, WTFPL
 	}
 	
 	$(selectors.join(", ")).each(function () {
+		if ($(this).parent().data("expanded")) {return;}
+		
 		var $this = $(this);
 		
-		if (!$this.parent().data("expanded")) {
-			$this.on("mousemove", imageHoverStart);
-			$this.on("mouseout",  imageHoverEnd);
-			$this.on("click",     imageHoverEnd);
-		}
+		$this.on("mousemove", imageHoverStart);
+		$this.on("mouseout",  imageHoverEnd);
+		$this.on("click",     imageHoverEnd);
 	});
 }
 
