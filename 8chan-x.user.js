@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Pashe's 8chanX v2
-// @version     2.0.0.1422520120
+// @version     2.0.0.1422564930
 // @description Small userscript to improve 8chan
 // @icon        https://cdn.rawgit.com/Pashe/8chanX/2-0/images/logo.svg
 // @namespace   https://github.com/Pashe/8chanX/tree/2-0
@@ -308,12 +308,13 @@ function updateMenuStats() { //Pashe, WTFPL
 ////////////////
 //IMAGE HOVER
 ////////////////
-function imageHoverStart(e) { //Tux et al, MIT //TODO: Cleanup
+function imageHoverStart(e) { //Pashe, WTFPL
 	var posPercent = (e.screenX/screen.availWidth)*100;
 	var maxWidth = (posPercent<50)?(99-posPercent)+"%":(posPercent-1)+"%";
 	
 	if ($("#chx_hoverImage").length) {
-		$("#chx_hoverImage").css("max-width", maxWidth);
+		var hoverImage = $("#chx_hoverImage");
+		hoverImage.css("max-width", maxWidth);
 		if (posPercent<50) {hoverImage.css("right", 0);} else {hoverImage.css("right", "100%");}
 		return;
 	}
@@ -337,7 +338,7 @@ function imageHoverStart(e) { //Tux et al, MIT //TODO: Cleanup
 	hoverImage.appendTo($("body"));
 }
 
-function imageHoverEnd(e) { //Tux et al, MIT
+function imageHoverEnd(e) { //Pashe, WTFPL
 	$("#chx_hoverImage").remove();
 }
 
@@ -439,7 +440,7 @@ function notifyReplies() {
 	$(this).find('div.body:first a:not([rel="nofollow"])').each(function() {
 		var postID = $(this).text().match(/^>>(\d+)$/);
 		
-		if (postID.hasOwnProperty(1)) {
+		if (postID !== null && postID.hasOwnProperty(1)) {
 			postID = postID[1];
 		} else {
 			return;
@@ -1149,7 +1150,7 @@ function onNewPostRelativeTime(post) {
 	if (!getSetting("dateFormat")) {$(post).find("time").timeago();}
 }
 
-function onNewPostImageHover(post) { //Tux et al, MIT
+function onNewPostImageHover(post) { //Pashe, influenced by tux, et al, WTFPL
 	if (!getSetting("imageHover")) {return;}
 	
 	$(post).find("img.post-image, canvas.post-image").each(function () {
@@ -1191,7 +1192,7 @@ function intervalMenu() {
 ////////////////
 //EVENT HANDLERS
 ////////////////
-if (isOnThread()) {
+if (unsafeWindow.jQuery) {
 	unsafeWindow.$(document).on('new_post', function (e, post) { try {
 		onNewPostRelativeTime(post);
 		onNewPostImageHover(post);
