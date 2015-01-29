@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Pashe's 8chanX v2 [pure]
-// @version     2.0.0.1422344710
+// @version     2.0.0.1422493310
 // @description Small userscript to improve 8chan
 // @icon        https://cdn.rawgit.com/Pashe/8chanX/2-0_pure/images/logo.svg
 // @namespace   https://github.com/Pashe/8chanX/tree/2-0
@@ -300,98 +300,31 @@ function updateMenuStats() { //Pashe, WTFPL
 ////////////////
 //IMAGE HOVER
 ////////////////
-var imghoverMMove = function(e) { //Tux et al, MIT //TODO: Cleanup
-	if (!getSetting('imageHover') && !getSetting('catalogImageHover')) {return;}
+function imageHoverStart(e) { //Tux et al, MIT //TODO: Cleanup
+	if ($("#chx_hoverImage").length) {return;}
 	
-	var pic;
-	if ($(this)[0].tagName == "IMG") {pic = $(this);}
-	else if ($(this)[0].tagName == "CANVAS") {pic = $(this).next();}
+	var $this = $(this);
+	var fullUrl = $this.parent().attr("href");
+	var fileExtension = fullUrl.match(/\.([a-z0-9]+)(&loop.*)?$/i)!==null?fullUrl.match(/\.([a-z0-9]+)(&loop.*)?$/i)[1]:"unknown";
 	
-	var picUrl = pic.attr("src");
-	if (picUrl.indexOf('spoiler.png') >= 0) {picUrl = $(this).parent().attr("href");}
+	if ($.inArray(fileExtension, ["webm", "mp4"]) != -1) {return;}
 	
-	pic.parent().removeData("expanded");
-	if (pic.parent().data("expanded")) {
-		return;
-	}
+	var hoverImage = $(sprintf('<img id="chx_hoverImage" src="%s" />', fullUrl));
+	hoverImage.css({
+		"position"  : "fixed",
+		"top"       : 0,
+		"right"     : 0,
+		"z-index"   : 101,
+		"max-width" : "50%",
+		"max-height": "100%",
+	});
 	
-	picUrl = picUrl.replace("/src/","/thumb/");
-	if (picUrl.indexOf('/thumb/') == -1) {
-		return;
-	}
-	
-	var picTimestamp;
-	picTimestamp = picUrl.substr(picUrl.indexOf("/thumb/")+7);
-	picTimestamp = picTimestamp.substr(0, picTimestamp.lastIndexOf("."));
-	
-	var picId = "post-image-"+picTimestamp;
-	var hoverPic = $("#"+picId);
-	
-	var picRightEdge = hoverPic.width() + e.pageX;
-	var windowWidth = $(window).width();
-	
-	if (!hoverPic.length) {
-		var newpic = pic.clone();
-		newpic.attr("id",picId);
-		newpic.css('display', 'block').css('position', 'absolute').css('z-index', '200').css("margin", "0px").css("padding", "0px");
-		newpic.attr("src",picUrl.replace("/thumb/","/src/"));
-		
-		if (picRightEdge > windowWidth) {
-			newpic.css('left', (e.pageX + (windowWidth - picRightEdge))).css('top', top);
-		} else {
-			newpic.css('left', e.pageX).css('top', top);
-		}
-		
-		newpic.css('width', 'auto').css('height', 'auto');
-		newpic.css('pointer-events','none');
-		newpic.css('max-height',$(window).height());
-		newpic.css('max-width',$(window).width());
-		newpic.insertAfter(pic);
-	} else {
-		var scrollTop = $(window).scrollTop();
-		var epy = e.pageY;
-		var top = epy;
-		if (epy < scrollTop + 15) {
-		  top = scrollTop;
-		} else if (epy > scrollTop + $(window).height() - hoverPic.height() - 15) {
-		  top = scrollTop + $(window).height() - hoverPic.height() - 15;
-		}
-		
-		if (picRightEdge > windowWidth) {
-			hoverPic.css('left', (e.pageX + (windowWidth - picRightEdge))).css('top', top);
-		} else {
-			hoverPic.css('left', e.pageX).css('top', top);
-		}
-	}
-};
+	hoverImage.appendTo($("body"));
+}
 
-var imghoverMOut = function(e) { //Tux et al, MIT
-	var pic;
-	if ($(this)[0].tagName == "IMG") {pic = $(this);}
-	else if ($(this)[0].tagName == "CANVAS") {pic = $(this).next();}
-	
-	var picUrl = pic.attr("src");
-	if (picUrl.indexOf('spoiler.png') >= 0) {picUrl = $(this).parent().attr("href");}
-	picUrl = picUrl.replace("/src/","/thumb/");
-	
-	var picTimestamp;
-	picTimestamp = picUrl.substr(picUrl.indexOf("/thumb/")+7);
-	picTimestamp = picTimestamp.substr(0, picTimestamp.lastIndexOf("."));
-	var picId = "post-image-"+picTimestamp;
-	
-	var hoverPic = $("#"+picId);
-	if (hoverPic.length) {hoverPic.remove();}
-	
-	if ($(this).hasClass('unanimated')) {
-		$($(this).parent().children()).each( function (index, data) { //Oh Jesus what the fuck
-			if ($(this).parent().data("expanded") != "true") {
-				$(this).mousemove(imghoverMMove);
-				$(this).mouseout(imghoverMOut);
-				$(this).click(imghoverMOut);
-			}
-		});
-	}
-};
+function imageHoverEnd(e) { //Tux et al, MIT
+	$("#chx_hoverImage").remove();
+}
 
 ////////////////
 //KEYBOARD SHORTCUTS
@@ -854,25 +787,24 @@ function initRevealImageSpoilers() { //Tux et al, MIT
 	});
 }
 
-function initImageHover() { //Tux et al, MIT //TODO: Cleanup
+function initImageHover() { //Pashe, influenced by tux, et al, WTFPL
 	if (!getSetting("imageHover") && !getSetting("catalogImageHover")) {return;}
 	
-	var selector = '';
-	if (getSetting("imageHover")) selector += "img.post-image, canvas.post-image";
+	var selectors = [];
 	
-	if (getSetting('catalogImageHover') && isOnCatalog()) {
-		if (selector !== '') {selector += ', ';}
-		selector += '.thread-image';
-		$('.theme-catalog div.thread').each(function() {
-			$(this).css('position','inherit');
-		});
+	if (getSetting("imageHover")) {selectors.push("img.post-image", "canvas.post-image");}
+	if (getSetting("catalogImageHover") && isOnCatalog()) {
+		selectors.push(".thread-image");
+		$(".theme-catalog div.thread").css("position", "inherit");
 	}
 	
-	$(selector).each( function (index, data) {
-		if ($(this).parent().data("expanded") != "true") {
-			$(this).mousemove(imghoverMMove);
-			$(this).mouseout(imghoverMOut);
-			$(this).click(imghoverMOut);
+	$(selectors.join(", ")).each(function () {
+		var $this = $(this);
+		
+		if (!$this.parent().data("expanded")) {
+			$this.on("mousemove", imageHoverStart);
+			$this.on("mouseout",  imageHoverEnd);
+			$this.on("click",     imageHoverEnd);
 		}
 	});
 }
@@ -1167,11 +1099,14 @@ function onNewPostRelativeTime(post) {
 
 function onNewPostImageHover(post) { //Tux et al, MIT
 	if (!getSetting("imageHover")) {return;}
-	$("#"+$(post).attr("id")+" .post-image").each( function (index, data) {
-		if ($(this).parent().data("expanded") != "true") {
-			$(this).mousemove(imghoverMMove);
-			$(this).mouseout(imghoverMOut);
-			$(this).click(imghoverMOut);
+	
+	$(post).find("img.post-image, canvas.post-image").each(function () {
+		var $this = $(this);
+		
+		if (!$this.parent().data("expanded")) {
+			$this.on("mousemove", imageHoverStart);
+			$this.on("mouseout",  imageHoverEnd);
+			$this.on("click",     imageHoverEnd);
 		}
 	});
 }
