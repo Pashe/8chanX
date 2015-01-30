@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Pashe's 8chanX v2
-// @version     2.0.0.1422593750
+// @version     2.0.0.1422595070
 // @description Small userscript to improve 8chan
 // @icon        https://cdn.rawgit.com/Pashe/8chanX/2-0/images/logo.svg
 // @namespace   https://github.com/Pashe/8chanX/tree/2-0
@@ -37,6 +37,7 @@
 */
 
 function chxErrorHandler(e, section) {
+	console.error(e);
 	console.trace();
 	
 	var rptObj = { //Chrome needs this
@@ -54,8 +55,7 @@ function chxErrorHandler(e, section) {
 		userAgent:     (unsafeWindow&&unsafeWindow.navigator)?(unsafeWindow.navigator.userAgent||"unknown"):"VERY unknown",
 		location:      (unsafeWindow&&unsafeWindow.location)?(unsafeWindow.location.href||"unknown"):"VERY unknown",
 		stack:         e?((e.stack||"unknown").replace(/file:[^ \n]*\//g, "file:").replace(/^/gm, "  ")):"VERY unknown",
-	}
-	console.log(e);
+	};
 	
 	console.error(sprintf(
 		"8chanX experienced an error. Please include the following information with your report:\n"+ 
@@ -88,7 +88,6 @@ var galleryImageIndex;
 
 //Dynamic
 var isMod = (unsafeWindow.location.pathname.split("/")[1]=="mod.php");
-var originalPageTitle = unsafeWindow.document.title;
 var thisBoard = isMod?unsafeWindow.location.href.split("/")[4]:unsafeWindow.location.pathname.split("/")[1];
 try {thisThread = parseInt(unsafeWindow.location.href.match(/([0-9]+)\.html/)[1]);} catch (e) {thisThread = -1;}
 
@@ -327,11 +326,12 @@ function updateMenuStats() { //Pashe, WTFPL
 //IMAGE HOVER
 ////////////////
 function imageHoverStart(e) { //Pashe, WTFPL
+	var hoverImage;
 	var posPercent = (e.screenX/screen.availWidth)*100;
 	var maxWidth = (posPercent<50)?(99-posPercent)+"%":(posPercent-1)+"%";
 	
 	if ($("#chx_hoverImage").length) {
-		var hoverImage = $("#chx_hoverImage");
+		hoverImage = $("#chx_hoverImage");
 		hoverImage.css("max-width", maxWidth);
 		if (posPercent<50) {hoverImage.css("right", 0);} else {hoverImage.css("right", "100%");}
 		return;
@@ -343,7 +343,7 @@ function imageHoverStart(e) { //Pashe, WTFPL
 	
 	if (isVideo(fileExtension)) {return;}
 	
-	var hoverImage = $(sprintf('<img id="chx_hoverImage" src="%s" />', fullUrl));
+	hoverImage = $(sprintf('<img id="chx_hoverImage" src="%s" />', fullUrl));
 	hoverImage.css({
 		"position"  : "fixed",
 		"top"       : 0,
@@ -356,7 +356,7 @@ function imageHoverStart(e) { //Pashe, WTFPL
 	hoverImage.appendTo($("body"));
 }
 
-function imageHoverEnd(e) { //Pashe, WTFPL
+function imageHoverEnd() { //Pashe, WTFPL
 	$("#chx_hoverImage").remove();
 }
 
@@ -653,7 +653,7 @@ function hidePost(post, recursive, stubs) { //Pashe, WTFPL
 		post.jqObj.next("br").remove();
 	} else {
 		unsafeWindow.$("#reply_"+post.no).find(".post-hide-link").trigger("click");
-	};
+	}
 	
 	if (recursive && post.ment.length) {
 		for (var i in post.ment) {
@@ -664,7 +664,7 @@ function hidePost(post, recursive, stubs) { //Pashe, WTFPL
 				$("#reply_"+post.ment[i]).next("br").remove();
 			} else {
 				unsafeWindow.$("#reply_"+post.ment[i]).find(".post-hide-link").trigger("click");
-			};
+			}
 		}
 	}
 }
@@ -720,7 +720,7 @@ function runFilter() { //Pashe, WTFPL
 		if (filterHideAll && (filterField.length)) {
 			hidePost(thisPost, filterRecursive, filterStubs);
 		} else if (filterRegex) {
-			var filterRegex = filterRegex.split('````');
+			filterRegex = filterRegex.split('````');
 			for (var i in filterRegex) {
 				var thisRegex;
 				var thisRegexStr = filterRegex[i].split("```")[0];
@@ -765,7 +765,7 @@ function initMenu() { //Pashe, WTFPL
 	$("[data-description='1'], [data-description='2']").hide();
 	
 	if (getSetting('catalogLinks') && !isOnCatalog()) {
-		$('.favorite-boards a').each( function (index, data) {
+		$('.favorite-boards a').each(function () {
 			$(this).attr("href", $(this).attr("href")+"/catalog.html");
 		});
 	}
@@ -922,7 +922,7 @@ function initCatalog() { //Pashe, WTFPL
 
 function initRISLinks() { //Pashe, 7185, WTFPL
 	if (!getSetting("reverseImageSearch")) {return;}
-	var posts = $("img.post-image").each(function() {addRISLinks(this);});
+	$("img.post-image").each(function() {addRISLinks(this);});
 }
 
 function initParseTimestampImage() { //Pashe, WTFPL
