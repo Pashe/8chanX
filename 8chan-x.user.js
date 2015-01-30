@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Pashe's 8chanX v2 [pure]
-// @version     2.0.0.1422604090
+// @version     2.0.0.1422605640
 // @description Small userscript to improve 8chan
 // @icon        https://cdn.rawgit.com/Pashe/8chanX/2-0_pure/images/logo.svg
 // @namespace   https://github.com/Pashe/8chanX/tree/2-0
@@ -324,9 +324,18 @@ function imageHoverStart(e) { //Pashe, WTFPL
 	
 	var fullUrl;
 	if ($this.parent().attr("href").match("src")) {
-		fullUrl = $this.parent().attr("href")
-	} else {
-		fullUrl = $this.attr("src").replace("thumb", "src"); //Temporary "fix" for catalog images
+		fullUrl = $this.parent().attr("href");
+	} else if (isOnCatalog()) {
+		fullUrl = $this.attr("src").replace("thumb", "src");
+		$.ajax(($this.parent().attr("href").replace(/\.html$/, ".json")), {
+			success: function (result) {
+				fullUrl = result.posts[0].tim + result.posts[0].ext;
+				if (isVideo(getFileExtension(fullUrl))) {return;}
+				$("#chx_hoverImage").attr("src", sprintf("/%s/src/%s", thisBoard, fullUrl));
+			},
+			async: true,
+			cache: true
+		});
 	}
 	
 	if (isVideo(getFileExtension(fullUrl))) {return;}
