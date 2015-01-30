@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Pashe's 8chanX v2 [pure]
-// @version     2.0.0.1422565070
+// @version     2.0.0.1422595210
 // @description Small userscript to improve 8chan
 // @icon        https://cdn.rawgit.com/Pashe/8chanX/2-0_pure/images/logo.svg
 // @namespace   https://github.com/Pashe/8chanX/tree/2-0
@@ -31,6 +31,7 @@
 */
 
 function chxErrorHandler(e, section) {
+	console.error(e);
 	console.trace();
 	
 	var rptObj = { //Chrome needs this
@@ -48,8 +49,7 @@ function chxErrorHandler(e, section) {
 		userAgent:     (window&&window.navigator)?(window.navigator.userAgent||"unknown"):"VERY unknown",
 		location:      (window&&window.location)?(window.location.href||"unknown"):"VERY unknown",
 		stack:         e?((e.stack||"unknown").replace(/file:[^ \n]*\//g, "file:").replace(/^/gm, "  ")):"VERY unknown",
-	}
-	console.log(e);
+	};
 	
 	console.error(sprintf(
 		"8chanX experienced an error. Please include the following information with your report:\n"+
@@ -271,6 +271,24 @@ function getThreadImages() { //Pashe, WTFPL
 	return $(".post-image").length;
 }
 
+function getFileExtension(filename) { //Pashe, WTFPL
+	if (filename.match(/\.([a-z0-9]+)(&loop.*)?$/i) !== null) {
+		return filename.match(/\.([a-z0-9]+)(&loop.*)?$/i)[1];
+	} else if (filename.match(/https?:\/\/(www\.)?youtube.com/)) {
+		return 'Youtube';
+	} else {
+		return sprintf("unknown: %s", filename);
+	}
+}
+
+function isImage(fileExtension) { //Pashe, WTFPL
+	return ($.inArray(fileExtension, ["jpg", "jpeg", "gif", "png"]) !== -1);
+}
+
+function isVideo(fileExtension) { //Pashe, WTFPL
+	return ($.inArray(fileExtension, ["webm", "mp4"]) !== -1);
+}
+
 ////////////////
 //MENU BAR
 ////////////////
@@ -301,11 +319,12 @@ function updateMenuStats() { //Pashe, WTFPL
 //IMAGE HOVER
 ////////////////
 function imageHoverStart(e) { //Pashe, WTFPL
+	var hoverImage;
 	var posPercent = (e.screenX/screen.availWidth)*100;
 	var maxWidth = (posPercent<50)?(99-posPercent)+"%":(posPercent-1)+"%";
 	
 	if ($("#chx_hoverImage").length) {
-		var hoverImage = $("#chx_hoverImage");
+		hoverImage = $("#chx_hoverImage");
 		hoverImage.css("max-width", maxWidth);
 		if (posPercent<50) {hoverImage.css("right", 0);} else {hoverImage.css("right", "100%");}
 		return;
@@ -313,11 +332,11 @@ function imageHoverStart(e) { //Pashe, WTFPL
 	
 	var $this = $(this);
 	var fullUrl = $this.parent().attr("href").match("src")?$this.parent().attr("href"):$this.attr("src").replace("thumb", "src");
-	var fileExtension = fullUrl.match(/\.([a-z0-9]+)(&loop.*)?$/i)!==null?fullUrl.match(/\.([a-z0-9]+)(&loop.*)?$/i)[1]:"unknown";
+	var fileExtension = getFileExtension(fullUrl);
 	
-	if ($.inArray(fileExtension, ["webm", "mp4"]) != -1) {return;}
+	if (isVideo(fileExtension)) {return;}
 	
-	var hoverImage = $(sprintf('<img id="chx_hoverImage" src="%s" />', fullUrl));
+	hoverImage = $(sprintf('<img id="chx_hoverImage" src="%s" />', fullUrl));
 	hoverImage.css({
 		"position"  : "fixed",
 		"top"       : 0,
@@ -330,7 +349,7 @@ function imageHoverStart(e) { //Pashe, WTFPL
 	hoverImage.appendTo($("body"));
 }
 
-function imageHoverEnd(e) { //Pashe, WTFPL
+function imageHoverEnd() { //Pashe, WTFPL
 	$("#chx_hoverImage").remove();
 }
 
@@ -501,7 +520,7 @@ function openGallery() { //Pashe, WTFPL
 	for (var i in galleryImages) {
 		if (!galleryImages.hasOwnProperty(i)) {continue;}
 		var image = galleryImages[i];
-		var fileExtension = image.full.match(/\.([a-z0-9]+)(&loop.*)?$/i)!==null?image.full.match(/\.([a-z0-9]+)(&loop.*)?$/i)[1]:"???";
+		var fileExtension = getFileExtension(image.full);
 		
 		var thumbHolder = $('<div class="chx_galleryThumbHolder"></div>');
 		var thumbLink = $(sprintf('<a class="chx_galleryThumbLink" href="%s"></a>', image.full));
@@ -562,9 +581,9 @@ function expandGalleryImage(index) { //Pashe, WTFPL
 	var expandedImage;
 	var image = galleryImages[index].full;
 	var imageHolder = $('<div id="chx_galleryExpandedImageHolder"></div>');
-	var fileExtension = image.match(/\.([a-z0-9]+)(&loop.*)?$/i)!==null?image.match(/\.([a-z0-9]+)(&loop.*)?$/i)[1]:"unknown";
+	var fileExtension = getFileExtension(image);
 	
-	if ($.inArray(fileExtension, ["jpg", "jpeg", "gif", "png"]) != -1) {
+	if (isImage(fileExtension)) {
 		expandedImage = $(sprintf('<img class="chx_galleryExpandedImage" src="%s" />', image));
 		expandedImage.css({
 			"max-height": "98%",
@@ -572,7 +591,7 @@ function expandGalleryImage(index) { //Pashe, WTFPL
 			"margin":     "auto auto auto auto",
 			"display":    "block"
 		});
-	} else if ($.inArray(fileExtension, ["webm", "mp4"]) != -1) {
+	} else if (isVideo(fileExtension)) {
 		image = image.match(/player\.php\?v=([^&]*[0-9]+\.[a-z0-9]+).*/i)[1];
 		expandedImage = $(sprintf('<video class="chx_galleryExpandedImage" src="%s" autoplay controls>Your browser is shit</video>', image));
 		expandedImage.css({
@@ -627,7 +646,7 @@ function hidePost(post, recursive, stubs) { //Pashe, WTFPL
 		post.jqObj.next("br").remove();
 	} else {
 		window.$("#reply_"+post.no).find(".post-hide-link").trigger("click");
-	};
+	}
 	
 	if (recursive && post.ment.length) {
 		for (var i in post.ment) {
@@ -638,7 +657,7 @@ function hidePost(post, recursive, stubs) { //Pashe, WTFPL
 				$("#reply_"+post.ment[i]).next("br").remove();
 			} else {
 				window.$("#reply_"+post.ment[i]).find(".post-hide-link").trigger("click");
-			};
+			}
 		}
 	}
 }
@@ -694,7 +713,7 @@ function runFilter() { //Pashe, WTFPL
 		if (filterHideAll && (filterField.length)) {
 			hidePost(thisPost, filterRecursive, filterStubs);
 		} else if (filterRegex) {
-			var filterRegex = filterRegex.split('````');
+			filterRegex = filterRegex.split('````');
 			for (var i in filterRegex) {
 				var thisRegex;
 				var thisRegexStr = filterRegex[i].split("```")[0];
@@ -739,7 +758,7 @@ function initMenu() { //Pashe, WTFPL
 	$("[data-description='1'], [data-description='2']").hide();
 	
 	if (getSetting('catalogLinks') && !isOnCatalog()) {
-		$('.favorite-boards a').each( function (index, data) {
+		$('.favorite-boards a').each(function () {
 			$(this).attr("href", $(this).attr("href")+"/catalog.html");
 		});
 	}
@@ -896,7 +915,7 @@ function initCatalog() { //Pashe, WTFPL
 
 function initRISLinks() { //Pashe, 7185, WTFPL
 	if (!getSetting("reverseImageSearch")) {return;}
-	var posts = $("img.post-image").each(function() {addRISLinks(this);});
+	$("img.post-image").each(function() {addRISLinks(this);});
 }
 
 function initParseTimestampImage() { //Pashe, WTFPL
