@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Pashe's 8chanX v2 [pure]
-// @version     2.0.0.1422595210
+// @version     2.0.0.1422604090
 // @description Small userscript to improve 8chan
 // @icon        https://cdn.rawgit.com/Pashe/8chanX/2-0_pure/images/logo.svg
 // @namespace   https://github.com/Pashe/8chanX/tree/2-0
@@ -319,32 +319,28 @@ function updateMenuStats() { //Pashe, WTFPL
 //IMAGE HOVER
 ////////////////
 function imageHoverStart(e) { //Pashe, WTFPL
-	var hoverImage;
-	var posPercent = (e.screenX/screen.availWidth)*100;
-	var maxWidth = (posPercent<50)?(99-posPercent)+"%":(posPercent-1)+"%";
+	if ($("#chx_hoverImage").length) {return;}
+	var $this = $(this);
 	
-	if ($("#chx_hoverImage").length) {
-		hoverImage = $("#chx_hoverImage");
-		hoverImage.css("max-width", maxWidth);
-		if (posPercent<50) {hoverImage.css("right", 0);} else {hoverImage.css("right", "100%");}
-		return;
+	var fullUrl;
+	if ($this.parent().attr("href").match("src")) {
+		fullUrl = $this.parent().attr("href")
+	} else {
+		fullUrl = $this.attr("src").replace("thumb", "src"); //Temporary "fix" for catalog images
 	}
 	
-	var $this = $(this);
-	var fullUrl = $this.parent().attr("href").match("src")?$this.parent().attr("href"):$this.attr("src").replace("thumb", "src");
-	var fileExtension = getFileExtension(fullUrl);
+	if (isVideo(getFileExtension(fullUrl))) {return;}
 	
-	if (isVideo(fileExtension)) {return;}
-	
-	hoverImage = $(sprintf('<img id="chx_hoverImage" src="%s" />', fullUrl));
+	var hoverImage = $(sprintf('<img id="chx_hoverImage" src="%s" />', fullUrl));
 	hoverImage.css({
-		"position"  : "fixed",
-		"top"       : 0,
-		"z-index"   : 101,
-		"max-width" : maxWidth,
-		"max-height": "100%",
+		"position"      : "fixed",
+		"top"           : 0,
+		"right"         : 0,
+		"z-index"       : 101,
+		"pointer-events": "none",
+		"max-width"     : "100%",
+		"max-height"    : "100%",
 	});
-	if (posPercent<50) {hoverImage.css({"right": 0, "left": "initial"});} else {hoverImage.css({"right": "initial", "left": 0});}
 	
 	hoverImage.appendTo($("body"));
 }
