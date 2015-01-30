@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Pashe's 8chanX v2
-// @version     2.0.0.1422595070
+// @version     2.0.0.1422603800
 // @description Small userscript to improve 8chan
 // @icon        https://cdn.rawgit.com/Pashe/8chanX/2-0/images/logo.svg
 // @namespace   https://github.com/Pashe/8chanX/tree/2-0
@@ -326,16 +326,7 @@ function updateMenuStats() { //Pashe, WTFPL
 //IMAGE HOVER
 ////////////////
 function imageHoverStart(e) { //Pashe, WTFPL
-	var hoverImage;
-	var posPercent = (e.screenX/screen.availWidth)*100;
-	var maxWidth = (posPercent<50)?(99-posPercent)+"%":(posPercent-1)+"%";
-	
-	if ($("#chx_hoverImage").length) {
-		hoverImage = $("#chx_hoverImage");
-		hoverImage.css("max-width", maxWidth);
-		if (posPercent<50) {hoverImage.css("right", 0);} else {hoverImage.css("right", "100%");}
-		return;
-	}
+	if ($("#chx_hoverImage").length) {return;}
 	
 	var $this = $(this);
 	var fullUrl = $this.parent().attr("href").match("src")?$this.parent().attr("href"):$this.attr("src").replace("thumb", "src");
@@ -343,15 +334,16 @@ function imageHoverStart(e) { //Pashe, WTFPL
 	
 	if (isVideo(fileExtension)) {return;}
 	
-	hoverImage = $(sprintf('<img id="chx_hoverImage" src="%s" />', fullUrl));
+	var hoverImage = $(sprintf('<img id="chx_hoverImage" src="%s" />', fullUrl));
 	hoverImage.css({
-		"position"  : "fixed",
-		"top"       : 0,
-		"z-index"   : 101,
-		"max-width" : maxWidth,
-		"max-height": "100%",
+		"position"      : "fixed",
+		"top"           : 0,
+		"right"         : 0,
+		"z-index"       : 101,
+		"pointer-events": "none",
+		"max-width"     : "100%",
+		"max-height"    : "100%",
 	});
-	if (posPercent<50) {hoverImage.css({"right": 0, "left": "initial"});} else {hoverImage.css({"right": "initial", "left": 0});}
 	
 	hoverImage.appendTo($("body"));
 }
