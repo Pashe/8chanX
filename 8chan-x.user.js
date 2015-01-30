@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Pashe's 8chanX v2
-// @version     2.0.0.1422564930
+// @version     2.0.0.1422593750
 // @description Small userscript to improve 8chan
 // @icon        https://cdn.rawgit.com/Pashe/8chanX/2-0/images/logo.svg
 // @namespace   https://github.com/Pashe/8chanX/tree/2-0
@@ -279,6 +279,24 @@ function getThreadImages() { //Pashe, WTFPL
 	return $(".post-image").length;
 }
 
+function getFileExtension(filename) { //Pashe, WTFPL
+	if (filename.match(/\.([a-z0-9]+)(&loop.*)?$/i) !== null) {
+		return filename.match(/\.([a-z0-9]+)(&loop.*)?$/i)[1];
+	} else if (filename.match(/https?:\/\/(www\.)?youtube.com/)) {
+		return 'Youtube';
+	} else {
+		return sprintf("unknown: %s", filename);
+	}
+}
+
+function isImage(fileExtension) { //Pashe, WTFPL
+	return ($.inArray(fileExtension, ["jpg", "jpeg", "gif", "png"]) !== -1);
+}
+
+function isVideo(fileExtension) { //Pashe, WTFPL
+	return ($.inArray(fileExtension, ["webm", "mp4"]) !== -1);
+}
+
 ////////////////
 //MENU BAR
 ////////////////
@@ -321,9 +339,9 @@ function imageHoverStart(e) { //Pashe, WTFPL
 	
 	var $this = $(this);
 	var fullUrl = $this.parent().attr("href").match("src")?$this.parent().attr("href"):$this.attr("src").replace("thumb", "src");
-	var fileExtension = fullUrl.match(/\.([a-z0-9]+)(&loop.*)?$/i)!==null?fullUrl.match(/\.([a-z0-9]+)(&loop.*)?$/i)[1]:"unknown";
+	var fileExtension = getFileExtension(fullUrl);
 	
-	if ($.inArray(fileExtension, ["webm", "mp4"]) != -1) {return;}
+	if (isVideo(fileExtension)) {return;}
 	
 	var hoverImage = $(sprintf('<img id="chx_hoverImage" src="%s" />', fullUrl));
 	hoverImage.css({
@@ -509,7 +527,7 @@ function openGallery() { //Pashe, WTFPL
 	for (var i in galleryImages) {
 		if (!galleryImages.hasOwnProperty(i)) {continue;}
 		var image = galleryImages[i];
-		var fileExtension = image.full.match(/\.([a-z0-9]+)(&loop.*)?$/i)!==null?image.full.match(/\.([a-z0-9]+)(&loop.*)?$/i)[1]:"???";
+		var fileExtension = getFileExtension(image.full);
 		
 		var thumbHolder = $('<div class="chx_galleryThumbHolder"></div>');
 		var thumbLink = $(sprintf('<a class="chx_galleryThumbLink" href="%s"></a>', image.full));
@@ -570,9 +588,9 @@ function expandGalleryImage(index) { //Pashe, WTFPL
 	var expandedImage;
 	var image = galleryImages[index].full;
 	var imageHolder = $('<div id="chx_galleryExpandedImageHolder"></div>');
-	var fileExtension = image.match(/\.([a-z0-9]+)(&loop.*)?$/i)!==null?image.match(/\.([a-z0-9]+)(&loop.*)?$/i)[1]:"unknown";
+	var fileExtension = getFileExtension(image);
 	
-	if ($.inArray(fileExtension, ["jpg", "jpeg", "gif", "png"]) != -1) {
+	if (isImage(fileExtension)) {
 		expandedImage = $(sprintf('<img class="chx_galleryExpandedImage" src="%s" />', image));
 		expandedImage.css({
 			"max-height": "98%",
@@ -580,7 +598,7 @@ function expandGalleryImage(index) { //Pashe, WTFPL
 			"margin":     "auto auto auto auto",
 			"display":    "block"
 		});
-	} else if ($.inArray(fileExtension, ["webm", "mp4"]) != -1) {
+	} else if (isVideo(fileExtension)) {
 		image = image.match(/player\.php\?v=([^&]*[0-9]+\.[a-z0-9]+).*/i)[1];
 		expandedImage = $(sprintf('<video class="chx_galleryExpandedImage" src="%s" autoplay controls>Your browser is shit</video>', image));
 		expandedImage.css({
