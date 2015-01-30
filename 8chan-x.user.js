@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Pashe's 8chanX v2
-// @version     2.0.0.1422603800
+// @version     2.0.0.1422604050
 // @description Small userscript to improve 8chan
 // @icon        https://cdn.rawgit.com/Pashe/8chanX/2-0/images/logo.svg
 // @namespace   https://github.com/Pashe/8chanX/tree/2-0
@@ -327,12 +327,16 @@ function updateMenuStats() { //Pashe, WTFPL
 ////////////////
 function imageHoverStart(e) { //Pashe, WTFPL
 	if ($("#chx_hoverImage").length) {return;}
-	
 	var $this = $(this);
-	var fullUrl = $this.parent().attr("href").match("src")?$this.parent().attr("href"):$this.attr("src").replace("thumb", "src");
-	var fileExtension = getFileExtension(fullUrl);
 	
-	if (isVideo(fileExtension)) {return;}
+	var fullUrl;
+	if ($this.parent().attr("href").match("src")) {
+		fullUrl = $this.parent().attr("href")
+	} else {
+		fullUrl = $this.attr("src").replace("thumb", "src"); //Temporary "fix" for catalog images
+	}
+	
+	if (isVideo(getFileExtension(fullUrl))) {return;}
 	
 	var hoverImage = $(sprintf('<img id="chx_hoverImage" src="%s" />', fullUrl));
 	hoverImage.css({
