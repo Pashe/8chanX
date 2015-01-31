@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Pashe's 8chanX v2
-// @version     2.0.0.1422680450
+// @version     2.0.0.1422681010
 // @description Small userscript to improve 8chan
 // @icon        https://cdn.rawgit.com/Pashe/8chanX/2-0/images/logo.svg
 // @namespace   https://github.com/Pashe/8chanX/tree/2-0
@@ -328,29 +328,35 @@ function updateMenuStats() { //Pashe, WTFPL
 //IMAGE HOVER
 ////////////////
 function imageHoverStart(e) { //Pashe, anonish, WTFPL
-	var $imgHovered = $("#chx_hoverImage");
+	var hoverImage = $("#chx_hoverImage");
 	
-	if ($imgHovered.length) {
+	if (hoverImage.length) {
 		if (getSetting("imageHoverFollowCursor")) {
 			var scrollTop = $(window).scrollTop();
 			var imgY = e.pageY;
 			var imgTop = imgY;
 			var windowWidth = $(window).width();
-			var imgWidth = $imgHovered.width() + e.pageX;
+			var imgWidth = hoverImage.width() + e.pageX;
 			
 			if (imgY < scrollTop + 15) {
 				imgTop = scrollTop;
-			} else if (imgY > scrollTop + $(window).height() - $imgHovered.height() - 15) {
-				imgTop = scrollTop + $(window).height() - $imgHovered.height() - 15;
+			} else if (imgY > scrollTop + $(window).height() - hoverImage.height() - 15) {
+				imgTop = scrollTop + $(window).height() - hoverImage.height() - 15;
 			}
 			
 			if (imgWidth > windowWidth) {
-				$imgHovered.css('left', (e.pageX + (windowWidth - imgWidth))).css('top', imgTop);
+				hoverImage.css({
+					'left': (e.pageX + (windowWidth - imgWidth)),
+					'top' : imgTop,
+				});
 			} else {
-				$imgHovered.css('left', e.pageX).css('top', imgTop);
+				hoverImage.css({
+					'left': e.pageX,
+					'top' : imgTop,
+				});
 			}
 			
-			$imgHovered.appendTo($("body"));
+			hoverImage.appendTo($("body"));
 		}
 		
 		return;
@@ -376,7 +382,7 @@ function imageHoverStart(e) { //Pashe, anonish, WTFPL
 	
 	if (isVideo(getFileExtension(fullUrl))) {return;}
 
-	var hoverImage = $(sprintf('<img id="chx_hoverImage" src="%s" />', fullUrl));
+	hoverImage = $(sprintf('<img id="chx_hoverImage" src="%s" />', fullUrl));
 	if (getSetting("imageHoverFollowCursor")) {
 		hoverImage.css({
 			"position"      : "absolute",
