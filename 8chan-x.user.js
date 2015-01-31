@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Pashe's 8chanX v2 [pure]
-// @version     2.0.0.1422668550
+// @version     2.0.0.1422681210
 // @description Small userscript to improve 8chan
 // @icon        https://cdn.rawgit.com/Pashe/8chanX/2-0_pure/images/logo.svg
 // @namespace   https://github.com/Pashe/8chanX/tree/2-0
@@ -27,6 +27,7 @@
 ** Zaphkiel
 ** varemenos
 ** 7185
+** anonish
 ** Pashe
 */
 
@@ -97,7 +98,7 @@ if (window.Options) {
 
 settingsMenu.innerHTML = sprintf('<span style="font-size:8pt;">8chanX %s pure</span>', GM_info.script.version)
 + '<div style="overflow:auto;height:100%;">' //General
-+ '<label><input type="checkbox" name="imageHover">' + 'Image hover' + '</label><br>'
++ '<label><input type="checkbox" name="imageHover">' + 'Image hover' + '</label><label><input type="checkbox" name="imageHoverFollowCursor">' + 'follow cursor' + '</label><br>'
 + '<label><input type="checkbox" name="catalogImageHover">' + 'Image hover on catalog' + '</label><br>'
 + '<label><input type="checkbox" name="catalogLinks">' + 'Force catalog links' + '</label><br>'
 + '<label><input type="checkbox" name="revealImageSpoilers">' + 'Reveal image spoilers' + '</label><br>'
@@ -140,6 +141,7 @@ var defaultSettings = {
 	'catalogLinks': true,
 	'revealImageSpoilers': false,
 	'imageHover': true,
+	'imageHoverFollowCursor': true,
 	'catalogImageHover': true,
 	'reverseImageSearch': true,
 	'parseTimestampImage': true,
@@ -318,30 +320,39 @@ function updateMenuStats() { //Pashe, WTFPL
 ////////////////
 //IMAGE HOVER
 ////////////////
-function imageHoverStart(e) { //Pashe, WTFPL
-	var $imgHovered=$("#chx_hoverImage");
+function imageHoverStart(e) { //Pashe, anonish, WTFPL
+	var hoverImage = $("#chx_hoverImage");
 	
-	if ($imgHovered.length) {
-	    var scrollTop = $(window).scrollTop();
-	    var imgY = e.pageY;
-	    var imgTop = imgY;
-	    var windowWidth = $(window).width();
-	    var imgWidth = $imgHovered.width() + e.pageX;
-	    
-	    if (imgY < scrollTop + 15) {
-		imgTop = scrollTop;
-	    } else if (imgY > scrollTop + $(window).height() - $imgHovered.height() - 15) {
-		imgTop = scrollTop + $(window).height() - $imgHovered.height() - 15;
-	    }
-	    
-	    if (imgWidth > windowWidth) {
-		$imgHovered.css('left', (e.pageX + (windowWidth - imgWidth))).css('top', imgTop);
-	    } else {
-		$imgHovered.css('left', e.pageX).css('top', imgTop);
-	    }
-	    
-	    $imgHovered.appendTo($("body"));
-	    return;
+	if (hoverImage.length) {
+		if (getSetting("imageHoverFollowCursor")) {
+			var scrollTop = $(window).scrollTop();
+			var imgY = e.pageY;
+			var imgTop = imgY;
+			var windowWidth = $(window).width();
+			var imgWidth = hoverImage.width() + e.pageX;
+			
+			if (imgY < scrollTop + 15) {
+				imgTop = scrollTop;
+			} else if (imgY > scrollTop + $(window).height() - hoverImage.height() - 15) {
+				imgTop = scrollTop + $(window).height() - hoverImage.height() - 15;
+			}
+			
+			if (imgWidth > windowWidth) {
+				hoverImage.css({
+					'left': (e.pageX + (windowWidth - imgWidth)),
+					'top' : imgTop,
+				});
+			} else {
+				hoverImage.css({
+					'left': e.pageX,
+					'top' : imgTop,
+				});
+			}
+			
+			hoverImage.appendTo($("body"));
+		}
+		
+		return;
 	}
 	
 	var $this = $(this);
@@ -364,16 +375,28 @@ function imageHoverStart(e) { //Pashe, WTFPL
 	
 	if (isVideo(getFileExtension(fullUrl))) {return;}
 
-	var hoverImage = $(sprintf('<img id="chx_hoverImage" src="%s" />', fullUrl));
-	hoverImage.css({
-		"position"      : "absolute",
-		"z-index"       : 101,
-		"pointer-events": "none",
-		"max-width"     : $(window).width(),
-		"max-height"    : $(window).height(),
-		'left'		: e.pageX,
-		'top'		: imgTop
-	});
+	hoverImage = $(sprintf('<img id="chx_hoverImage" src="%s" />', fullUrl));
+	if (getSetting("imageHoverFollowCursor")) {
+		hoverImage.css({
+			"position"      : "absolute",
+			"z-index"       : 101,
+			"pointer-events": "none",
+			"max-width"     : $(window).width(),
+			"max-height"    : $(window).height(),
+			'left'          : e.pageX,
+			'top'           : imgTop,
+		});
+	} else {
+		hoverImage.css({
+			"position"      : "fixed",
+			"top"           : 0,
+			"right"         : 0,
+			"z-index"       : 101,
+			"pointer-events": "none",
+			"max-width"     : "100%",
+			"max-height"    : "100%",
+		});
+	}
 	hoverImage.appendTo($("body"));
 	$this.css("cursor", "none");
 }
