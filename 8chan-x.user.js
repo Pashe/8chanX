@@ -326,9 +326,16 @@ function updateMenuStats() { //Pashe, WTFPL
 //IMAGE HOVER
 ////////////////
 function imageHoverStart(e) { //Pashe, WTFPL
-	if ($("#chx_hoverImage").length) {return;}
-	var $this = $(this);
+	var $imgHovered=$("#chx_hoverImage");
 	
+	if ($imgHovered.length) {
+	  $imgHovered.css('left',e.clientX);
+	  $imgHovered.css('top',e.pageY);
+	  $imgHovered.appendTo($("body"));
+	  return;
+	}
+	var $this = $(this);
+
 	var fullUrl;
 	if ($this.parent().attr("href").match("src")) {
 		fullUrl = $this.parent().attr("href");
@@ -346,18 +353,17 @@ function imageHoverStart(e) { //Pashe, WTFPL
 	}
 	
 	if (isVideo(getFileExtension(fullUrl))) {return;}
-	
+
 	var hoverImage = $(sprintf('<img id="chx_hoverImage" src="%s" />', fullUrl));
 	hoverImage.css({
-		"position"      : "fixed",
-		"top"           : 0,
-		"right"         : 0,
+		"position"      : "absolute",
 		"z-index"       : 101,
 		"pointer-events": "none",
 		"max-width"     : "100%",
 		"max-height"    : "100%",
 	});
-	
+	hoverImage.css('left',e.clientX);
+	hoverImage.css('top',e.pageY);
 	hoverImage.appendTo($("body"));
 	$this.css("cursor", "none");
 }
