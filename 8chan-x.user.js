@@ -319,9 +319,33 @@ function updateMenuStats() { //Pashe, WTFPL
 //IMAGE HOVER
 ////////////////
 function imageHoverStart(e) { //Pashe, WTFPL
-	if ($("#chx_hoverImage").length) {return;}
-	var $this = $(this);
+	var $imgHovered=$("#chx_hoverImage");
 	
+	if ($imgHovered.length) {
+	    var scrollTop = $(window).scrollTop();
+	    var imgY = e.pageY;
+	    var imgTop = imgY;
+	    var windowWidth = $(window).width();
+	    var imgWidth = $imgHovered.width() + e.pageX;
+	    
+	    if (imgY < scrollTop + 15) {
+		imgTop = scrollTop;
+	    } else if (imgY > scrollTop + $(window).height() - $imgHovered.height() - 15) {
+		imgTop = scrollTop + $(window).height() - $imgHovered.height() - 15;
+	    }
+	    
+	    if (imgWidth > windowWidth) {
+		$imgHovered.css('left', (e.pageX + (windowWidth - imgWidth))).css('top', imgTop);
+	    } else {
+		$imgHovered.css('left', e.pageX).css('top', imgTop);
+	    }
+	    
+	    $imgHovered.appendTo($("body"));
+	    return;
+	}
+	
+	var $this = $(this);
+
 	var fullUrl;
 	if ($this.parent().attr("href").match("src")) {
 		fullUrl = $this.parent().attr("href");
@@ -339,18 +363,17 @@ function imageHoverStart(e) { //Pashe, WTFPL
 	}
 	
 	if (isVideo(getFileExtension(fullUrl))) {return;}
-	
+
 	var hoverImage = $(sprintf('<img id="chx_hoverImage" src="%s" />', fullUrl));
 	hoverImage.css({
-		"position"      : "fixed",
-		"top"           : 0,
-		"right"         : 0,
+		"position"      : "absolute",
 		"z-index"       : 101,
 		"pointer-events": "none",
-		"max-width"     : "100%",
-		"max-height"    : "100%",
+		"max-width"     : $(window).width(),
+		"max-height"    : $(window).height(),
+		'left'		: e.pageX,
+		'top'		: imgTop
 	});
-	
 	hoverImage.appendTo($("body"));
 	$this.css("cursor", "none");
 }
