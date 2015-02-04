@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Pashe's 8chanX v2
-// @version     2.0.0.1422681010
+// @version     2.0.0.1423023650
 // @description Small userscript to improve 8chan
 // @icon        https://cdn.rawgit.com/Pashe/8chanX/2-0/images/logo.svg
 // @namespace   https://github.com/Pashe/8chanX/tree/2-0
@@ -113,7 +113,7 @@ settingsMenu.innerHTML = sprintf('<span style="font-size:8pt;">8chanX %s</span>'
 + '<label><input type="checkbox" name="parseTimestampImage">' + 'Guess original download date of imageboard-style filenames' + '</label><br>'
 + '<label><input type="checkbox" name="precisePages">' + 'Increase page indicator precision' + '</label><br>'
 + '<label>' + 'Mascot URL(s) (pipe separated):<br />' + '<input type="text" name="mascotUrl" style="width: 30em"></label><br>'
-+ '<label>' + '<a href="http://strftime.net/">Date format</a> (relative dates when empty):<br />' + '<input type="text" name="dateFormat" style="width:30em"></label><br>'
++ '<label>' + '<a href="http://strftime.net/">Date format</a>:<br />' + '<input type="text" name="dateFormat" style="width:30em"></label><br>'
 + '<label><input type="checkbox" name="localTime">' + 'Use local time' + '</label><br>'
 + '<hr>' //Filters
 + '<h3>Filters</h3>'
@@ -806,10 +806,6 @@ function initSettings() {
 	}
 }
 
-function initRelativeTime() {
-	if (!getSetting("dateFormat")) {$("time").timeago();}
-}
-
 function initMenu() { //Pashe, WTFPL
 	var menu = unsafeWindow.document.getElementsByClassName("boardlist")[0];
 	var $menu = $(menu);
@@ -1198,7 +1194,6 @@ $(unsafeWindow.document).ready(function() { try {
 	initCatalog();
 	initFilter();
 	initFormattedTime();
-	initRelativeTime();
 	initMascot();
 	initImageHover();
 	initRevealImageSpoilers();
@@ -1216,10 +1211,6 @@ $(unsafeWindow.document).ready(function() { try {
 ////////////////
 //EVENT HANDLER FUNCTIONS
 ////////////////
-function onNewPostRelativeTime(post) {
-	if (!getSetting("dateFormat")) {$(post).find("time").timeago();}
-}
-
 function onNewPostImageHover(post) { //Pashe, influenced by tux, et al, WTFPL
 	if (!getSetting("imageHover")) {return;}
 	
@@ -1264,7 +1255,6 @@ function intervalMenu() {
 ////////////////
 if (unsafeWindow.jQuery) {
 	unsafeWindow.$(document).on('new_post', function (e, post) { try {
-		onNewPostRelativeTime(post);
 		onNewPostImageHover(post);
 		onNewPostRISLinks(post);
 		onNewPostNotifications(post);
