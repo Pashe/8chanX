@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Pashe's 8chanX v2 [pure]
-// @version     2.0.0.1423024340
+// @version     2.0.0.1423036180
 // @description Small userscript to improve 8chan
 // @icon        https://cdn.rawgit.com/Pashe/8chanX/2-0_pure/images/logo.svg
 // @namespace   https://github.com/Pashe/8chanX/tree/2-0
@@ -356,12 +356,12 @@ function imageHoverStart(e) { //Pashe, anonish, WTFPL
 	}
 	
 	var $this = $(this);
-
+	
 	var fullUrl;
 	if ($this.parent().attr("href").match("src")) {
 		fullUrl = $this.parent().attr("href");
 	} else if (isOnCatalog()) {
-		fullUrl = $this.attr("src").replace("thumb", "src");
+		fullUrl = $this.attr("src");
 		$.ajax(($this.parent().attr("href").replace(/\.html$/, ".json")), {
 			success: function (result) {
 				fullUrl = result.posts[0].tim + result.posts[0].ext;
@@ -374,7 +374,7 @@ function imageHoverStart(e) { //Pashe, anonish, WTFPL
 	}
 	
 	if (isVideo(getFileExtension(fullUrl))) {return;}
-
+	
 	hoverImage = $(sprintf('<img id="chx_hoverImage" src="%s" />', fullUrl));
 	if (getSetting("imageHoverFollowCursor")) {
 		hoverImage.css({
@@ -398,7 +398,7 @@ function imageHoverStart(e) { //Pashe, anonish, WTFPL
 		});
 	}
 	hoverImage.appendTo($("body"));
-	$this.css("cursor", "none");
+	if (isOnThread()) {$this.css("cursor", "none");}
 }
 
 function imageHoverEnd() { //Pashe, WTFPL
