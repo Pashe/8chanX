@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Pashe's 8chanX v2 [pure]
-// @version     2.0.0.1423036180
+// @version     2.0.0.1423102150
 // @description Small userscript to improve 8chan
 // @icon        https://cdn.rawgit.com/Pashe/8chanX/2-0_pure/images/logo.svg
 // @namespace   https://github.com/Pashe/8chanX/tree/2-0
@@ -803,7 +803,37 @@ function initMenu() { //Pashe, WTFPL
 	var menu = window.document.getElementsByClassName("boardlist")[0];
 	var $menu = $(menu);
 	
-	$("[data-description='1'], [data-description='2']").hide();
+	// [data-description="0"] - home, boards
+	// [data-description="1"] - pinned boards (/b/, /meta/, /int/)
+	// [data-description="2"] - twitter
+	// [data-description="3"] - top boards
+	
+	$('[data-description="1"], [data-description="2"]').hide();
+	$(".boardlist.bottom").find('[data-description="0"], [data-description="2"], .favorite-boards').hide(); //Hide stuff that's at the top already
+	$(".boardlist.bottom").find('[data-description="1"]').show(); //Show pinned boards at the bottom
+	$(".boardlist.bottom").find('.favorite-boards').next().hide(); //Hide the watchlist link at the bottom
+	
+	if ((!$(".boardlist.bottom").find('[data-description="3"]').length) && ($(".boardlist.bottom").find('[data-description="1"]').length)) {
+		var topBoardsLinks = [];
+
+		$.ajax("/boards-top20.json", {
+			async: true,
+			cache: true,
+			success: function(response) {
+				for (var x in response) {
+					topBoardsLinks.push(sprintf(
+						'<a href="/%s/" title="%s &bull; %s &bull; %s">%s</a>',
+						response[x].uri,
+						response[x].title,
+						response[x].subtitle,
+						response[x].tags.join("/"),
+						response[x].uri
+					));
+				}
+				$(".boardlist.bottom").find('[data-description="1"]').after(sprintf(' <span class="chx_topBoards">[ %s ]</span>', topBoardsLinks.slice(0,15).join(" / ")));
+			}
+		});
+	}
 	
 	if (getSetting('catalogLinks') && !isOnCatalog()) {
 		$('.favorite-boards a').each(function () {
