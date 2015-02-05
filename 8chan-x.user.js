@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Pashe's 8chanX v2
-// @version     2.0.0.1423034990
+// @version     2.0.0.1423101770
 // @description Small userscript to improve 8chan
 // @icon        https://cdn.rawgit.com/Pashe/8chanX/2-0/images/logo.svg
 // @namespace   https://github.com/Pashe/8chanX/tree/2-0
@@ -810,7 +810,15 @@ function initMenu() { //Pashe, WTFPL
 	var menu = unsafeWindow.document.getElementsByClassName("boardlist")[0];
 	var $menu = $(menu);
 	
-	$("[data-description='1'], [data-description='2']").hide();
+	// [data-description="0"] - home, boards
+	// [data-description="1"] - pinned boards (/b/, /meta/, /int/)
+	// [data-description="2"] - twitter
+	// [data-description="3"] - top boards
+	
+	$('[data-description="1"], [data-description="2"]').hide();
+	$(".boardlist.bottom").find('[data-description="0"], [data-description="2"], .favorite-boards').hide(); //Hide stuff that's at the top already
+	$(".boardlist.bottom").find('[data-description="1"]').show(); //Show pinned boards at the bottom
+	$(".boardlist.bottom").find('.favorite-boards').next().hide(); //Hide the watchlist link at the bottom
 	
 	if (getSetting('catalogLinks') && !isOnCatalog()) {
 		$('.favorite-boards a').each(function () {
