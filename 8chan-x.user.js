@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Pashe's 8chanX v2
-// @version     2.0.0.1423336140
+// @version     2.0.0.1423370750
 // @description Small userscript to improve 8chan
 // @icon        https://cdn.rawgit.com/Pashe/8chanX/2-0/images/logo.svg
 // @namespace   https://github.com/Pashe/8chanX/tree/2-0
@@ -107,6 +107,7 @@ settingsMenu.innerHTML = sprintf('<span style="font-size:8pt;">8chanX %s</span>'
 + '<label><input type="checkbox" name="catalogImageHover">' + 'Image hover on catalog' + '</label><br>'
 + '<label><input type="checkbox" name="catalogLinks">' + 'Force catalog links' + '</label><br>'
 + '<label><input type="checkbox" name="revealImageSpoilers">' + 'Reveal image spoilers' + '</label><br>'
++ '<label><input type="checkbox" name="hideNoFilePosts">' + 'Hide posts without files' + '</label><br>'
 + '<label><input type="checkbox" name="keyboardShortcutsEnabled">' + 'Enable keyboard shortcuts' + '</label><br>'
 + '<hr>' //How information is displayed
 + '<label><input type="checkbox" name="reverseImageSearch">' + 'Add reverse image search links' + '</label><br>'
@@ -160,6 +161,7 @@ var defaultSettings = {
 	'filterDefaultRecursive': true,
 	'filterDefaultStubs': false,
 	'filterDefault': false,
+	'hideNoFilePosts': false,
 };
 
 function getSetting(key) {
@@ -750,6 +752,11 @@ function runFilter() { //Pashe, WTFPL
 	}
 	
 	if (isMod) {return;}
+	
+	if (getSetting("hideNoFilePosts") && (!$this.find("div.file").length)) {
+		hidePost(thisPost, false, false);
+		return;
+	}
 	
 	var filterTypes = {
 		trip: "Trips",
