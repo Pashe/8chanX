@@ -219,6 +219,26 @@ function setupControl(control) {
 ////////////////
 //GENERAL FUNCTIONS
 ////////////////
+function contentEval(source) {  // GFDL 1.2 http://wiki.greasespot.net/Content_Script_Injection
+	// Check for function input.
+	if ('function' == typeof source) {
+		// Execute this function with no arguments, by adding parentheses.
+		// One set around the function, required for valid syntax, and a
+		// second empty set calls the surrounded function.
+		source = '(' + source + ')();'
+	}
+
+	// Create a script node holding this  source code.
+	var script = document.createElement('script');
+	script.setAttribute("type", "application/javascript");
+	script.textContent = source;
+
+	// Insert the script node into the page, so it will run, and immediately
+	// remove it to clean up.
+	document.body.appendChild(script);
+	document.body.removeChild(script);
+}
+
 function isOnCatalog() {
 	return unsafeWindow.active_page === "catalog";
 }
@@ -1292,15 +1312,23 @@ function intervalMenu() {
 ////////////////
 //EVENT HANDLERS
 ////////////////
-if (unsafeWindow.jQuery) {
-	unsafeWindow.$(document).on('new_post', function (e, post) { try {
+window.addEventListener('message', function(e) {
+	try {
+		if (!("8chanXType" in e.data)) return;
+		if (e.data["8chanXType"] !== "newpost") return;
+		post = document.getElementById(e.data.postid);
 		onNewPostImageHover(post);
 		onNewPostRISLinks(post);
 		onNewPostNotifications(post);
 		onNewPostFormattedTime();
 		onNewPostFilter(post);
-	} catch(e) {chxErrorHandler(e, "newpost");}});
+	} catch(e) {chxErrorHandler(e, "newpost");}
+});
+contentEval(function() {
+	$(document).on('new_post', function(e, post) {
+		window.postMessage({'8chanXType': 'newpost', 'postid': post.id}, "*");
+	});
+});
 
-	setInterval(intervalMenu, (1.5*60*1000));
-}
+setInterval(intervalMenu, (1.5*60*1000));
 } catch(e) {chxErrorHandler(e, "global");}
