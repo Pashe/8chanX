@@ -1314,6 +1314,7 @@ function intervalMenu() {
 ////////////////
 window.addEventListener('message', function(e) {
 	try {
+		if (typeof(e.data) != 'object') return;
 		if (!("8chanXType" in e.data)) return;
 		if (e.data["8chanXType"] !== "newpost") return;
 		post = document.getElementById(e.data.postid);
