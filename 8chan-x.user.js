@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Pashe's 8chanX v2 [pure]
-// @version     2.0.0.1423370840
+// @version     2.0.0.1423722810
 // @description Small userscript to improve 8chan
 // @icon        https://cdn.rawgit.com/Pashe/8chanX/2-0_pure/images/logo.svg
 // @namespace   https://github.com/Pashe/8chanX/tree/2-0
@@ -367,8 +367,9 @@ function imageHoverStart(e) { //Pashe, anonish, WTFPL
 		fullUrl = $this.attr("src");
 		$.ajax(($this.parent().attr("href").replace(/\.html$/, ".json")), {
 			success: function (result) {
+				$this.css("cursor", "unset");
 				fullUrl = result.posts[0].tim + result.posts[0].ext;
-				if (isVideo(getFileExtension(fullUrl))) {return;}
+				if (!isImage(getFileExtension(fullUrl))) {return;}
 				$("#chx_hoverImage").attr("src", sprintf("/%s/src/%s", thisBoard, fullUrl));
 				$("#chx_hoverImage").on("load", function() {$this.css("cursor", "none")});
 			},
@@ -443,27 +444,33 @@ function goToCatalog() { //Pashe, WTFPL
 ////////////////
 //REVERSE IMAGE SEARCH
 ////////////////
-var RISProviders = [
-	{
+var RISProviders = {
+	"google": {
 		"urlFormat" : "https://www.google.com/searchbyimage?image_url=%s",
 		"name"      : "Google"
 	},
-	{
+	"iqdb": {
 		"urlFormat" : "http://iqdb.org/?url=%s",
 		"name"      : "iqdb"
 	},
-	{
+	"saucenao": {
 		"urlFormat" : "https://saucenao.com/search.php?db=999&url=%s",
 		"name"      : "SauceNAO"
 	},
-	{
+	"tineye": {
 		"urlFormat" : "https://www.tineye.com/search/?url=%s",
 		"name"      : "TinEye"
-	}
-];
+	},
+};
+
+var RISProvidersBoards = {
+	"##ALL": ["google", "iqdb", "saucenao", "tineye"],
+};
 
 function addRISLinks(image) { //Pashe, 7185, WTFPL
-	for (var providerIdx in RISProviders) {
+	var thisBoardRISProviders = (RISProvidersBoards["##ALL"].concat(RISProvidersBoards[thisBoard]||[]));
+	for (var providerIdx in thisBoardRISProviders) {
+		providerIdx = thisBoardRISProviders[providerIdx];
 		if (!RISProviders.hasOwnProperty(providerIdx)) {continue;}
 		var provider = RISProviders[providerIdx];
 		
@@ -481,7 +488,7 @@ function addRISLinks(image) { //Pashe, 7185, WTFPL
 			RISLink.attr("target", "_blank");
 			RISLink.css("font-size", "8pt");
 			RISLink.css("margin-left", "2pt");
-			RISLink.text("[" + provider.name[0].toUpperCase() + "]");
+			RISLink.text(sprintf("[%s]", provider.shortName||provider.name[0].toUpperCase()));
 			
 			RISLink.appendTo(image.parentNode.parentNode.getElementsByClassName("fileinfo")[0]);
 		} catch (e) {}
