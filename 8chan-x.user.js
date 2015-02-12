@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Pashe's 8chanX v2
-// @version     2.0.0.1423721460
+// @version     2.0.0.1423722170
 // @description Small userscript to improve 8chan
 // @icon        https://cdn.rawgit.com/Pashe/8chanX/2-0/images/logo.svg
 // @namespace   https://github.com/Pashe/8chanX/tree/2-0
@@ -471,27 +471,33 @@ function goToCatalog() { //Pashe, WTFPL
 ////////////////
 //REVERSE IMAGE SEARCH
 ////////////////
-var RISProviders = [
-	{
+var RISProviders = {
+	"google": {
 		"urlFormat" : "https://www.google.com/searchbyimage?image_url=%s",
 		"name"      : "Google"
 	},
-	{
+	"iqdb": {
 		"urlFormat" : "http://iqdb.org/?url=%s",
 		"name"      : "iqdb"
 	},
-	{
+	"saucenao": {
 		"urlFormat" : "https://saucenao.com/search.php?db=999&url=%s",
 		"name"      : "SauceNAO"
 	},
-	{
+	"tineye": {
 		"urlFormat" : "https://www.tineye.com/search/?url=%s",
 		"name"      : "TinEye"
-	}
-];
+	},
+};
+
+var RISProvidersBoards = {
+	"##ALL": ["google", "iqdb", "saucenao", "tineye"],
+};
 
 function addRISLinks(image) { //Pashe, 7185, WTFPL
-	for (var providerIdx in RISProviders) {
+	var thisBoardRISProviders = (RISProvidersBoards["##ALL"].concat(RISProvidersBoards[thisBoard]||[]));
+	for (var providerIdx in thisBoardRISProviders) {
+		providerIdx = thisBoardRISProviders[providerIdx];
 		if (!RISProviders.hasOwnProperty(providerIdx)) {continue;}
 		var provider = RISProviders[providerIdx];
 		
