@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Pashe's 8chanX v2
-// @version     2.0.0.1423722170
+// @version     2.0.0.1423722490
 // @description Small userscript to improve 8chan
 // @icon        https://cdn.rawgit.com/Pashe/8chanX/2-0/images/logo.svg
 // @namespace   https://github.com/Pashe/8chanX/tree/2-0
@@ -515,7 +515,7 @@ function addRISLinks(image) { //Pashe, 7185, WTFPL
 			RISLink.attr("target", "_blank");
 			RISLink.css("font-size", "8pt");
 			RISLink.css("margin-left", "2pt");
-			RISLink.text("[" + provider.name[0].toUpperCase() + "]");
+			RISLink.text(sprintf("[%s]", provider.shortName||provider.name[0].toUpperCase()));
 			
 			RISLink.appendTo(image.parentNode.parentNode.getElementsByClassName("fileinfo")[0]);
 		} catch (e) {}
