@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Pashe's 8chanX v2
-// @version     2.0.0.1423722490
+// @version     2.0.0.1423977660
 // @description Small userscript to improve 8chan
 // @icon        https://cdn.rawgit.com/Pashe/8chanX/2-0/images/logo.svg
 // @namespace   https://github.com/Pashe/8chanX/tree/2-0
@@ -488,10 +488,16 @@ var RISProviders = {
 		"urlFormat" : "https://www.tineye.com/search/?url=%s",
 		"name"      : "TinEye"
 	},
+	"harrylu": {
+		"urlFormat" : "https://iqdb.harry.lu/?url=%s",
+		"name"      : "Harry.lu (e621)",
+		"shortName" : "E"
+	}
 };
 
 var RISProvidersBoards = {
 	"##ALL": ["google", "iqdb", "saucenao", "tineye"],
+	"furry": ["harrylu"],
 };
 
 function addRISLinks(image) { //Pashe, 7185, WTFPL
