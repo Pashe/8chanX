@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Pashe's 8chanX v2
-// @version     2.0.0.1423977660
+// @version     2.0.0.1424725210
 // @description Small userscript to improve 8chan
 // @icon        https://cdn.rawgit.com/Pashe/8chanX/2-0/images/logo.svg
 // @namespace   https://github.com/Pashe/8chanX/tree/2-0
@@ -492,11 +492,15 @@ var RISProviders = {
 		"urlFormat" : "https://iqdb.harry.lu/?url=%s",
 		"name"      : "Harry.lu (e621)",
 		"shortName" : "E"
-	}
+	},
+	"karmadecay": {
+		"urlFormat" : "http://karmadecay.com/%s",
+		"name"      : "Karma Decay"
+	},
 };
 
 var RISProvidersBoards = {
-	"##ALL": ["google", "iqdb", "saucenao", "tineye"],
+	"##ALL": ["google", "iqdb", "saucenao", "tineye", "karmadecay"],
 	"furry": ["harrylu"],
 };
 
