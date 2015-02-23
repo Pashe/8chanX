@@ -5,7 +5,6 @@ This branch removes a few features in order to improve compatibility. You should
 ***
 
 This userscript adds various features and options like:
- * Image hover
  * Gallery
  * Filters
  * Reverse image search

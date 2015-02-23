@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Pashe's 8chanX v2 [pure]
-// @version     2.0.0.1423977740
+// @version     2.0.0.1424726000
 // @description Small userscript to improve 8chan
 // @icon        https://cdn.rawgit.com/Pashe/8chanX/2-0_pure/images/logo.svg
 // @namespace   https://github.com/Pashe/8chanX/tree/2-0
@@ -98,8 +98,6 @@ if (window.Options) {
 
 settingsMenu.innerHTML = sprintf('<span style="font-size:8pt;">8chanX %s pure</span>', GM_info.script.version)
 + '<div style="overflow:auto;height:100%;">' //General
-+ '<label><input type="checkbox" name="imageHover">' + 'Image hover' + '</label><label><input type="checkbox" name="imageHoverFollowCursor">' + 'follow cursor' + '</label><br>'
-+ '<label><input type="checkbox" name="catalogImageHover">' + 'Image hover on catalog' + '</label><br>'
 + '<label><input type="checkbox" name="catalogLinks">' + 'Force catalog links' + '</label><br>'
 + '<label><input type="checkbox" name="revealImageSpoilers">' + 'Reveal image spoilers' + '</label><br>'
 + '<label><input type="checkbox" name="hideNoFilePosts">' + 'Hide posts without files' + '</label><br>'
@@ -141,9 +139,6 @@ var defaultSettings = {
 	'precisePages': true,
 	'catalogLinks': true,
 	'revealImageSpoilers': false,
-	'imageHover': true,
-	'imageHoverFollowCursor': true,
-	'catalogImageHover': true,
 	'reverseImageSearch': true,
 	'parseTimestampImage': true,
 	'localTime': true,
@@ -320,97 +315,6 @@ function updateMenuStats() { //Pashe, WTFPL
 }
 
 ////////////////
-//IMAGE HOVER
-////////////////
-function imageHoverStart(e) { //Pashe, anonish, WTFPL
-	var hoverImage = $("#chx_hoverImage");
-	
-	if (hoverImage.length) {
-		if (getSetting("imageHoverFollowCursor")) {
-			var scrollTop = $(window).scrollTop();
-			var imgY = e.pageY;
-			var imgTop = imgY;
-			var windowWidth = $(window).width();
-			var imgWidth = hoverImage.width() + e.pageX;
-			
-			if (imgY < scrollTop + 15) {
-				imgTop = scrollTop;
-			} else if (imgY > scrollTop + $(window).height() - hoverImage.height() - 15) {
-				imgTop = scrollTop + $(window).height() - hoverImage.height() - 15;
-			}
-			
-			if (imgWidth > windowWidth) {
-				hoverImage.css({
-					'left': (e.pageX + (windowWidth - imgWidth)),
-					'top' : imgTop,
-				});
-			} else {
-				hoverImage.css({
-					'left': e.pageX,
-					'top' : imgTop,
-				});
-			}
-			
-			hoverImage.appendTo($("body"));
-		}
-		
-		return;
-	}
-	
-	var $this = $(this);
-	
-	var fullUrl;
-	if ($this.parent().attr("href").match("src")) {
-		fullUrl = $this.parent().attr("href");
-	} else if (isOnCatalog()) {
-		$this.css("cursor", "progress");
-		fullUrl = $this.attr("src");
-		$.ajax(($this.parent().attr("href").replace(/\.html$/, ".json")), {
-			success: function (result) {
-				$this.css("cursor", "unset");
-				fullUrl = result.posts[0].tim + result.posts[0].ext;
-				if (!isImage(getFileExtension(fullUrl))) {return;}
-				$("#chx_hoverImage").attr("src", sprintf("/%s/src/%s", thisBoard, fullUrl));
-				$("#chx_hoverImage").on("load", function() {$this.css("cursor", "none")});
-			},
-			async: true,
-			cache: true
-		});
-	}
-	
-	if (isVideo(getFileExtension(fullUrl))) {return;}
-	
-	hoverImage = $(sprintf('<img id="chx_hoverImage" src="%s" />', fullUrl));
-	if (getSetting("imageHoverFollowCursor")) {
-		hoverImage.css({
-			"position"      : "absolute",
-			"z-index"       : 101,
-			"pointer-events": "none",
-			"max-width"     : $(window).width(),
-			"max-height"    : $(window).height(),
-			'left'          : e.pageX,
-			'top'           : imgTop,
-		});
-	} else {
-		hoverImage.css({
-			"position"      : "fixed",
-			"top"           : 0,
-			"right"         : 0,
-			"z-index"       : 101,
-			"pointer-events": "none",
-			"max-width"     : "100%",
-			"max-height"    : "100%",
-		});
-	}
-	hoverImage.appendTo($("body"));
-	if (isOnThread()) {$this.css("cursor", "none");}
-}
-
-function imageHoverEnd() { //Pashe, WTFPL
-	$("#chx_hoverImage").remove();
-}
-
-////////////////
 //KEYBOARD SHORTCUTS
 ////////////////
 function reloadPage() { //Pashe, WTFPL
@@ -465,11 +369,15 @@ var RISProviders = {
 		"urlFormat" : "https://iqdb.harry.lu/?url=%s",
 		"name"      : "Harry.lu (e621)",
 		"shortName" : "E"
-	}
+	},
+	"karmadecay": {
+		"urlFormat" : "http://karmadecay.com/%s",
+		"name"      : "Karma Decay"
+	},
 };
 
 var RISProvidersBoards = {
-	"##ALL": ["google", "iqdb", "saucenao", "tineye"],
+	"##ALL": ["google", "iqdb", "saucenao", "tineye", "karmadecay"],
 	"furry": ["harrylu"],
 };
 
@@ -914,28 +822,6 @@ function initRevealImageSpoilers() { //Tux et al, MIT
 	});
 }
 
-function initImageHover() { //Pashe, influenced by tux, et al, WTFPL
-	if (!getSetting("imageHover") && !getSetting("catalogImageHover")) {return;}
-	
-	var selectors = [];
-	
-	if (getSetting("imageHover")) {selectors.push("img.post-image", "canvas.post-image");}
-	if (getSetting("catalogImageHover") && isOnCatalog()) {
-		selectors.push(".thread-image");
-		$(".theme-catalog div.thread").css("position", "inherit");
-	}
-	
-	$(selectors.join(", ")).each(function () {
-		if ($(this).parent().data("expanded")) {return;}
-		
-		var $this = $(this);
-		
-		$this.on("mousemove", imageHoverStart);
-		$this.on("mouseout",  imageHoverEnd);
-		$this.on("click",     imageHoverEnd);
-	});
-}
-
 function initKeyboardShortcuts() { //Pashe, heavily influenced by Tux et al, WTFPL
 	if (!getSetting("keyboardShortcutsEnabled")) {return;}
 	
@@ -1146,8 +1032,10 @@ function initpurgeDeadFavorites() { //Pashe, WTFPL
 
 function initDefaultSettings() { //Pashe, WTFPL
 	if (window.localStorage.color_ids === undefined) window.localStorage.color_ids = true;
-	if ((window.localStorage.videohover === undefined) && getSetting('imageHover')) window.localStorage.videohover = true;
+	if (window.localStorage.videohover === undefined) window.localStorage.videohover = true;
 	if (window.localStorage.useInlining === undefined) window.localStorage.useInlining = true;
+	if (window.localStorage.catalogImageHover === undefined) window.localStorage.catalogImageHover = true;
+	if (window.localStorage.imageHover === undefined) window.localStorage.imageHover = true;
 }
 
 function initFavicon() { //Pashe, WTFPL
@@ -1205,7 +1093,6 @@ $(window.document).ready(function() { try {
 	initFilter();
 	initFormattedTime();
 	initMascot();
-	initImageHover();
 	initRevealImageSpoilers();
 	initRISLinks();
 	initParseTimestampImage();
@@ -1219,20 +1106,6 @@ $(window.document).ready(function() { try {
 ////////////////
 //EVENT HANDLER FUNCTIONS
 ////////////////
-function onNewPostImageHover(post) { //Pashe, influenced by tux, et al, WTFPL
-	if (!getSetting("imageHover")) {return;}
-	
-	$(post).find("img.post-image, canvas.post-image").each(function () {
-		var $this = $(this);
-		
-		if (!$this.parent().data("expanded")) {
-			$this.on("mousemove", imageHoverStart);
-			$this.on("mouseout",  imageHoverEnd);
-			$this.on("click",     imageHoverEnd);
-		}
-	});
-}
-
 function onNewPostRISLinks(post) { //Pashe, 7185, WTFPL
 	$("#"+$(post).attr("id")+" img.post-image").each(function() {addRISLinks(this);}); 
 }
@@ -1263,7 +1136,6 @@ function intervalMenu() {
 ////////////////
 if (window.jQuery) {
 	window.$(document).on('new_post', function (e, post) { try {
-		onNewPostImageHover(post);
 		onNewPostRISLinks(post);
 		onNewPostNotifications(post);
 		onNewPostFormattedTime();
