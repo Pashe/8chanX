@@ -5,7 +5,6 @@ This branch may not work on versions of Firefox past 30. If you experience any i
 ***
 
 This userscript adds various features and options like:
- * Image hover
  * Gallery
  * Filters
  * Reverse image search

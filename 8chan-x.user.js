@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Pashe's 8chanX v2
-// @version     2.0.0.1424725210
+// @version     2.0.0.1424725680
 // @description Small userscript to improve 8chan
 // @icon        https://cdn.rawgit.com/Pashe/8chanX/2-0/images/logo.svg
 // @namespace   https://github.com/Pashe/8chanX/tree/2-0
@@ -103,8 +103,6 @@ if (unsafeWindow.Options) {
 }
 settingsMenu.innerHTML = sprintf('<span style="font-size:8pt;">8chanX %s</span>', GM_info.script.version)
 + '<div style="overflow:auto;height:100%;">' //General
-+ '<label><input type="checkbox" name="imageHover">' + 'Image hover' + '</label><label><input type="checkbox" name="imageHoverFollowCursor">' + 'follow cursor' + '</label><br>'
-+ '<label><input type="checkbox" name="catalogImageHover">' + 'Image hover on catalog' + '</label><br>'
 + '<label><input type="checkbox" name="catalogLinks">' + 'Force catalog links' + '</label><br>'
 + '<label><input type="checkbox" name="revealImageSpoilers">' + 'Reveal image spoilers' + '</label><br>'
 + '<label><input type="checkbox" name="hideNoFilePosts">' + 'Hide posts without files' + '</label><br>'
@@ -148,9 +146,6 @@ var defaultSettings = {
 	'precisePages': true,
 	'catalogLinks': true,
 	'revealImageSpoilers': false,
-	'imageHover': true,
-	'imageHoverFollowCursor': true,
-	'catalogImageHover': true,
 	'reverseImageSearch': true,
 	'parseTimestampImage': true,
 	'localTime': true,
@@ -344,97 +339,6 @@ function updateMenuStats() { //Pashe, WTFPL
 		}
 	});
 	
-}
-
-////////////////
-//IMAGE HOVER
-////////////////
-function imageHoverStart(e) { //Pashe, anonish, WTFPL
-	var hoverImage = $("#chx_hoverImage");
-	
-	if (hoverImage.length) {
-		if (getSetting("imageHoverFollowCursor")) {
-			var scrollTop = $(window).scrollTop();
-			var imgY = e.pageY;
-			var imgTop = imgY;
-			var windowWidth = $(window).width();
-			var imgWidth = hoverImage.width() + e.pageX;
-			
-			if (imgY < scrollTop + 15) {
-				imgTop = scrollTop;
-			} else if (imgY > scrollTop + $(window).height() - hoverImage.height() - 15) {
-				imgTop = scrollTop + $(window).height() - hoverImage.height() - 15;
-			}
-			
-			if (imgWidth > windowWidth) {
-				hoverImage.css({
-					'left': (e.pageX + (windowWidth - imgWidth)),
-					'top' : imgTop,
-				});
-			} else {
-				hoverImage.css({
-					'left': e.pageX,
-					'top' : imgTop,
-				});
-			}
-			
-			hoverImage.appendTo($("body"));
-		}
-		
-		return;
-	}
-	
-	var $this = $(this);
-	
-	var fullUrl;
-	if ($this.parent().attr("href").match("src")) {
-		fullUrl = $this.parent().attr("href");
-	} else if (isOnCatalog()) {
-		$this.css("cursor", "progress");
-		fullUrl = $this.attr("src");
-		$.ajax(($this.parent().attr("href").replace(/\.html$/, ".json")), {
-			success: function (result) {
-				$this.css("cursor", "unset");
-				fullUrl = result.posts[0].tim + result.posts[0].ext;
-				if (!isImage(getFileExtension(fullUrl))) {return;}
-				$("#chx_hoverImage").attr("src", sprintf("/%s/src/%s", thisBoard, fullUrl));
-				$("#chx_hoverImage").on("load", function() {$this.css("cursor", "none")});
-			},
-			async: true,
-			cache: true
-		});
-	}
-	
-	if (isVideo(getFileExtension(fullUrl))) {return;}
-	
-	hoverImage = $(sprintf('<img id="chx_hoverImage" src="%s" />', fullUrl));
-	if (getSetting("imageHoverFollowCursor")) {
-		hoverImage.css({
-			"position"      : "absolute",
-			"z-index"       : 101,
-			"pointer-events": "none",
-			"max-width"     : $(window).width(),
-			"max-height"    : $(window).height(),
-			'left'          : e.pageX,
-			'top'           : imgTop,
-		});
-	} else {
-		hoverImage.css({
-			"position"      : "fixed",
-			"top"           : 0,
-			"right"         : 0,
-			"z-index"       : 101,
-			"pointer-events": "none",
-			"max-width"     : "100%",
-			"max-height"    : "100%",
-		});
-	}
-	hoverImage.appendTo($("body"));
-	if (isOnThread()) {$this.css("cursor", "none");}
-}
-
-function imageHoverEnd() { //Pashe, WTFPL
-	$("#chx_hoverImage").remove();
 }
 
 ////////////////
@@ -945,28 +849,6 @@ function initRevealImageSpoilers() { //Tux et al, MIT
 	});
 }
 
-function initImageHover() { //Pashe, influenced by tux, et al, WTFPL
-	if (!getSetting("imageHover") && !getSetting("catalogImageHover")) {return;}
-	
-	var selectors = [];
-	
-	if (getSetting("imageHover")) {selectors.push("img.post-image", "canvas.post-image");}
-	if (getSetting("catalogImageHover") && isOnCatalog()) {
-		selectors.push(".thread-image");
-		$(".theme-catalog div.thread").css("position", "inherit");
-	}
-	
-	$(selectors.join(", ")).each(function () {
-		if ($(this).parent().data("expanded")) {return;}
-		
-		var $this = $(this);
-		
-		$this.on("mousemove", imageHoverStart);
-		$this.on("mouseout",  imageHoverEnd);
-		$this.on("click",     imageHoverEnd);
-	});
-}
-
 function initKeyboardShortcuts() { //Pashe, heavily influenced by Tux et al, WTFPL
 	if (!getSetting("keyboardShortcutsEnabled")) {return;}
 	
@@ -1177,8 +1059,10 @@ function initpurgeDeadFavorites() { //Pashe, WTFPL
 
 function initDefaultSettings() { //Pashe, WTFPL
 	if (unsafeWindow.localStorage.color_ids === undefined) unsafeWindow.localStorage.color_ids = true;
-	if ((unsafeWindow.localStorage.videohover === undefined) && getSetting('imageHover')) unsafeWindow.localStorage.videohover = true;
+	if (unsafeWindow.localStorage.videohover === undefined) unsafeWindow.localStorage.videohover = true;
 	if (unsafeWindow.localStorage.useInlining === undefined) unsafeWindow.localStorage.useInlining = true;
+	if (unsafeWindow.localStorage.catalogImageHover === undefined) unsafeWindow.localStorage.catalogImageHover = true;
+	if (unsafeWindow.localStorage.imageHover === undefined) unsafeWindow.localStorage.imageHover = true;
 }
 
 function initFavicon() { //Pashe, WTFPL
@@ -1271,7 +1155,6 @@ $(unsafeWindow.document).ready(function() { try {
 	initFilter();
 	initFormattedTime();
 	initMascot();
-	initImageHover();
 	initRevealImageSpoilers();
 	initRISLinks();
 	initParseTimestampImage();
@@ -1287,20 +1170,6 @@ $(unsafeWindow.document).ready(function() { try {
 ////////////////
 //EVENT HANDLER FUNCTIONS
 ////////////////
-function onNewPostImageHover(post) { //Pashe, influenced by tux, et al, WTFPL
-	if (!getSetting("imageHover")) {return;}
-	
-	$(post).find("img.post-image, canvas.post-image").each(function () {
-		var $this = $(this);
-		
-		if (!$this.parent().data("expanded")) {
-			$this.on("mousemove", imageHoverStart);
-			$this.on("mouseout",  imageHoverEnd);
-			$this.on("click",     imageHoverEnd);
-		}
-	});
-}
-
 function onNewPostRISLinks(post) { //Pashe, 7185, WTFPL
 	$("#"+$(post).attr("id")+" img.post-image").each(function() {addRISLinks(this);}); 
 }
@@ -1335,7 +1204,6 @@ window.addEventListener('message', function(e) {
 		if (!("8chanXType" in e.data)) return;
 		if (e.data["8chanXType"] !== "newpost") return;
 		post = document.getElementById(e.data.postid);
-		onNewPostImageHover(post);
 		onNewPostRISLinks(post);
 		onNewPostNotifications(post);
 		onNewPostFormattedTime();
