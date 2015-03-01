@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Pashe's 8chanX v2
-// @version     2.0.0.1424941380
+// @version     2.0.0.1425196040
 // @description Small userscript to improve 8chan
 // @icon        https://cdn.rawgit.com/Pashe/8chanX/2-0/images/logo.svg
 // @namespace   https://github.com/Pashe/8chanX/tree/2-0
@@ -528,7 +528,7 @@ function openGallery() { //Pashe, WTFPL
 		var fileExtension = getFileExtension(image.full);
 		
 		var thumbHolder = $('<div class="chx_galleryThumbHolder"></div>');
-		var thumbLink = $(sprintf('<a class="chx_galleryThumbLink" href="%s"></a>', image.full));
+		var thumbLink = $(sprintf('<a class="chx_galleryThumbLink" href="%s" data-extension="%s"></a>', image.full, fileExtension));
 		var thumbImage = $(sprintf('<img class="chx_galleryThumbImage" src="%s" />', image.thumbnail));
 		var metadataSpan = $(sprintf('<span class="chx_galleryThumbMetadata">%s</span>', fileExtension));
 		
@@ -549,6 +549,10 @@ function openGallery() { //Pashe, WTFPL
 			"color":      "#fff"
 		});
 		
+		metadataSpan.css({
+			"cursor": "pointer",
+		});
+		
 		if (fileExtensionStyles.hasOwnProperty(fileExtension)) {
 			metadataSpan.css(fileExtensionStyles[fileExtension]).css({"padding": "0pt 5pt 2pt 5pt", "border-radius": "2pt", "font-weight": "bolder"});
 		}
@@ -557,6 +561,19 @@ function openGallery() { //Pashe, WTFPL
 		thumbLink.appendTo(thumbHolder);
 		metadataSpan.appendTo(thumbHolder);
 		thumbHolder.appendTo(galleryHolder);
+		
+		metadataSpan.click(fileExtension, function(e) {
+			$(sprintf('.chx_galleryThumbLink[data-extension=%s]', e.data)).each(function(i) {
+				$this = $(this);
+				if ($this.attr("data-hidden") === "false" || $this.attr("data-hidden") === undefined) {
+					if (i === 0) {$this.hide();} else {$this.parent().hide();}
+					$this.attr("data-hidden", "true");
+				} else {
+					if (i === 0) {$this.show();} else {$this.parent().show();}
+					$this.attr("data-hidden", "false");
+				}
+			});
+		});
 		
 		thumbLink.click(i, function(e) {
 			e.preventDefault();
