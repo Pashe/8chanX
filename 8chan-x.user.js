@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Pashe's 8chanX v2 [pure]
-// @version     2.0.0.1425196080
+// @version     2.0.0.1431302940
 // @description Small userscript to improve 8chan
 // @icon        https://cdn.rawgit.com/Pashe/8chanX/2-0_pure/images/logo.svg
 // @namespace   https://github.com/Pashe/8chanX/tree/2-0
@@ -871,12 +871,16 @@ function initCatalog() { //Pashe, WTFPL
 	if (!isOnCatalog()) {return;}
 	
 	//addCatalogPages
-	$(".thread").each(function (e, ele) {
-		var threadId = $(ele).html().match(/<a href="[^0-9]*([0-9]+).html?">/)[1];
-		var threadPage = getThreadPage(threadId, thisBoard, true);
-		
-		$(ele).find("strong").first().append(" / P: " + (threadPage<1?"<span style='opacity:0.5'>???</span>":threadPage));
-	});
+	if (getSetting("precisePages")) { 
+		$(".thread").each(function (e, ele) {
+			var threadId = $(ele).html().match(/<a href="[^0-9]*([0-9]+).html?">/)[1];
+			var threadPage = getThreadPage(threadId, thisBoard, true);
+			
+			$(ele).find("strong").first().html(function(e, html) {
+				return html.replace(/P: [0-9]+/, ("P: " + (threadPage<1?"<span style='opacity:0.5'>???</span>":threadPage)));
+			});
+		});
+	};
 	
 	//highlightCatalogAutosage
 	$(".replies").each(function (e, ele) {
