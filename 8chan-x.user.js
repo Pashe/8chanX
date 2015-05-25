@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Pashe's 8chanX v2
-// @version     2.0.0.1431302870
+// @version     2.0.0.1432518870
 // @description Small userscript to improve 8chan
 // @icon        https://cdn.rawgit.com/Pashe/8chanX/2-0/images/logo.svg
 // @namespace   https://github.com/Pashe/8chanX/tree/2-0
@@ -868,6 +868,13 @@ function initRevealImageSpoilers() { //Tux et al, MIT
 		if (picUrl.indexOf('spoiler.png') >= 0) {
 			pic.attr("src", $(this).parent().attr("href"));
 			pic.addClass("chx_unspoileredImage");
+			
+			pic.css({
+				"width":      "auto",
+				"height":     "auto",
+				"max-width":  "255px",
+				"max-height": "255px",
+			});
 		}
 	});
 }
