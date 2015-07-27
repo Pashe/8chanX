@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Pashe's 8chanX v2 [pure]
-// @version     2.0.0.1432518960
+// @version     2.0.0.1437985560
 // @description Small userscript to improve 8chan
 // @icon        https://cdn.rawgit.com/Pashe/8chanX/2-0_pure/images/logo.svg
 // @namespace   https://github.com/Pashe/8chanX/tree/2-0
@@ -86,6 +86,7 @@ var isMod = (window.location.pathname.split("/")[1]=="mod.php");
 var thisBoard = isMod?window.location.href.split("/")[4]:window.location.pathname.split("/")[1];
 try {thisThread = parseInt(window.location.href.match(/([0-9]+)\.html/)[1]);} catch (e) {thisThread = -1;}
 var thisBoardAnonName;
+var thisBoardSettings;
 
 ////////////////
 //SETTINGS
@@ -289,11 +290,29 @@ function isVideo(fileExtension) { //Pashe, WTFPL
 	return ($.inArray(fileExtension, ["webm", "mp4"]) !== -1);
 }
 
+function updateBoardSettings(response) { //Pashe, WTFPL
+	thisBoardSettings = response;
+	
+	thisBoardAnonName = thisBoardSettings.anonymous;
+	bumpLimit = thisBoardSettings.reply_limit;
+}
+
 ////////////////
 //MENU BAR
 ////////////////
 function updateMenuStats() { //Pashe, WTFPL
 	var nPosts = getThreadPosts(thisThread, thisBoard, false);
+	
+	$.ajax({
+		url: "/settings.php?board="+thisBoard,
+		async: true,
+		cache: true,
+		dataType: "json",
+		success: function (response) {
+			updateBoardSettings(response);
+		}
+	});
+	
 	if (nPosts >= bumpLimit) {nPosts = sprintf('<span style="color:#f00;font-weight:bold;">%d</span>', nPosts);}
 	
 	$("#chx_menuPosts").html(nPosts);
@@ -890,11 +909,21 @@ function initCatalog() { //Pashe, WTFPL
 	};
 	
 	//highlightCatalogAutosage
-	$(".replies").each(function (e, ele) {
-		var eReplies = $(ele).html().match(/R: ([0-9]+)/)[1];
-		if (eReplies>bumpLimit) {
-			$(ele).html(function(e, html) {
-				return html.replace(/R: ([0-9]+)/, "<span style='color:#f00;'>R: $1</span>");
+	$.ajax({
+		url: "/settings.php?board="+thisBoard,
+		async: true,
+		cache: true,
+		dataType: "json",
+		success: function (response) {
+			updateBoardSettings(response);
+			
+			$(".replies").each(function (e, ele) {
+				var eReplies = $(ele).html().match(/R: ([0-9]+)/)[1];
+				if (eReplies>bumpLimit) {
+					$(ele).html(function(e, html) {
+						return html.replace(/R: ([0-9]+)/, "<span style='color:#f00;'>R: $1</span>");
+					});
+				}
 			});
 		}
 	});
@@ -1099,15 +1128,16 @@ function initFilter() { //Pashe, WTFPL
 	$(".reply").each(runFilter);
 	
 	$.ajax({
-	url: "/settings.php?board="+thisBoard,
-	async: true,
-	cache: true,
-	dataType: "json",
-	success: function (response) {
-		thisBoardAnonName = response.anonymous;
-		$(".reply").each(runFilter);
-	}
-});
+		url: "/settings.php?board="+thisBoard,
+		async: true,
+		cache: true,
+		dataType: "json",
+		success: function (response) {
+			updateBoardSettings(response);
+			
+			$(".reply").each(runFilter);
+		}
+	});
 }
 
 ////////////////
