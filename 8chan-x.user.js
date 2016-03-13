@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Pashe's 8chanX v2
-// @version     2.0.0.1457849240
+// @version     2.0.0.1457850800
 // @description Small userscript to improve 8chan
 // @icon        https://cdn.rawgit.com/Pashe/8chanX/2-0/images/logo.svg
 // @namespace   https://github.com/Pashe/8chanX/tree/2-0
@@ -113,6 +113,7 @@ settingsMenu.innerHTML = sprintf('<span style="font-size:8pt;">8chanX %s</span>'
 + '<label><input type="checkbox" name="reverseImageSearch">' + 'Add reverse image search links' + '</label><br>'
 + '<label><input type="checkbox" name="parseTimestampImage">' + 'Guess original download date of imageboard-style filenames' + '</label><br>'
 + '<label><input type="checkbox" name="precisePages">' + 'Increase page indicator precision' + '</label><br>'
++ '<label><input type="checkbox" name="failToCatalogPages">' + 'Get thread page from catalog.html if thread is not in threads.json' + '</label><br>'
 + '<label>' + 'Mascot URL(s) (pipe separated):<br />' + '<input type="text" name="mascotUrl" style="width: 30em"></label><br>'
 + '<label>' + '<a href="http://strftime.net/">Date format</a>:<br />' + '<input type="text" name="dateFormat" style="width:30em"></label><br>'
 + '<label><input type="checkbox" name="localTime">' + 'Use local time' + '</label><br>'
@@ -146,6 +147,7 @@ $(settingsMenu).find('input').css("max-width", "100%");
 
 var defaultSettings = {
 	'precisePages': true,
+	'failToCatalogPages': false,
 	'catalogLinks': true,
 	'revealImageSpoilers': false,
 	'reverseImageSearch': true,
@@ -390,25 +392,27 @@ function updateMenuStats() { //Pashe, WTFPL
 			if (nPage < 1) {
 				nPage = "<span style='opacity:0.5'>3+</span>";
 				
-				$.ajax({
-					url: "/" + thisBoard + "/catalog.html",
-					async: false,
-					dataType: "html",
-					success: function (response) {
-						var pageArray = [];
-						
-						$(response).find("div.thread").each(function() {
-							$this = $(this);
+				if (getSetting("failToCatalogPages")) {
+					$.ajax({
+						url: "/" + thisBoard + "/catalog.html",
+						async: false,
+						dataType: "html",
+						success: function (response) {
+							var pageArray = [];
 							
-							var threadId = parseInt($this.children("a").attr("href").match(/([0-9]+).html$/)[1]);
-							var page = parseInt($this.find("strong").text().match(/P: ([0-9]+)/)[1]);
+							$(response).find("div.thread").each(function() {
+								$this = $(this);
+								
+								var threadId = parseInt($this.children("a").attr("href").match(/([0-9]+).html$/)[1]);
+								var page = parseInt($this.find("strong").text().match(/P: ([0-9]+)/)[1]);
+								
+								pageArray[threadId] = page;
+							});
 							
-							pageArray[threadId] = page;
-						});
-						
-						if (pageArray.hasOwnProperty(thisThread)) {nPage = pageArray[thisThread];}
-					}
-				});
+							if (pageArray.hasOwnProperty(thisThread)) {nPage = pageArray[thisThread];}
+						}
+					});
+				}
 			}
 			
 			$("#chx_menuPage").html(nPage);
