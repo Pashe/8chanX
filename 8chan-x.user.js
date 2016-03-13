@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Pashe's 8chanX v2 [pure]
-// @version     2.0.0.1437985560
+// @version     2.0.0.1457850720
 // @description Small userscript to improve 8chan
 // @icon        https://cdn.rawgit.com/Pashe/8chanX/2-0_pure/images/logo.svg
 // @namespace   https://github.com/Pashe/8chanX/tree/2-0
@@ -108,6 +108,7 @@ settingsMenu.innerHTML = sprintf('<span style="font-size:8pt;">8chanX %s pure</s
 + '<label><input type="checkbox" name="reverseImageSearch">' + 'Add reverse image search links' + '</label><br>'
 + '<label><input type="checkbox" name="parseTimestampImage">' + 'Guess original download date of imageboard-style filenames' + '</label><br>'
 + '<label><input type="checkbox" name="precisePages">' + 'Increase page indicator precision' + '</label><br>'
++ '<label><input type="checkbox" name="failToCatalogPages">' + 'Get thread page from catalog.html if thread is not in threads.json' + '</label><br>'
 + '<label>' + 'Mascot URL(s) (pipe separated):<br />' + '<input type="text" name="mascotUrl" style="width: 30em"></label><br>'
 + '<label>' + '<a href="http://strftime.net/">Date format</a>:<br />' + '<input type="text" name="dateFormat" style="width:30em"></label><br>'
 + '<label><input type="checkbox" name="localTime">' + 'Use local time' + '</label><br>'
@@ -139,6 +140,7 @@ $(settingsMenu).find('input').css("max-width", "100%");
 
 var defaultSettings = {
 	'precisePages': true,
+	'failToCatalogPages': false,
 	'catalogLinks': true,
 	'revealImageSpoilers': false,
 	'reverseImageSearch': true,
@@ -264,6 +266,40 @@ function calcThreadPage(pages, threadId) { //Pashe, WTFPL
 	return threadPage;
 }
 
+function getThreadLastModified(threadId, boardId, cached) { //Pashe, WTFPL
+	if ((!cached) || (cachedPages === null)) {
+		$.ajax({
+			url: "/" + boardId + "/threads.json",
+			async: false,
+			dataType: "json",
+			success: function (response) {cachedPages = response;}
+		});
+	}
+	
+	return calcThreadLastModified(cachedPages, threadId);
+}
+
+function calcThreadLastModified(pages, threadId) { //Pashe, WTFPL
+	var threadLastModified = -1;
+	
+	for (var pageIdx in pages) {
+		if (!pages.hasOwnProperty(pageIdx)) {continue;}
+		if (threadLastModified != -1) {break;}
+		var threads = pages[pageIdx].threads;
+		
+		for (var threadIdx in threads) {
+			if (!threads.hasOwnProperty(threadIdx)) {continue;}
+			if (threadLastModified != -1) {break;}
+			
+			if (threads[threadIdx].no == threadId) {
+				threadLastModified = pages[pageIdx]["threads"][threadIdx]["last_modified"];
+				break;
+			}
+		}
+	}
+	return threadLastModified;
+}
+
 function getThreadPosts() { //Pashe, WTFPL
 	return $(".post").length;
 }
@@ -326,7 +362,31 @@ function updateMenuStats() { //Pashe, WTFPL
 			cachedPages = response;
 			
 			var nPage = calcThreadPage(response, thisThread);
-			if (nPage < 1 ) {nPage = "<span style='opacity:0.5'>???</span>";}
+			if (nPage < 1) {
+				nPage = "<span style='opacity:0.5'>3+</span>";
+				
+				if (getSetting("failToCatalogPages")) {
+					$.ajax({
+						url: "/" + thisBoard + "/catalog.html",
+						async: false,
+						dataType: "html",
+						success: function (response) {
+							var pageArray = [];
+							
+							$(response).find("div.thread").each(function() {
+								$this = $(this);
+								
+								var threadId = parseInt($this.children("a").attr("href").match(/([0-9]+).html$/)[1]);
+								var page = parseInt($this.find("strong").text().match(/P: ([0-9]+)/)[1]);
+								
+								pageArray[threadId] = page;
+							});
+							
+							if (pageArray.hasOwnProperty(thisThread)) {nPage = pageArray[thisThread];}
+						}
+					});
+				}
+			}
 			
 			$("#chx_menuPage").html(nPage);
 		}
@@ -902,11 +962,31 @@ function initCatalog() { //Pashe, WTFPL
 			var threadId = $(ele).html().match(/<a href="[^0-9]*([0-9]+).html?">/)[1];
 			var threadPage = getThreadPage(threadId, thisBoard, true);
 			
+			if (threadPage < 1) {return;}
+			
 			$(ele).find("strong").first().html(function(e, html) {
-				return html.replace(/P: [0-9]+/, ("P: " + (threadPage<1?"<span style='opacity:0.5'>???</span>":threadPage)));
+				return html.replace(/P: [0-9]+/, ("P: " + threadPage));
 			});
 		});
 	};
+	
+	//Last Modified
+	$(".thread").each(function (e, ele) {
+			var $this = $(this);
+			var threadId = $this.html().match(/<a href="[^0-9]*([0-9]+).html?">/)[1];
+			var threadPage = getThreadPage(threadId, thisBoard, true);
+			
+			var timestamp = getThreadLastModified(threadId, thisBoard, true);
+			if (timestamp == -1) {return;}
+			var lmDate  = new Date(timestamp * 1000);
+			
+			var lmTimeElement = $('<span class="chx_catalogLMTStamp"></span>');
+			lmTimeElement.attr("title", lmDate.toGMTString());
+			lmTimeElement.attr("data-timestamp", timestamp);
+			lmTimeElement.attr("data-isotime", lmDate.toISOString());
+			lmTimeElement.html("<br>" + $.timeago(timestamp * 1000));
+			lmTimeElement.appendTo($this.find("strong").first());
+		});
 	
 	//highlightCatalogAutosage
 	$.ajax({
