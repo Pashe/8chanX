@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Pashe's 8chanX v2
-// @version     2.0.0.1437985460
+// @version     2.0.0.1457847580
 // @description Small userscript to improve 8chan
 // @icon        https://cdn.rawgit.com/Pashe/8chanX/2-0/images/logo.svg
 // @namespace   https://github.com/Pashe/8chanX/tree/2-0
@@ -289,6 +289,40 @@ function calcThreadPage(pages, threadId) { //Pashe, WTFPL
 		}
 	}
 	return threadPage;
+}
+
+function getThreadLastModified(threadId, boardId, cached) { //Pashe, WTFPL
+	if ((!cached) || (cachedPages === null)) {
+		$.ajax({
+			url: "/" + boardId + "/threads.json",
+			async: false,
+			dataType: "json",
+			success: function (response) {cachedPages = response;}
+		});
+	}
+	
+	return calcThreadLastModified(cachedPages, threadId);
+}
+
+function calcThreadLastModified(pages, threadId) { //Pashe, WTFPL
+	var threadLastModified = -1;
+	
+	for (var pageIdx in pages) {
+		if (!pages.hasOwnProperty(pageIdx)) {continue;}
+		if (threadLastModified != -1) {break;}
+		var threads = pages[pageIdx].threads;
+		
+		for (var threadIdx in threads) {
+			if (!threads.hasOwnProperty(threadIdx)) {continue;}
+			if (threadLastModified != -1) {break;}
+			
+			if (threads[threadIdx].no == threadId) {
+				threadLastModified = pages[pageIdx]["threads"][threadIdx]["last_modified"];
+				break;
+			}
+		}
+	}
+	return threadLastModified;
 }
 
 function getThreadPosts() { //Pashe, WTFPL
@@ -951,6 +985,24 @@ function initCatalog() { //Pashe, WTFPL
 			});
 		});
 	};
+	
+	//Last Modified
+	$(".thread").each(function (e, ele) {
+			var $this = $(this);
+			var threadId = $this.html().match(/<a href="[^0-9]*([0-9]+).html?">/)[1];
+			var threadPage = getThreadPage(threadId, thisBoard, true);
+			
+			var timestamp = getThreadLastModified(threadId, thisBoard, true);
+			if (timestamp == -1) {return;}
+			var lmDate  = new Date(timestamp * 1000);
+			
+			var lmTimeElement = $('<span class="chx_catalogLMTStamp"></span>');
+			lmTimeElement.attr("title", lmDate.toGMTString());
+			lmTimeElement.attr("data-timestamp", timestamp);
+			lmTimeElement.attr("data-isotime", lmDate.toISOString());
+			lmTimeElement.html("<br>" + $.timeago(timestamp * 1000));
+			lmTimeElement.appendTo($this.find("strong").first());
+		});
 	
 	//highlightCatalogAutosage
 	$.ajax({
