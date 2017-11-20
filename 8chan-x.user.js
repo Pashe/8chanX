@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Pashe's 8chanX v2 [pure]
-// @version     2.0.0.1457850720
+// @version     2.0.0.1511219830
 // @description Small userscript to improve 8chan
 // @icon        https://cdn.rawgit.com/Pashe/8chanX/2-0_pure/images/logo.svg
 // @namespace   https://github.com/Pashe/8chanX/tree/2-0
@@ -19,7 +19,10 @@
 // @match       *://h.8ch.net/*
 // @match       *://jp.8chan.co/*
 // @match       *://jp.8ch.net/*
+// @match       *://sys.8ch.net/*
 // @match       *://8ch.net/*
+// @exclude     *.json
+// @exclude     *.txt
 // ==/UserScript==
 
 /*Contributors
@@ -649,8 +652,8 @@ function expandGalleryImage(index) { //Pashe, WTFPL
 			"display":    "block"
 		});
 	} else if (isVideo(fileExtension)) {
-		image = image.match(/player\.php\?v=([^&]*[0-9]+\.[a-z0-9]+).*/i)[1];
-		expandedImage = $(sprintf('<video class="chx_galleryExpandedImage" src="%s" autoplay controls>Your browser is shit</video>', image));
+		image = image.match(/player\.php\?v=([^&]*[a-f0-9]+\.[a-z0-9]+).*/i)[1];
+		expandedImage = $(sprintf('<video class="chx_galleryExpandedImage" src="%s" autoplay controls></video>', image));
 		expandedImage.css({
 			"max-height": "98%",
 			"max-width":  "100%",
@@ -959,7 +962,7 @@ function initCatalog() { //Pashe, WTFPL
 	//addCatalogPages
 	if (getSetting("precisePages")) { 
 		$(".thread").each(function (e, ele) {
-			var threadId = $(ele).html().match(/<a href="[^0-9]*([0-9]+).html?">/)[1];
+			var threadId = $(ele).html().match(/<a href=".*\/([0-9]+).html?">/)[1];
 			var threadPage = getThreadPage(threadId, thisBoard, true);
 			
 			if (threadPage < 1) {return;}
@@ -973,7 +976,7 @@ function initCatalog() { //Pashe, WTFPL
 	//Last Modified
 	$(".thread").each(function (e, ele) {
 			var $this = $(this);
-			var threadId = $this.html().match(/<a href="[^0-9]*([0-9]+).html?">/)[1];
+			var threadId = $this.html().match(/\/res\/([0-9]+).html?">/)[1];
 			var threadPage = getThreadPage(threadId, thisBoard, true);
 			
 			var timestamp = getThreadLastModified(threadId, thisBoard, true);
